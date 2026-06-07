@@ -16,7 +16,7 @@ async function handleSelectMenu(interaction, client) {
 
         const reasonInput = new TextInputBuilder()
             .setCustomId('ticket_reason')
-            .setLabel("Description - Must be between 30 and 4,000 in length.")
+            .setLabel("Description")
             .setStyle(TextInputStyle.Paragraph)
             .setMinLength(30)
             .setMaxLength(4000)
