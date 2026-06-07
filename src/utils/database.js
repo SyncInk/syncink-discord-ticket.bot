@@ -74,8 +74,6 @@ function getGuildSettingsModel() {
             guildId: { type: String, required: true, unique: true },
             ticketCategoryId: { type: String, default: null },
             logChannelId: { type: String, default: null },
-            messageLogChannelId: { type: String, default: null },
-            voiceLogChannelId: { type: String, default: null },
             staffRoleIds: { type: [String], default: [] },
             adminRoleIds: { type: [String], default: [] },
             ownerRoleIds: { type: [String], default: [] },
