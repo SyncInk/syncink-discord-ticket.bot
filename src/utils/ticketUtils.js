@@ -73,9 +73,16 @@ async function handleModalSubmit(interaction, client) {
             });
 
             // Formatting exactly like screenshots
-            const staffPing = guildConfig.developerRoleIds && guildConfig.developerRoleIds.length > 0 
-                ? `<@&${guildConfig.developerRoleIds[0]}>` 
-                : (guildConfig.staffRoleIds && guildConfig.staffRoleIds.length > 0 ? `<@&${guildConfig.staffRoleIds[0]}>` : '@Staff');
+            let staffPing = '@Staff';
+            if (typeValue === 'general_request' || typeValue === 'other_request') {
+                staffPing = guildConfig.staffRoleIds && guildConfig.staffRoleIds.length > 0 ? `<@&${guildConfig.staffRoleIds[0]}>` : '@Staff';
+            } else if (typeValue === 'user_report' || typeValue === 'staff_abuse') {
+                staffPing = guildConfig.adminRoleIds && guildConfig.adminRoleIds.length > 0 ? `<@&${guildConfig.adminRoleIds[0]}>` : '@Admins';
+            } else if (typeValue === 'bug_report') {
+                staffPing = guildConfig.developerRoleIds && guildConfig.developerRoleIds.length > 0 ? `<@&${guildConfig.developerRoleIds[0]}>` : '@Developers';
+            } else if (typeValue === 'owner_contact') {
+                staffPing = guildConfig.ownerRoleIds && guildConfig.ownerRoleIds.length > 0 ? `<@&${guildConfig.ownerRoleIds[0]}>` : '@Owner';
+            }
 
             const contentText = `Thank you for your patience <@${interaction.user.id}>\n${staffPing} will be with you shortly.`;
 
