@@ -12,12 +12,14 @@ async function handleSelectMenu(interaction, client) {
 
         const modal = new ModalBuilder()
             .setCustomId(`ticket_modal_${selectedValue}`)
-            .setTitle(optionData.label.substring(0, 45));
+            .setTitle('What is your issue?');
 
         const reasonInput = new TextInputBuilder()
             .setCustomId('ticket_reason')
-            .setLabel("Reason for opening ticket")
+            .setLabel("Description - Must be between 30 and 4,000 in length.")
             .setStyle(TextInputStyle.Paragraph)
+            .setMinLength(30)
+            .setMaxLength(4000)
             .setRequired(true);
 
         modal.addComponents(
@@ -25,6 +27,21 @@ async function handleSelectMenu(interaction, client) {
         );
 
         await interaction.showModal(modal);
+    } else if (interaction.customId === 'ticket_transfer_select') {
+        const role = interaction.values[0];
+        const ticket = await db.getTicket(interaction.channel.id);
+        if (!ticket) return interaction.reply({ content: 'Ticket not found.', ephemeral: true });
+        
+        const guildConfig = await db.getGuildConfig(interaction.guild.id);
+        let ping = '@here';
+        if (role === 'staff') ping = guildConfig.staffRoleIds && guildConfig.staffRoleIds[0] ? `<@&${guildConfig.staffRoleIds[0]}>` : '@Staff';
+        if (role === 'admin') ping = guildConfig.adminRoleIds && guildConfig.adminRoleIds[0] ? `<@&${guildConfig.adminRoleIds[0]}>` : '@Admins';
+        if (role === 'dev') ping = guildConfig.developerRoleIds && guildConfig.developerRoleIds[0] ? `<@&${guildConfig.developerRoleIds[0]}>` : '@Developers';
+        if (role === 'owner') ping = guildConfig.ownerRoleIds && guildConfig.ownerRoleIds[0] ? `<@&${guildConfig.ownerRoleIds[0]}>` : '@Owner';
+        
+        await interaction.channel.send(`🔁 This ticket has been transferred to ${ping} by <@${interaction.user.id}>.`);
+        await interaction.update({ content: 'Ticket transferred successfully!', components: [] });
+        await logTicketAction(client, interaction.guild, 'Ticket Transferred', `Thread: <#${interaction.channel.id}>\nTransferred To: ${ping}\nBy: <@${interaction.user.id}>`, config.colors.primary);
     }
 }
 
@@ -35,6 +52,11 @@ async function handleModalSubmit(interaction, client) {
         const typeValue = interaction.customId.replace('ticket_modal_', '');
         const optionData = config.ticketOptions.find(o => o.value === typeValue);
         const reason = interaction.fields.getTextInputValue('ticket_reason');
+        
+        // Reset the select menu on the panel message so it doesn't get "stuck"
+        if (interaction.message && interaction.message.components) {
+            await interaction.message.edit({ components: interaction.message.components }).catch(() => {});
+        }
         
         const guild = interaction.guild;
         const guildConfig = await db.getGuildConfig(guild.id);
@@ -165,7 +187,20 @@ async function handleButton(interaction, client) {
 
     } else if (customId === 'ticket_btn_transfer') {
         if (!isStaff) return interaction.reply({ content: 'Only staff can transfer tickets.', ephemeral: true });
-        await interaction.reply({ content: 'Transfer feature is currently limited. Mention another staff member in the thread to assist.', ephemeral: true });
+        
+        const { StringSelectMenuBuilder } = require('discord.js');
+        const selectMenu = new StringSelectMenuBuilder()
+            .setCustomId('ticket_transfer_select')
+            .setPlaceholder('Select a role to transfer to')
+            .addOptions([
+                { label: 'Staff', value: 'staff', emoji: '🛡️' },
+                { label: 'Admins', value: 'admin', emoji: '🔨' },
+                { label: 'Developers', value: 'dev', emoji: '💻' },
+                { label: 'Owner', value: 'owner', emoji: '👑' }
+            ]);
+            
+        const row = new ActionRowBuilder().addComponents(selectMenu);
+        await interaction.reply({ content: 'Who would you like to transfer this ticket to?', components: [row], ephemeral: true });
     }
 }
 
