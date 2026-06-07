@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const config = require('../../config');
 require('dotenv').config();
 
+async function initDatabase() {
     if (!process.env.MONGO_URI) {
         console.error('[DB] MONGO_URI is missing in .env file!');
         process.exit(1);
@@ -11,7 +12,6 @@ require('dotenv').config();
         useUnifiedTopology: true
     });
     console.log('[DB] Connected to MongoDB');
-
 }
 
 // ========================
