@@ -36,7 +36,7 @@ module.exports = {
             label: 'Bug Report',
             description: 'report a bug to the developers',
             value: 'bug_report',
-            emoji: '846569357353680896'
+            emoji: '1513328514529624185'
         },
         {
             label: 'Staff Abuse',
@@ -48,7 +48,7 @@ module.exports = {
             label: 'Other',
             description: 'something else that is not listed above',
             value: 'other_request',
-            emoji: '846569357353680896'
+            emoji: '1513328514529624185'
         },
         {
             label: 'Owner Contact',

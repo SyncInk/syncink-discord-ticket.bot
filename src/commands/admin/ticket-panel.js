@@ -9,7 +9,7 @@ module.exports = {
     
     async execute(interaction) {
         const embed = new EmbedBuilder()
-            .setDescription('<:DiscordStaff:846569357353680896> **__Support Requests__**\n\n• <:looking:1513319472172367992> Choose the appropriate `Option` from the select `Menu` below\n\n• <:rules:1513319398688034997> Any form of `Trolling/Spam` to abuse the system will result in a severe punishment')
+            .setDescription('# <:staff:1513328514529624185> __Support Requests__\n\n• <:looking:1513319472172367992> Choose the appropriate `Option` from the select `Menu` below\n\n• <:rules:1513319398688034997> Any form of `Trolling/Spam` to abuse the system will result in a severe punishment')
             .setColor('#2b2d31') // Invisible Discord color to match Worldwide
             .setThumbnail('https://cdn.discordapp.com/emojis/1513315354439581746.webp?size=1024');
 
