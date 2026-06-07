@@ -24,31 +24,31 @@ module.exports = {
             label: 'General Request',
             description: 'request help with something in general',
             value: 'general_request',
-            emoji: '<:looking:1513319472172367992>'
+            emoji: '1513319472172367992'
         },
         {
             label: 'User Report',
             description: 'report a misbehaving user to the moderators',
             value: 'user_report',
-            emoji: '<:looking:1513319472172367992>'
+            emoji: '1513319472172367992'
         },
         {
             label: 'Bug Report',
             description: 'report a bug to the developers',
             value: 'bug_report',
-            emoji: '<:DiscordStaff:846569357353680896>'
+            emoji: '846569357353680896'
         },
         {
             label: 'Staff Abuse',
             description: 'report a misbehaving staff member to the admins',
             value: 'staff_abuse',
-            emoji: '<:rules:1513319398688034997>'
+            emoji: '1513319398688034997'
         },
         {
             label: 'Other',
             description: 'something else that is not listed above',
             value: 'other_request',
-            emoji: '<:DiscordStaff:846569357353680896>'
+            emoji: '846569357353680896'
         },
         {
             label: 'Owner Contact',
