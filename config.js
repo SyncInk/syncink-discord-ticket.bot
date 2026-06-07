@@ -24,31 +24,31 @@ module.exports = {
             label: 'General Request',
             description: 'request help with something in general',
             value: 'general_request',
-            emoji: '🔮' // Replace with your custom emoji ID if desired, e.g. '<:shield_fire:123456789>'
+            emoji: '<:looking:1513319472172367992>'
         },
         {
             label: 'User Report',
             description: 'report a misbehaving user to the moderators',
             value: 'user_report',
-            emoji: '👤'
+            emoji: '<:looking:1513319472172367992>'
         },
         {
             label: 'Bug Report',
             description: 'report a bug to the developers',
             value: 'bug_report',
-            emoji: '🐛'
+            emoji: '<:DiscordStaff:846569357353680896>'
         },
         {
             label: 'Staff Abuse',
             description: 'report a misbehaving staff member to the admins',
             value: 'staff_abuse',
-            emoji: '🛡️'
+            emoji: '<:rules:1513319398688034997>'
         },
         {
             label: 'Other',
             description: 'something else that is not listed above',
             value: 'other_request',
-            emoji: '🔧'
+            emoji: '<:DiscordStaff:846569357353680896>'
         },
         {
             label: 'Owner Contact',
