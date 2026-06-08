@@ -110,9 +110,9 @@ async function handleModalSubmit(interaction, client) {
 
             const claimersEmbed = new EmbedBuilder()
                 .setTitle('Claimers')
-                .setDescription('• 🦅 No one has claimed this ticket yet.')
+                .setDescription('• <:claimers:1513345698689581087> No one has claimed this ticket yet.')
                 .setColor('#9b59b6') // Purple
-                .setThumbnail('https://i.imgur.com/vH1l5s4.png'); // Placeholder purple shield
+                .setThumbnail('https://cdn.discordapp.com/emojis/1513348396851794080.webp?size=1024'); // User provided placeholder
 
             const reasonEmbed = new EmbedBuilder()
                 .setTitle('Reason')
@@ -160,11 +160,11 @@ async function handleButton(interaction, client) {
         await db.updateTicket(thread.id, { claimerId: user.id });
 
         const claimersEmbed = EmbedBuilder.from(interaction.message.embeds[0]);
-        claimersEmbed.setDescription(`• 🦅 <@${user.id}>`);
+        claimersEmbed.setDescription(`• <:claimers:1513345698689581087> <@${user.id}>`);
 
         await interaction.update({ embeds: [claimersEmbed, interaction.message.embeds[1]] });
 
-        await thread.send({ content: `🦅 <@${user.id}> is a claimer now!` });
+        await thread.send({ content: `<:claimers:1513345698689581087> <@${user.id}> is a claimer now!` });
         await logTicketAction(client, guild, 'Ticket Claimed', `Thread: <#${thread.id}>\nClaimed By: <@${user.id}>`, config.colors.primary);
 
     } else if (customId === 'ticket_btn_close') {

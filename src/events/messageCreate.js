@@ -26,16 +26,16 @@ module.exports = {
                     let desc = claimersEmbed.data.description || '';
                     
                     if (desc.includes('No one has claimed')) {
-                        desc = `• 🦅 <@${message.author.id}>`;
+                        desc = `• <:claimers:1513345698689581087> <@${message.author.id}>`;
                         claimersEmbed.setDescription(desc);
                         await welcomeMsg.edit({ embeds: [claimersEmbed, welcomeMsg.embeds[1]] });
-                        await message.channel.send(`🦅 <@${message.author.id}> is a claimer now!`);
+                        await message.channel.send(`<:claimers:1513345698689581087> <@${message.author.id}> is a claimer now!`);
                         await db.updateTicket(message.channel.id, { claimerId: message.author.id });
                     } else if (!desc.includes(message.author.id)) {
-                        desc += `\n• 🦅 <@${message.author.id}>`;
+                        desc += `\n• <:claimers:1513345698689581087> <@${message.author.id}>`;
                         claimersEmbed.setDescription(desc);
                         await welcomeMsg.edit({ embeds: [claimersEmbed, welcomeMsg.embeds[1]] });
-                        await message.channel.send(`🦅 <@${message.author.id}> is also a claimer now!`);
+                        await message.channel.send(`<:claimers:1513345698689581087> <@${message.author.id}> is also a claimer now!`);
                     }
                 }
             } catch (err) {
