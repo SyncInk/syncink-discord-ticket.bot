@@ -24,37 +24,37 @@ module.exports = {
             label: 'General Request',
             description: 'request help with something in general',
             value: 'general_request',
-            emoji: '1513319472172367992'
+            emoji: '1513336781263732836'
         },
         {
             label: 'User Report',
             description: 'report a misbehaving user to the moderators',
             value: 'user_report',
-            emoji: '1513319472172367992'
+            emoji: '1513336966681460856'
         },
         {
             label: 'Bug Report',
             description: 'report a bug to the developers',
             value: 'bug_report',
-            emoji: '1513328514529624185'
+            emoji: '1513337174148513892'
         },
         {
             label: 'Staff Abuse',
             description: 'report a misbehaving staff member to the admins',
             value: 'staff_abuse',
-            emoji: '1513319398688034997'
+            emoji: '1513337285024677899'
         },
         {
             label: 'Other',
             description: 'something else that is not listed above',
             value: 'other_request',
-            emoji: '1513328514529624185'
+            emoji: '1513337572078911488'
         },
         {
             label: 'Owner Contact',
             description: 'only for serious matters and community inquiries',
             value: 'owner_contact',
-            emoji: '👑'
+            emoji: '1513337741105037332'
         }
     ],
 
