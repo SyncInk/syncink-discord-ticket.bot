@@ -75,12 +75,12 @@ module.exports = {
                         // 2 hours = 7200000 ms
                         if (timeDiff >= 7200000) {
                             // Don't spam if the last message is already our reminder
-                            if (lastMsg.author.id === client.user.id && lastMsg.embeds.length > 0 && lastMsg.embeds[0].description === '<:sync_alert:1513822294831534220> **Inactivity Reminder**') {
+                            if (lastMsg.author.id === client.user.id && lastMsg.embeds.length > 0 && lastMsg.embeds[0].description === '<a:sync_alert:1513822294831534220> **Inactivity Reminder**') {
                                 continue;
                             }
 
                             const embed = new EmbedBuilder()
-                                .setDescription('<:sync_alert:1513822294831534220> **Inactivity Reminder**')
+                                .setDescription('<a:sync_alert:1513822294831534220> **Inactivity Reminder**')
                                 .setColor('#F1C40F');
 
                             await channel.send({ embeds: [embed] });
