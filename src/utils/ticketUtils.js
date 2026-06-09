@@ -42,11 +42,13 @@ async function handleSelectMenu(interaction, client) {
         if (role === 'owner') ping = guildConfig.ownerRoleIds && guildConfig.ownerRoleIds[0] ? `<@&${guildConfig.ownerRoleIds[0]}>` : '@Owner';
         
         let reason = 'Transferred ticket';
+        let welcomeMsgId = null;
         try {
             const msgs = await interaction.channel.messages.fetch({ after: '1', limit: 10 });
             const welcomeMsg = msgs.find(m => m.author.id === client.user.id && m.embeds.length >= 2);
             if (welcomeMsg) {
                 reason = welcomeMsg.embeds[1].description;
+                welcomeMsgId = welcomeMsg.id;
             }
         } catch(e) {}
 
@@ -94,7 +96,12 @@ async function handleSelectMenu(interaction, client) {
         const embed = new EmbedBuilder()
             .setDescription(`<:sync_transfer_ticket:1513811992249499648> **This ticket has been transferred to** <#${newThread.id}>`)
             .setColor('#2ecc71');
-        await interaction.channel.send({ embeds: [embed], reply: { messageReference: interaction.message.id } });
+        
+        if (welcomeMsgId) {
+            await interaction.channel.send({ embeds: [embed], reply: { messageReference: welcomeMsgId } });
+        } else {
+            await interaction.channel.send({ embeds: [embed] });
+        }
         
         try { await interaction.channel.setName(`transferred-${ticket.creatorId}`); } catch(e) {}
         
