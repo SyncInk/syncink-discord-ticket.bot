@@ -193,10 +193,10 @@ async function handleButton(interaction, client) {
             .setCustomId('ticket_transfer_select')
             .setPlaceholder('Select a role to transfer to')
             .addOptions([
-                { label: 'Staff', value: 'staff', emoji: '🛡️' },
-                { label: 'Admins', value: 'admin', emoji: '🔨' },
-                { label: 'Developers', value: 'dev', emoji: '💻' },
-                { label: 'Owner', value: 'owner', emoji: '👑' }
+                { label: 'Staff', value: 'staff', emoji: '1513352362121625661' },
+                { label: 'Admins', value: 'admin', emoji: '1513805305492799508' },
+                { label: 'Developers', value: 'dev', emoji: '754668951232839772' },
+                { label: 'Owner', value: 'owner', emoji: '1513803214674464788' }
             ]);
             
         const row = new ActionRowBuilder().addComponents(selectMenu);
