@@ -43,9 +43,10 @@ async function handleSelectMenu(interaction, client) {
         
         let reason = 'Transferred ticket';
         try {
-            const msgs = await interaction.channel.messages.fetch({ after: '1', limit: 1 });
-            if (msgs.size > 0 && msgs.first().embeds.length > 1) {
-                reason = msgs.first().embeds[1].description;
+            const msgs = await interaction.channel.messages.fetch({ after: '1', limit: 10 });
+            const welcomeMsg = msgs.find(m => m.author.id === client.user.id && m.embeds.length >= 2);
+            if (welcomeMsg) {
+                reason = welcomeMsg.embeds[1].description;
             }
         } catch(e) {}
 
@@ -239,9 +240,9 @@ async function handleButton(interaction, client) {
 
         // Edit original welcome message to add log link
         try {
-            const firstMsgCollection = await thread.messages.fetch({ after: '1', limit: 1 });
-            if (firstMsgCollection.size > 0) {
-                const welcomeMsg = firstMsgCollection.first();
+            const firstMsgCollection = await thread.messages.fetch({ after: '1', limit: 10 });
+            const welcomeMsg = firstMsgCollection.find(m => m.author.id === client.user.id && m.embeds.length >= 2);
+            if (welcomeMsg) {
                 const logEmbed = new EmbedBuilder()
                     .setTitle('Log')
                     .setDescription(`🔒 [No Access](${logMsg ? logMsg.url : '#'})`)
