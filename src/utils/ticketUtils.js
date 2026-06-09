@@ -32,6 +32,8 @@ async function handleSelectMenu(interaction, client) {
         const ticket = await db.getTicket(interaction.channel.id);
         if (!ticket) return interaction.reply({ content: 'Ticket not found.', ephemeral: true });
         
+        await interaction.update({ content: 'Transferring ticket...', components: [] });
+
         const guildConfig = await db.getGuildConfig(interaction.guild.id);
         let ping = '@here';
         if (role === 'staff') ping = guildConfig.staffRoleIds && guildConfig.staffRoleIds[0] ? `<@&${guildConfig.staffRoleIds[0]}>` : '@Staff';
@@ -39,9 +41,63 @@ async function handleSelectMenu(interaction, client) {
         if (role === 'dev') ping = guildConfig.developerRoleIds && guildConfig.developerRoleIds[0] ? `<@&${guildConfig.developerRoleIds[0]}>` : '@Developers';
         if (role === 'owner') ping = guildConfig.ownerRoleIds && guildConfig.ownerRoleIds[0] ? `<@&${guildConfig.ownerRoleIds[0]}>` : '@Owner';
         
-        await interaction.channel.send(`<:sync_transfer_ticket:1513811992249499648> This ticket has been transferred to ${ping} by <@${interaction.user.id}>.`);
-        await interaction.update({ content: 'Ticket transferred successfully!', components: [] });
-        await logTicketAction(client, interaction.guild, 'Ticket Transferred', `Thread: <#${interaction.channel.id}>\nTransferred To: ${ping}\nBy: <@${interaction.user.id}>`, config.colors.primary);
+        let reason = 'Transferred ticket';
+        try {
+            const msgs = await interaction.channel.messages.fetch({ after: '1', limit: 1 });
+            if (msgs.size > 0 && msgs.first().embeds.length > 1) {
+                reason = msgs.first().embeds[1].description;
+            }
+        } catch(e) {}
+
+        const parentChannel = interaction.channel.parent;
+        let newThread;
+        try {
+            newThread = await parentChannel.threads.create({
+                name: interaction.channel.name,
+                autoArchiveDuration: 1440,
+                type: ChannelType.PrivateThread,
+                reason: 'Ticket transferred'
+            });
+            await newThread.members.add(ticket.creatorId);
+
+            const contentText = `Thank you for your patience <@${ticket.creatorId}>\n${ping} will be with you shortly.`;
+            const claimersEmbed = new EmbedBuilder()
+                .setTitle('Claimers')
+                .setDescription('• <:claimers:1513345698689581087> No one has claimed this ticket yet.')
+                .setColor('#9b59b6')
+                .setThumbnail('https://cdn.discordapp.com/emojis/1513348396851794080.webp?size=1024');
+
+            const reasonEmbed = new EmbedBuilder()
+                .setTitle('Reason')
+                .setDescription(reason)
+                .setColor('#ff5555');
+
+            const closeBtn = new ButtonBuilder().setCustomId('ticket_btn_close').setLabel('Close').setStyle(ButtonStyle.Danger).setEmoji('1513811041694519326');
+            const transferBtn = new ButtonBuilder().setCustomId('ticket_btn_transfer').setLabel('Transfer').setStyle(ButtonStyle.Secondary).setEmoji('1513811992249499648');
+            const claimBtn = new ButtonBuilder().setCustomId('ticket_btn_claim').setLabel('Claim').setStyle(ButtonStyle.Success).setEmoji('1513812248957550683');
+            const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
+
+            await newThread.send({ content: contentText, embeds: [claimersEmbed, reasonEmbed], components: [row] });
+            
+            // Update database with new thread ID
+            await db.updateTicket(interaction.channel.id, { channelId: newThread.id });
+            await logTicketAction(client, interaction.guild, 'Ticket Transferred', `Old Thread: <#${interaction.channel.id}>\nNew Thread: <#${newThread.id}>\nTransferred To: ${ping}\nBy: <@${interaction.user.id}>`, config.colors.primary);
+        } catch (e) {
+            console.error('Transfer cloning failed', e);
+            return;
+        }
+
+        // Old Thread Cleanup
+        const embed = new EmbedBuilder()
+            .setDescription(`<:sync_transfer_ticket:1513811992249499648> **This ticket has been transferred to** <#${newThread.id}>`)
+            .setColor('#2ecc71');
+        await interaction.channel.send({ embeds: [embed] });
+        
+        try { await interaction.channel.setName(`transferred-${ticket.creatorId}`); } catch(e) {}
+        try { await interaction.channel.members.remove(ticket.creatorId); } catch(e) {}
+        
+        await interaction.channel.setLocked(true);
+        await interaction.channel.setArchived(true);
     }
 }
 
@@ -170,7 +226,7 @@ async function handleButton(interaction, client) {
     } else if (customId === 'ticket_btn_close') {
         if (!isStaff && user.id !== ticket.creatorId) return interaction.reply({ content: 'You do not have permission to close this ticket.', ephemeral: true });
 
-        await interaction.reply({ content: 'Closing ticket and generating transcript in 5 seconds...' });
+        await interaction.reply({ content: 'Closing ticket, please wait...', ephemeral: true });
 
         // Generate simple text transcript for native Discord readability
         const messages = await thread.messages.fetch({ limit: 100 });
@@ -179,11 +235,27 @@ async function handleButton(interaction, client) {
 
         await db.updateTicket(thread.id, { status: 'closed', closedAt: Date.now() });
 
-        await logTicketAction(client, guild, 'Ticket Closed', `Thread: ${thread.name}\nClosed By: <@${user.id}>\nCreator: <@${ticket.creatorId}>`, config.colors.error, transcript);
+        const logMsg = await logTicketAction(client, guild, 'Ticket Closed', `Thread: ${thread.name}\nClosed By: <@${user.id}>\nCreator: <@${ticket.creatorId}>`, config.colors.error, transcript);
 
-        setTimeout(() => {
-            thread.delete().catch(() => {});
-        }, 5000);
+        // Edit original welcome message to add log link
+        try {
+            const firstMsgCollection = await thread.messages.fetch({ after: '1', limit: 1 });
+            if (firstMsgCollection.size > 0) {
+                const welcomeMsg = firstMsgCollection.first();
+                const logEmbed = new EmbedBuilder()
+                    .setTitle('Log')
+                    .setDescription(`🔒 [No Access](${logMsg ? logMsg.url : '#'})`)
+                    .setColor('#2b2d31');
+                await welcomeMsg.edit({ embeds: [...welcomeMsg.embeds, logEmbed] });
+            }
+        } catch (e) { console.error('Error adding log embed', e); }
+
+        // Remove creator
+        try { await thread.members.remove(ticket.creatorId); } catch(e) {}
+
+        // Lock & Archive to display native banner
+        await thread.setLocked(true);
+        await thread.setArchived(true);
 
     } else if (customId === 'ticket_btn_transfer') {
         if (!isStaff) return interaction.reply({ content: 'Only staff can transfer tickets.', ephemeral: true });
@@ -220,9 +292,11 @@ async function logTicketAction(client, guild, title, description, color, attachm
     if (attachment) payload.files = [attachment];
 
     try {
-        await logChannel.send(payload);
+        const msg = await logChannel.send(payload);
+        return msg;
     } catch (e) {
         console.error('[LOG ERROR]', e);
+        return null;
     }
 }
 
