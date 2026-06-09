@@ -39,7 +39,7 @@ async function handleSelectMenu(interaction, client) {
         if (role === 'dev') ping = guildConfig.developerRoleIds && guildConfig.developerRoleIds[0] ? `<@&${guildConfig.developerRoleIds[0]}>` : '@Developers';
         if (role === 'owner') ping = guildConfig.ownerRoleIds && guildConfig.ownerRoleIds[0] ? `<@&${guildConfig.ownerRoleIds[0]}>` : '@Owner';
         
-        await interaction.channel.send(`🔁 This ticket has been transferred to ${ping} by <@${interaction.user.id}>.`);
+        await interaction.channel.send(`<:sync_transfer_ticket:1513811992249499648> This ticket has been transferred to ${ping} by <@${interaction.user.id}>.`);
         await interaction.update({ content: 'Ticket transferred successfully!', components: [] });
         await logTicketAction(client, interaction.guild, 'Ticket Transferred', `Thread: <#${interaction.channel.id}>\nTransferred To: ${ping}\nBy: <@${interaction.user.id}>`, config.colors.primary);
     }

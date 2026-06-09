@@ -29,6 +29,11 @@ async function updateTicket(channelId, updateData) {
     await Ticket.updateOne({ channelId }, updateData);
 }
 
+async function getAllOpenTickets() {
+    const Ticket = getMongoModel();
+    return await Ticket.find({ status: 'open' });
+}
+
 // ========================
 // GUILD SETTINGS FUNCTIONS
 // ========================
@@ -89,6 +94,7 @@ module.exports = {
     createTicket,
     getTicket,
     updateTicket,
+    getAllOpenTickets,
     getGuildConfig,
     updateGuildConfig
 };

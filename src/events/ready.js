@@ -53,5 +53,45 @@ module.exports = {
         } catch (error) {
             console.error('[SLASH ERROR]', error);
         }
+
+        // --- INACTIVITY REMINDER SYSTEM ---
+        setInterval(async () => {
+            try {
+                const db = require('../utils/database');
+                const { EmbedBuilder } = require('discord.js');
+                const tickets = await db.getAllOpenTickets();
+                
+                for (const ticket of tickets) {
+                    const channel = client.channels.cache.get(ticket.channelId);
+                    if (!channel) continue;
+
+                    const lastMessageId = channel.lastMessageId;
+                    if (!lastMessageId) continue;
+
+                    try {
+                        const lastMsg = await channel.messages.fetch(lastMessageId);
+                        const timeDiff = Date.now() - lastMsg.createdTimestamp;
+                        
+                        // 2 hours = 7200000 ms
+                        if (timeDiff >= 7200000) {
+                            // Don't spam if the last message is already our reminder
+                            if (lastMsg.author.id === client.user.id && lastMsg.embeds.length > 0 && lastMsg.embeds[0].description === '<:sync_alert:1513822294831534220> **Inactivity Reminder**') {
+                                continue;
+                            }
+
+                            const embed = new EmbedBuilder()
+                                .setDescription('<:sync_alert:1513822294831534220> **Inactivity Reminder**')
+                                .setColor('#F1C40F');
+
+                            await channel.send({ embeds: [embed] });
+                        }
+                    } catch (err) {
+                        // Ignore errors fetching message
+                    }
+                }
+            } catch (e) {
+                console.error('[INACTIVITY CHECK ERROR]', e);
+            }
+        }, 60 * 1000 * 5); // Check every 5 minutes
     },
 };
