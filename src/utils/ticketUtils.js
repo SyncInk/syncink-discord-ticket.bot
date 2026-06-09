@@ -119,9 +119,9 @@ async function handleModalSubmit(interaction, client) {
                 .setDescription(reason)
                 .setColor('#ff5555'); // Pink/Red
 
-            const closeBtn = new ButtonBuilder().setCustomId('ticket_btn_close').setLabel('Close').setStyle(ButtonStyle.Danger).setEmoji('🔒');
-            const transferBtn = new ButtonBuilder().setCustomId('ticket_btn_transfer').setLabel('Transfer').setStyle(ButtonStyle.Secondary).setEmoji('🔁');
-            const claimBtn = new ButtonBuilder().setCustomId('ticket_btn_claim').setLabel('Claim').setStyle(ButtonStyle.Success).setEmoji('📝');
+            const closeBtn = new ButtonBuilder().setCustomId('ticket_btn_close').setLabel('Close').setStyle(ButtonStyle.Danger).setEmoji('1513811041694519326');
+            const transferBtn = new ButtonBuilder().setCustomId('ticket_btn_transfer').setLabel('Transfer').setStyle(ButtonStyle.Secondary).setEmoji('1513811992249499648');
+            const claimBtn = new ButtonBuilder().setCustomId('ticket_btn_claim').setLabel('Claim').setStyle(ButtonStyle.Success).setEmoji('1513812248957550683');
 
             const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
 
