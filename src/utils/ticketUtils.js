@@ -76,7 +76,7 @@ async function handleSelectMenu(interaction, client) {
                 .setColor('#ff5555');
 
             const closeBtn = new ButtonBuilder().setCustomId('ticket_btn_close').setLabel('Close').setStyle(ButtonStyle.Danger).setEmoji('1513900649249505433');
-            const transferBtn = new ButtonBuilder().setCustomId('ticket_btn_transfer').setLabel('Transfer').setStyle(ButtonStyle.Secondary).setEmoji('1513811992249499648');
+            const transferBtn = new ButtonBuilder().setCustomId('ticket_btn_transfer').setLabel('Transfer').setStyle(ButtonStyle.Secondary).setEmoji('1513904436785971211');
             const claimBtn = new ButtonBuilder().setCustomId('ticket_btn_claim').setLabel('Claim').setStyle(ButtonStyle.Success).setEmoji('1513902469028249680');
             const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
 
@@ -94,7 +94,7 @@ async function handleSelectMenu(interaction, client) {
         try { await interaction.channel.members.remove(ticket.creatorId); } catch(e) {}
 
         const embed = new EmbedBuilder()
-            .setDescription(`<:sync_transfer_ticket:1513811992249499648> **This ticket has been transferred to** <#${newThread.id}>`)
+            .setDescription(`<:sync_ticket_transfer:1513904436785971211> **This ticket has been transferred to** <#${newThread.id}>`)
             .setColor('#2ecc71');
         
         if (welcomeMsgId) {
@@ -185,7 +185,7 @@ async function handleModalSubmit(interaction, client) {
                 .setColor('#ff5555'); // Pink/Red
 
             const closeBtn = new ButtonBuilder().setCustomId('ticket_btn_close').setLabel('Close').setStyle(ButtonStyle.Danger).setEmoji('1513900649249505433');
-            const transferBtn = new ButtonBuilder().setCustomId('ticket_btn_transfer').setLabel('Transfer').setStyle(ButtonStyle.Secondary).setEmoji('1513811992249499648');
+            const transferBtn = new ButtonBuilder().setCustomId('ticket_btn_transfer').setLabel('Transfer').setStyle(ButtonStyle.Secondary).setEmoji('1513904436785971211');
             const claimBtn = new ButtonBuilder().setCustomId('ticket_btn_claim').setLabel('Claim').setStyle(ButtonStyle.Success).setEmoji('1513902469028249680');
 
             const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
