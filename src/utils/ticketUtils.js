@@ -246,7 +246,7 @@ async function handleButton(interaction, client) {
 
         const logMsg = await logTicketAction(client, guild, 'Ticket Closed', `Thread: ${thread.name}\nClosed By: <@${user.id}>\nCreator: <@${ticket.creatorId}>`, config.colors.error, transcript);
 
-        // Edit original welcome message to add log link
+        // Edit original welcome message to add log link and remove buttons
         try {
             const firstMsgCollection = await thread.messages.fetch({ after: '1', limit: 10 });
             const welcomeMsg = firstMsgCollection.find(m => m.author.id === client.user.id && m.embeds.length >= 2);
@@ -255,7 +255,7 @@ async function handleButton(interaction, client) {
                     .setTitle('Log')
                     .setDescription(`🔒 [Ticket Log](${logMsg ? logMsg.url : '#'})`)
                     .setColor('#2b2d31');
-                await welcomeMsg.edit({ embeds: [...welcomeMsg.embeds, logEmbed] });
+                await welcomeMsg.edit({ embeds: [...welcomeMsg.embeds, logEmbed], components: [] });
             }
         } catch (e) { console.error('Error adding log embed', e); }
 
