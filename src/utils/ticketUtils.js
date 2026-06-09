@@ -89,13 +89,14 @@ async function handleSelectMenu(interaction, client) {
         }
 
         // Old Thread Cleanup
+        try { await interaction.channel.members.remove(ticket.creatorId); } catch(e) {}
+
         const embed = new EmbedBuilder()
             .setDescription(`<:sync_transfer_ticket:1513811992249499648> **This ticket has been transferred to** <#${newThread.id}>`)
             .setColor('#2ecc71');
-        await interaction.channel.send({ embeds: [embed] });
+        await interaction.channel.send({ embeds: [embed], reply: { messageReference: interaction.message.id } });
         
         try { await interaction.channel.setName(`transferred-${ticket.creatorId}`); } catch(e) {}
-        try { await interaction.channel.members.remove(ticket.creatorId); } catch(e) {}
         
         await interaction.channel.setLocked(true);
         await interaction.channel.setArchived(true);
@@ -245,7 +246,7 @@ async function handleButton(interaction, client) {
             if (welcomeMsg) {
                 const logEmbed = new EmbedBuilder()
                     .setTitle('Log')
-                    .setDescription(`🔒 [No Access](${logMsg ? logMsg.url : '#'})`)
+                    .setDescription(`🔒 [Ticket Log](${logMsg ? logMsg.url : '#'})`)
                     .setColor('#2b2d31');
                 await welcomeMsg.edit({ embeds: [...welcomeMsg.embeds, logEmbed] });
             }
