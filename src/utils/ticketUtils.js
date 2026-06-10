@@ -28,6 +28,23 @@ async function handleSelectMenu(interaction, client) {
         );
 
         await interaction.showModal(modal);
+
+        // Instantly reset the dropdown so the UI doesn't show a tick mark
+        if (interaction.message && interaction.message.components) {
+            const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } = require('discord.js');
+            const selectMenu = new StringSelectMenuBuilder()
+                .setCustomId('ticket_select_type')
+                .setPlaceholder('Select a ticket type')
+                .addOptions(config.ticketOptions.map(opt => 
+                    new StringSelectMenuOptionBuilder()
+                        .setLabel(opt.label)
+                        .setDescription(opt.description)
+                        .setValue(opt.value)
+                        .setEmoji(opt.emoji)
+                ));
+            const row = new ActionRowBuilder().addComponents(selectMenu);
+            await interaction.message.edit({ components: [row] }).catch(() => {});
+        }
     } else if (interaction.customId === 'ticket_transfer_select') {
         const role = interaction.values[0];
         const ticket = await db.getTicket(interaction.channel.id);
@@ -119,23 +136,7 @@ async function handleModalSubmit(interaction, client) {
         const optionData = config.ticketOptions.find(o => o.value === typeValue);
         const reason = interaction.fields.getTextInputValue('ticket_reason');
         
-        // Reset the select menu on the panel message so it doesn't get "stuck"
-        if (interaction.message && interaction.message.components) {
-            const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } = require('discord.js');
-            const selectMenu = new StringSelectMenuBuilder()
-                .setCustomId('ticket_select_type')
-                .setPlaceholder('Select a ticket type')
-                .addOptions(config.ticketOptions.map(opt => 
-                    new StringSelectMenuOptionBuilder()
-                        .setLabel(opt.label)
-                        .setDescription(opt.description)
-                        .setValue(opt.value)
-                        .setEmoji(opt.emoji)
-                ));
-            const row = new ActionRowBuilder().addComponents(selectMenu);
-            await interaction.message.edit({ components: [row] }).catch(() => {});
-        }
-        
+        // Dropdown reset logic was moved to handleSelectMenu to prevent tick mark
         const guild = interaction.guild;
         const guildConfig = await db.getGuildConfig(guild.id);
 
