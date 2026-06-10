@@ -121,7 +121,19 @@ async function handleModalSubmit(interaction, client) {
         
         // Reset the select menu on the panel message so it doesn't get "stuck"
         if (interaction.message && interaction.message.components) {
-            await interaction.message.edit({ components: interaction.message.components }).catch(() => {});
+            const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } = require('discord.js');
+            const selectMenu = new StringSelectMenuBuilder()
+                .setCustomId('ticket_select_type')
+                .setPlaceholder('Select a ticket type')
+                .addOptions(config.ticketOptions.map(opt => 
+                    new StringSelectMenuOptionBuilder()
+                        .setLabel(opt.label)
+                        .setDescription(opt.description)
+                        .setValue(opt.value)
+                        .setEmoji(opt.emoji)
+                ));
+            const row = new ActionRowBuilder().addComponents(selectMenu);
+            await interaction.message.edit({ components: [row] }).catch(() => {});
         }
         
         const guild = interaction.guild;
