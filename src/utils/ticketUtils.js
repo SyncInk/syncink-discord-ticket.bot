@@ -18,7 +18,8 @@ async function handleSelectMenu(interaction, client) {
             .setCustomId('ticket_reason')
             .setLabel("Description")
             .setStyle(TextInputStyle.Paragraph)
-            .setMinLength(30)
+            .setPlaceholder('I need help with...')
+            .setMinLength(10)
             .setMaxLength(4000)
             .setRequired(true);
 
