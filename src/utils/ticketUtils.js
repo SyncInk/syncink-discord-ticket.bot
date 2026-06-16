@@ -208,7 +208,10 @@ async function handleModalSubmit(interaction, client) {
             
             await logTicketAction(client, guild, 'Ticket Created', `User: <@${interaction.user.id}>\nThread: <#${thread.id}>\nType: ${optionData.label}`, config.colors.success);
 
-            await interaction.editReply(`Your ticket has been created: <#${thread.id}>`);
+            const successEmbed = new EmbedBuilder()
+                .setDescription(`🎟️ <#${thread.id}> **| Ticket created successfully!**`)
+                .setColor('#2ecc71');
+            await interaction.editReply({ content: '', embeds: [successEmbed] });
         } catch (error) {
             console.error('[TICKET CREATE ERROR]', error);
             await interaction.editReply('Failed to create ticket thread. Please check permissions and ensure the server has Private Threads enabled.');
@@ -249,7 +252,10 @@ async function handleButton(interaction, client) {
     } else if (customId === 'ticket_btn_close') {
         if (!isStaff && user.id !== ticket.creatorId) return interaction.reply({ content: 'You do not have permission to close this ticket.', ephemeral: true });
 
-        await interaction.reply({ content: 'Closing ticket, please wait...', ephemeral: true });
+        const closeEmbed = new EmbedBuilder()
+            .setDescription(`🔒 **| Closing ticket, please wait...**`)
+            .setColor('#e74c3c');
+        await interaction.reply({ embeds: [closeEmbed], ephemeral: true });
 
         // Generate simple text transcript for native Discord readability
         const messages = await thread.messages.fetch({ limit: 100 });
