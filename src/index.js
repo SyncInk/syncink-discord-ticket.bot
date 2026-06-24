@@ -32,8 +32,8 @@ async function start() {
     try {
         await initDatabase();
         loadHandlers();
+        await initDashboard(client); // Start web server immediately for Railway health checks
         await client.login(process.env.DISCORD_TOKEN);
-        await initDashboard(client);
     } catch (err) {
         console.error('[CRITICAL] Error starting the ticket system:', err);
     }
