@@ -102,7 +102,8 @@ async function initDashboard(client) {
     // If running in production on Railway, serve the built Vite app
     app.use(express.static(path.join(__dirname, '../dashboard/dist')));
     
-    app.get('*', (req, res) => {
+    // Catch-all to serve React SPA for unknown routes
+    app.use((req, res) => {
         res.sendFile(path.join(__dirname, '../dashboard/dist/index.html'));
     });
 
