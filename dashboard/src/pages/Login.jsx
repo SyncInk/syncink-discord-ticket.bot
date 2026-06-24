@@ -1,53 +1,37 @@
 import React from 'react';
-import { LogIn } from 'lucide-react';
+import { LogIn, ShieldCheck, Sparkles } from 'lucide-react';
 
-const Login = () => {
-  const handleLogin = () => {
-    window.location.href = '/api/auth/login';
-  };
-
+export default function Login() {
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      backgroundColor: 'var(--bg-main)',
-      backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(155, 89, 182, 0.1) 0%, transparent 50%)'
-    }}>
-      <div className="card animate-slide-up" style={{ width: '400px', textAlign: 'center', padding: '40px' }}>
-        <div style={{ 
-          width: '80px', height: '80px', 
-          borderRadius: '20px', 
-          background: 'linear-gradient(135deg, var(--color-primary), #3498db)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'white', fontWeight: 'bold', fontSize: '32px',
-          margin: '0 auto 24px auto',
-          boxShadow: 'var(--shadow-glow)'
-        }}>
-          S
+    <div className="auth-shell">
+      <div className="auth-backdrop auth-left">
+        <div className="auth-brand">SyncInk Ticket Bot</div>
+        <h1>Premium control for your Discord support workflow.</h1>
+        <p>
+          Manage ticket panels, categories, logs, transcripts, analytics, and live activity without
+          changing the bot&apos;s proven backend behavior.
+        </p>
+        <div className="auth-feature-list">
+          <div><Sparkles size={16} /> SaaS-grade dark interface inspired by Discord</div>
+          <div><ShieldCheck size={16} /> Owner and Administrator access only</div>
+          <div><LogIn size={16} /> OAuth2 login with live bot synchronization</div>
         </div>
-        
-        <h1 style={{ marginBottom: '8px' }}>SyncInk Dashboard</h1>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '32px' }}>
-          Authenticate with Discord to manage your premium ticket system.
+      </div>
+
+      <div className="auth-card">
+        <div className="brand-mark large">S</div>
+        <h2>Sign in with Discord</h2>
+        <p>
+          Only the server owner and members with the Administrator permission can access this dashboard.
         </p>
 
-        <button 
-          onClick={handleLogin}
-          className="btn-primary" 
-          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px' }}
-        >
-          <LogIn size={20} />
-          Login with Discord
+        <button type="button" className="action-button tone-primary wide" onClick={() => {
+          window.location.href = '/api/auth/login';
+        }}>
+          <LogIn size={18} />
+          Continue with Discord
         </button>
-        
-        <p style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '24px' }}>
-          Only server Administrators and Owners are permitted to access this dashboard.
-        </p>
       </div>
     </div>
   );
-};
-
-export default Login;
+}
