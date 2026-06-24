@@ -26,11 +26,14 @@ const loadHandlers = () => {
     }
 };
 
+const { initDashboard } = require('./dashboardServer');
+
 async function start() {
     try {
         await initDatabase();
         loadHandlers();
         await client.login(process.env.DISCORD_TOKEN);
+        await initDashboard(client);
     } catch (err) {
         console.error('[CRITICAL] Error starting the ticket system:', err);
     }
