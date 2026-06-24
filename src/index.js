@@ -3,6 +3,7 @@ const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const { initDatabase } = require('./utils/database');
+const migrateLegacySqlite = require('./utils/migrateSqlite');
 
 const client = new Client({
     intents: [
@@ -31,6 +32,7 @@ const { initDashboard } = require('./dashboardServer');
 async function start() {
     try {
         await initDatabase();
+        await migrateLegacySqlite();
         loadHandlers();
         await initDashboard(client); // Start web server immediately for Railway health checks
         await client.login(process.env.DISCORD_TOKEN);
