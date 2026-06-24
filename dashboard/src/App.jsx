@@ -7,25 +7,33 @@ import PanelManager from './pages/PanelManager';
 import CategoryManager from './pages/CategoryManager';
 import LiveViewer from './pages/LiveViewer';
 import Settings from './pages/Settings';
+import ServerSelect from './pages/ServerSelect';
 import axios from 'axios';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [guilds, setGuilds] = useState([]);
+  const [selectedGuildId, setSelectedGuildId] = useState(localStorage.getItem('selectedGuildId') || null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check auth status
     axios.get('/api/auth/me')
       .then(res => {
         setUser(res.data.user);
+        setGuilds(res.data.guilds);
         setLoading(false);
       })
       .catch(() => {
         setUser(null);
+        setGuilds([]);
         setLoading(false);
       });
   }, []);
+
+  const handleSelectGuild = (id) => {
+    setSelectedGuildId(id);
+    localStorage.setItem('selectedGuildId', id);
+  };
 
   if (loading) {
     return (
@@ -35,12 +43,15 @@ function App() {
     );
   }
 
+  const selectedGuild = guilds.find(g => g.id === selectedGuildId) || null;
+
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+      <Route path="/servers" element={user ? <ServerSelect guilds={guilds} onSelect={handleSelectGuild} /> : <Navigate to="/login" />} />
       
       {/* Protected Dashboard Routes */}
-      <Route path="/" element={user ? <Layout user={user} /> : <Navigate to="/login" />}>
+      <Route path="/" element={user ? (selectedGuild ? <Layout user={user} selectedGuild={selectedGuild} guilds={guilds} onSelect={handleSelectGuild} /> : <Navigate to="/servers" />) : <Navigate to="/login" />}>
         <Route index element={<Overview />} />
         <Route path="panels" element={<PanelManager />} />
         <Route path="categories" element={<CategoryManager />} />

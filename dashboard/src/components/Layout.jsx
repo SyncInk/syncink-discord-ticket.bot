@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, MessageSquare, Settings, Activity, Server, Users, LogOut } from 'lucide-react';
 
-const Layout = ({ user }) => {
+const Layout = ({ user, selectedGuild }) => {
   const location = useLocation();
 
   const navItems = [
@@ -29,18 +29,30 @@ const Layout = ({ user }) => {
         padding: '20px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px', padding: '0 10px' }}>
-          <div style={{ 
-            width: '40px', height: '40px', 
-            borderRadius: '8px', 
-            background: 'linear-gradient(135deg, var(--color-primary), #3498db)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'white', fontWeight: 'bold', fontSize: '20px'
-          }}>
-            S
-          </div>
-          <div>
-            <h2 style={{ fontSize: '18px', color: 'var(--text-header)', margin: 0 }}>SyncInk</h2>
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0 }}>Dashboard Admin</p>
+          {selectedGuild?.icon ? (
+            <img 
+              src={`https://cdn.discordapp.com/icons/${selectedGuild.id}/${selectedGuild.icon}.png`} 
+              alt={selectedGuild.name}
+              style={{ width: '40px', height: '40px', borderRadius: '8px' }}
+            />
+          ) : (
+            <div style={{ 
+              width: '40px', height: '40px', 
+              borderRadius: '8px', 
+              background: 'linear-gradient(135deg, var(--color-primary), #3498db)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'white', fontWeight: 'bold', fontSize: '20px'
+            }}>
+              {selectedGuild?.name ? selectedGuild.name.charAt(0) : 'S'}
+            </div>
+          )}
+          <div style={{ overflow: 'hidden' }}>
+            <h2 style={{ fontSize: '14px', color: 'var(--text-header)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {selectedGuild?.name || 'SyncInk'}
+            </h2>
+            <Link to="/servers" style={{ fontSize: '11px', color: 'var(--color-primary)', margin: 0, textDecoration: 'none' }}>
+              Switch Server
+            </Link>
           </div>
         </div>
 
