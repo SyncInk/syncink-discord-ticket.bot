@@ -36,7 +36,15 @@ const navGroups = [
       { path: '/', label: 'Dashboard Overview', icon: LayoutDashboard },
       { path: '/panels', label: 'Ticket Panels', icon: PanelsTopLeft },
       { path: '/categories', label: 'Ticket Categories', icon: MessageSquareMore },
-      { path: '/ticket-logs', label: 'Ticket Logs', icon: ClipboardList }
+      { path: '/ticket-logs', label: 'Ticket Logs', icon: ClipboardList },
+      { path: '/transcripts', label: 'Transcripts', icon: FileText },
+      { path: '/analytics', label: 'Analytics', icon: ChartColumnBig },
+      { path: '/activity', label: 'Activity Feed', icon: Activity },
+      { path: '/audit-logs', label: 'Audit Logs', icon: ScrollText },
+      { path: '/interface', label: 'Interface', icon: BrushCleaning },
+      { path: '/bot-profile', label: 'Bot Profile', icon: Bot },
+      { path: '/dashboard-access', label: 'Dashboard Access', icon: Shield },
+      { path: '/miscellaneous', label: 'Miscellaneous', icon: SlidersHorizontal }
     ]
   }
 ];

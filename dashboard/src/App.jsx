@@ -98,6 +98,14 @@ export default function App() {
         <Route path="panels" element={<TicketPanels />} />
         <Route path="categories" element={<TicketCategories />} />
         <Route path="ticket-logs" element={<TicketLogs />} />
+        <Route path="transcripts" element={<Transcripts />} />
+        <Route path="analytics" element={<Analytics />} />
+        <Route path="activity" element={<ActivityFeed />} />
+        <Route path="audit-logs" element={<AuditLogs />} />
+        <Route path="interface" element={<InterfacePage />} />
+        <Route path="bot-profile" element={<BotProfile />} />
+        <Route path="dashboard-access" element={<DashboardAccess />} />
+        <Route path="miscellaneous" element={<Miscellaneous />} />
       </Route>
     </Routes>
   );
