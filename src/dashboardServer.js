@@ -104,7 +104,11 @@ async function initDashboard(client) {
     
     // Catch-all to serve React SPA for unknown routes
     app.use((req, res) => {
-        res.sendFile(path.join(__dirname, '../dashboard/dist/index.html'));
+        try {
+            res.sendFile(path.join(__dirname, '../dashboard/dist/index.html'));
+        } catch (err) {
+            res.status(500).send('Dashboard is still building or failed to compile. Check Railway build logs.');
+        }
     });
 
     const PORT = process.env.PORT || 3000;
