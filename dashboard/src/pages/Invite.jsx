@@ -10,9 +10,9 @@ export default function Invite() {
   return (
     <div className="invite-shell">
       <div className="invite-logos">
-        <div className="invite-logo-circle syncink-logo">S</div>
+        <img src="/syncink-main-logo.png" alt="SyncInk" className="invite-logo-img" />
         <div className="invite-logo-divider" />
-        <div className="invite-logo-circle syncink-ticket-logo">S</div>
+        <img src="/ticket-logo.png" alt="SyncInk Ticket" className="invite-logo-circle" />
       </div>
 
       <div className="invite-hero">

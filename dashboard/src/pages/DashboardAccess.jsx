@@ -4,11 +4,11 @@ import { Crown, ShieldCheck, X } from 'lucide-react';
 import { ActionButton, PageHeader } from '../components/Common';
 
 const TIERS = [
-  { id: 'owner', label: 'Owner', accessLabel: 'Owner (Full Access)', emojiId: '1513803214674464788', color: '#ff9eb5', desc: 'Reserved for the server owner and the most trusted roles.' },
-  { id: 'developer', label: 'Developer', accessLabel: 'Developer (Full Access)', emojiId: '1519379532409344142', color: '#b497ff', desc: 'Ideal for technical maintainers managing advanced setup.' },
-  { id: 'admin', label: 'Administrator', accessLabel: 'Administrator (Manage Server)', emojiId: '1518924309668823160', color: '#ffb6c8', desc: 'Best for senior staff managing categories, channels, and operations.' },
-  { id: 'moderator', label: 'Moderator', accessLabel: 'Moderator (Managed Access)', emojiId: '1518924931482779809', color: '#8fd7ff', desc: 'Useful for trusted team members with narrower dashboard scope.' },
-  { id: 'staff', label: 'Staff', accessLabel: 'Staff (Limited Access)', emojiId: '1513328514529624185', color: '#a2b8ff', desc: 'Lowest operational tier for safe visibility and light actions.' }
+  { id: 'owner', label: 'OWNER', accessLabel: 'Owner (Full Access)', emojiId: '1513803214674464788', color: 'linear-gradient(135deg, #FF6B9A 0%, #9D7CFF 100%)', desc: 'everything' },
+  { id: 'developer', label: 'DEVELOPER', accessLabel: 'Developer (Full Access)', emojiId: '1519379532409344142', color: '#9d7cff', desc: 'everything' },
+  { id: 'admin', label: 'ADMINISTRATOR', accessLabel: 'Administrator (Manage Server)', emojiId: '1518924309668823160', color: '#ffb6c8', desc: 'almost everything' },
+  { id: 'moderator', label: 'MODERATOR', accessLabel: 'Moderator (Managed Access)', emojiId: '1518924931482779809', color: '#8fd7ff', desc: 'higher tear changes' },
+  { id: 'staff', label: 'STAFF', accessLabel: 'Staff (Limited Access)', emojiId: '1513328514529624185', color: '#a2b8ff', desc: 'low level things not very dangerous' }
 ];
 
 export default function DashboardAccess() {
@@ -99,8 +99,14 @@ export default function DashboardAccess() {
           <div key={tier.id} className="access-tier-card">
             <div className="tier-eyebrow">Access Tier</div>
             <div className="tier-header">
-              <div className="tier-title" style={{ color: tier.color }}>
-                {tier.id === 'owner' ? <Crown size={17} /> : <ShieldCheck size={17} />}
+              <div 
+                className="tier-title" 
+                style={tier.color.includes('gradient') 
+                  ? { backgroundImage: tier.color, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', display: 'flex', alignItems: 'center', gap: '8px' } 
+                  : { color: tier.color, display: 'flex', alignItems: 'center', gap: '8px' }
+                }
+              >
+                <img src={`https://cdn.discordapp.com/emojis/${tier.emojiId}.png`} alt={tier.label} style={{ width: 18, height: 18 }} />
                 {tier.label}
               </div>
               <div className="tier-count">{getTierCount(tier.id)}</div>

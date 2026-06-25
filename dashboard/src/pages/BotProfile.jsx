@@ -45,7 +45,8 @@ export default function BotProfile() {
           <div className="profile-panel">
             <img src={snapshot.bot.avatarUrl} alt={snapshot.bot.username} className="profile-panel-avatar" />
             <div className="profile-panel-copy">
-              <strong>{snapshot.bot.username}</strong>
+              <strong>{snapshot.bot.nickname || snapshot.bot.username}</strong>
+              <span style={{ color: 'var(--text)', fontWeight: 500 }}>@{snapshot.bot.username}</span>
               <span>Bot ID: {snapshot.bot.id}</span>
               <span>Guild: {snapshot.guild.name}</span>
             </div>

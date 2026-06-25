@@ -98,20 +98,37 @@ export default function TicketPanels() {
               <Eye size={16} />
               Discord panel preview
             </div>
-            <div className="discord-preview-card">
-              <div className="discord-preview-accent" style={{ background: form.color }} />
-              <div className="discord-preview-body">
-                <strong>{form.title}</strong>
-                <div className="discord-preview-copy">
-                  {(form.description || []).filter(Boolean).map((line, index) => (
-                    <p key={index}>• {line}</p>
-                  ))}
+            <div className="discord-message-preview">
+              <img src={snapshot.bot.avatarUrl} alt={snapshot.bot.username} className="discord-message-avatar" />
+              <div className="discord-message-content">
+                <div className="discord-message-header">
+                  <span className="discord-message-author">{snapshot.bot.nickname || snapshot.bot.username}</span>
+                  <span className="discord-message-bot-tag">APP</span>
+                  <span className="discord-message-timestamp">{new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', '')}</span>
                 </div>
-                <div className="discord-preview-select">{form.placeholder}</div>
-                <div className="discord-preview-tags">
-                  {snapshot.settings.ticketOptions.map((option) => (
-                    <span key={option.value}>{option.emoji} {option.label}</span>
-                  ))}
+                
+                <div className="discord-message-embed">
+                  <div className="discord-message-embed-color" style={{ background: form.color || '#2B2D31' }} />
+                  <div className="discord-message-embed-body">
+                    <div className="discord-message-embed-title">
+                      {form.title}
+                      <img src="https://cdn.discordapp.com/emojis/1513337285024677899.png" alt="Shield" style={{ width: 20, height: 20 }} />
+                    </div>
+                    <div className="discord-message-embed-desc">
+                      {(form.description || []).filter(Boolean).map((line, index) => (
+                        <p key={index}>{line.startsWith('•') ? line : `• ${line}`}</p>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="discord-message-components">
+                  <div className="discord-message-select">
+                    <span>{form.placeholder}</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8.59003 16.59L13.17 12L8.59003 7.41L10 6L16 12L10 18L8.59003 16.59Z" fill="#B5BAC1" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
