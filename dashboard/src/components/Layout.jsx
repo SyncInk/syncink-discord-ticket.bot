@@ -42,11 +42,12 @@ const TIER_LEVELS = {
   developer: 4,
   admin: 3,
   moderator: 2,
-  staff: 1
+  staff: 1,
+  member: 0
 };
 
 const ALL_NAV_ITEMS = [
-  { path: '/', label: 'Dashboard Overview', icon: LayoutDashboard, minTier: 'staff' },
+  { path: '/', label: 'Dashboard Overview', icon: LayoutDashboard, minTier: 'member' },
   { path: '/panels', label: 'Ticket Panels', icon: PanelsTopLeft, minTier: 'moderator' },
   { path: '/categories', label: 'Ticket Categories', icon: MessageSquareMore, minTier: 'moderator' },
   { path: '/ticket-logs', label: 'Ticket Logs', icon: ClipboardList, minTier: 'staff' },
@@ -118,7 +119,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
     if (showLoader) setLoading(true);
 
     try {
-      const response = await axios.get(`/api/guilds/${selectedGuild.id}/bootstrap`);
+      const response = await axios.get(`/api/guilds/${selectedGuild.id}/bootstrap?_t=${Date.now()}`);
       startTransition(() => {
         setSnapshot(response.data);
       });

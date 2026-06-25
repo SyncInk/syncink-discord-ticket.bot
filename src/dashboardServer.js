@@ -276,6 +276,7 @@ function ensureGuildAccess(client) {
             else if (member.permissions.has('Administrator') || hasRole(adminRoles)) tier = 'admin';
             else if (hasRole(modRoles)) tier = 'moderator';
             else if (hasRole(staffRoles)) tier = 'staff';
+            else tier = 'member';
         }
 
         if (!tier) {
@@ -488,6 +489,7 @@ async function initDashboard(client) {
                             else if ((BigInt(guild.permissions) & BigInt(0x8)) === BigInt(0x8) || hasRole(adminRoles)) tier = 'admin';
                             else if (hasRole(modRoles)) tier = 'moderator';
                             else if (hasRole(staffRoles)) tier = 'staff';
+                            else tier = 'member';
                         }
                     }
 
@@ -530,7 +532,7 @@ async function initDashboard(client) {
                     if (member && member.permissions.has('Administrator')) {
                         guild.dashboardTier = 'admin';
                     } else {
-                        guild.dashboardTier = 'staff';
+                        guild.dashboardTier = 'member';
                     }
                 }
             }
@@ -564,7 +566,8 @@ async function initDashboard(client) {
         developer: 4,
         admin: 3,
         moderator: 2,
-        staff: 1
+        staff: 1,
+        member: 0
     };
 
     function hasPermission(userTier, requiredTier) {

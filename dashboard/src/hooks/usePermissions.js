@@ -5,7 +5,8 @@ const TIER_LEVELS = {
   developer: 4,
   admin: 3,
   moderator: 2,
-  staff: 1
+  staff: 1,
+  member: 0
 };
 
 export default function usePermissions() {
