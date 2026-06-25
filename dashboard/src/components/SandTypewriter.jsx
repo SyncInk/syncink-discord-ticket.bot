@@ -15,16 +15,17 @@ class Particle {
     
     // Physics properties
     this.progress = 0;
-    this.duration = 400 + Math.random() * 300; // 400-700ms travel time
+    this.duration = 400 + Math.random() * 200; // 400-600ms travel time
     this.delay = delay;
     
-    // Swirl offset parameters
-    this.swirlAmplitudeX = (Math.random() - 0.5) * 60;
-    this.swirlAmplitudeY = (Math.random() - 0.5) * 60;
+    // Swirl offset parameters (physics-based particle gathering)
+    this.swirlAmplitudeX = (Math.random() - 0.5) * 40;
+    this.swirlAmplitudeY = (Math.random() - 0.5) * 40;
     
-    this.size = 1 + Math.random() * 2;
+    this.size = 0.5 + Math.random() * 1.5;
     this.opacity = 0;
     this.dead = false;
+    this.reachedTarget = false;
   }
 
   update(deltaTime) {
@@ -36,14 +37,14 @@ class Particle {
     this.progress += deltaTime;
     let t = Math.min(this.progress / this.duration, 1);
     
-    // Fade in quickly, fade out at the very end
+    // Fade in
     if (t < 0.2) this.opacity = t / 0.2;
-    else if (t > 0.8) this.opacity = 1 - ((t - 0.8) / 0.2);
-    else this.opacity = 1;
+    else if (t < 0.9) this.opacity = 1;
+    else this.opacity = 1 - ((t - 0.9) / 0.1); // Quick fade out at the very end
 
     let easeT = easeOutCubic(t);
     
-    // Add swirl motion that reduces to 0 as it reaches target
+    // Spring physics swirl
     let swirlX = Math.sin(t * Math.PI * 2) * this.swirlAmplitudeX * (1 - easeT);
     let swirlY = Math.cos(t * Math.PI * 2) * this.swirlAmplitudeY * (1 - easeT);
 
@@ -51,6 +52,8 @@ class Particle {
     this.y = this.startY + (this.targetY - this.startY) * easeT + swirlY;
 
     if (t >= 1) {
+      this.reachedTarget = true;
+      this.opacity = 0;
       this.dead = true;
     }
   }
@@ -59,7 +62,7 @@ class Particle {
     if (this.opacity <= 0 || this.delay > 0) return;
     ctx.globalAlpha = this.opacity;
     ctx.fillStyle = this.color;
-    ctx.shadowBlur = 8;
+    ctx.shadowBlur = 6;
     ctx.shadowColor = this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -88,7 +91,9 @@ export default function SandTypewriter({
   const animationFrameRef = useRef(null);
   const lastTimeRef = useRef(0);
 
-  // Flatten text into array of chars while remembering line breaks and highlight
+  // Offscreen canvas for pixel extraction
+  const offscreenCanvasRef = useRef(document.createElement('canvas'));
+
   const chars = [];
   let charGlobalIndex = 0;
   
@@ -113,13 +118,12 @@ export default function SandTypewriter({
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setIsReducedMotion(mediaQuery.matches);
-    
     const handleMotionChange = (e) => setIsReducedMotion(e.matches);
     mediaQuery.addEventListener('change', handleMotionChange);
     return () => mediaQuery.removeEventListener('change', handleMotionChange);
   }, []);
 
-  // Animation Loop
+  // Main Canvas Render Loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -164,7 +168,7 @@ export default function SandTypewriter({
     };
   }, []);
 
-  // Typewriter Loop
+  // Typewriter + Pixel Extraction Sequence
   useEffect(() => {
     if (isReducedMotion) {
       setRevealedIndex(chars.length);
@@ -186,50 +190,86 @@ export default function SandTypewriter({
       }
 
       const currentChar = chars[currentIndex];
+      let particleDuration = 0;
       
-      // Spawn particles
       if (!currentChar.isBr && currentChar.char !== ' ' && containerRef.current && canvasRef.current) {
         const span = spansRef.current[currentIndex];
         if (span) {
           const containerRect = containerRef.current.getBoundingClientRect();
           const spanRect = span.getBoundingClientRect();
+          const style = window.getComputedStyle(span);
           
           const spanLeft = spanRect.left - containerRect.left;
           const spanTop = spanRect.top - containerRect.top;
-          const spanWidth = spanRect.width;
-          const spanHeight = spanRect.height;
-
-          // Spawn 15-25 particles per letter
-          const numParticles = Math.floor(15 + Math.random() * 10);
-          for (let i = 0; i < numParticles; i++) {
-            const targetX = spanLeft + Math.random() * spanWidth;
-            const targetY = spanTop + Math.random() * spanHeight;
-            
-            // Particles emerge from the bottom centerish area
-            const startX = spanLeft + (Math.random() - 0.5) * 150;
-            const startY = spanTop + 40 + Math.random() * 80;
-            
-            const color = currentChar.isHighlight ? '#C084FC' : '#ffffff';
-            
-            particlesRef.current.push(new Particle(targetX, targetY, startX, startY, color, Math.random() * 80));
+          
+          // Pixel Extraction
+          const offCanvas = offscreenCanvasRef.current;
+          const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
+          
+          // Use high DPI for better pixel sampling
+          const dpi = 2;
+          offCanvas.width = spanRect.width * dpi;
+          offCanvas.height = spanRect.height * dpi;
+          
+          offCtx.scale(dpi, dpi);
+          offCtx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+          offCtx.fillStyle = 'white';
+          offCtx.textAlign = 'center';
+          offCtx.textBaseline = 'middle';
+          
+          // Draw character in exact center
+          offCtx.fillText(currentChar.char, spanRect.width / 2, spanRect.height / 2);
+          
+          const imgData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height).data;
+          const targetPixels = [];
+          
+          // Scan for non-transparent pixels
+          for (let y = 0; y < offCanvas.height; y += 2) {
+            for (let x = 0; x < offCanvas.width; x += 2) {
+              const alpha = imgData[(y * offCanvas.width + x) * 4 + 3];
+              if (alpha > 128) {
+                targetPixels.push({ x: x / dpi, y: y / dpi });
+              }
+            }
           }
+
+          // Sample pixels to create particles (prevent lag)
+          const MAX_PARTICLES = 60;
+          const step = Math.max(1, Math.floor(targetPixels.length / MAX_PARTICLES));
+          const color = currentChar.isHighlight ? '#C084FC' : '#ffffff';
+          
+          for (let i = 0; i < targetPixels.length; i += step) {
+            const px = targetPixels[i];
+            const targetX = spanLeft + px.x;
+            const targetY = spanTop + px.y;
+            
+            // Particles spawn around the character
+            const startX = targetX + (Math.random() - 0.5) * 100;
+            const startY = targetY + (Math.random() - 0.5) * 100 + 40;
+            
+            particlesRef.current.push(new Particle(targetX, targetY, startX, startY, color, Math.random() * 50));
+          }
+          
+          particleDuration = 500; // wait ~500ms for particles to form the letter
         }
       }
 
-      setRevealedIndex(currentIndex);
+      // We wait for particles to form BEFORE revealing the DOM letter completely
+      setTimeout(() => {
+        setRevealedIndex(currentIndex);
+      }, particleDuration * 0.7);
 
-      // Delay for next char
       const delay = currentChar.char === ' ' ? 20 : (typingSpeedMin + Math.random() * (typingSpeedMax - typingSpeedMin));
-      timeoutId = setTimeout(typeNextChar, currentChar.isBr ? 0 : delay);
+      
+      // Wait for particle formation + typewriter delay
+      timeoutId = setTimeout(typeNextChar, particleDuration + delay);
     };
 
-    // Wait a brief moment before starting
-    timeoutId = setTimeout(typeNextChar, 400);
+    timeoutId = setTimeout(typeNextChar, 200);
 
     return () => clearTimeout(timeoutId);
   }, [isReducedMotion]);
 
-  // Construct final DOM for finished state to allow smooth continuous gradients
   const finalDom = [];
   textLines.forEach((line, lineIndex) => {
     const start = line.indexOf(highlightWord);
