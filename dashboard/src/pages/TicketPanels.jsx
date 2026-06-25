@@ -11,6 +11,69 @@ import {
   TextInput
 } from '../components/Common';
 
+function tokenizeDiscordText(text) {
+  const source = String(text || '');
+  const tokens = [];
+  const pattern = /<a?:([a-zA-Z0-9_]+):(\d+)>|`([^`]+)`|\*\*([^*]+)\*\*|__([^_]+)__/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = pattern.exec(source)) !== null) {
+    if (match.index > lastIndex) {
+      tokens.push({ type: 'text', value: source.slice(lastIndex, match.index) });
+    }
+
+    if (match[1] && match[2]) {
+      tokens.push({ type: 'emoji', name: match[1], id: match[2] });
+    } else if (match[3]) {
+      tokens.push({ type: 'code', value: match[3] });
+    } else if (match[4]) {
+      tokens.push({ type: 'bold', value: match[4] });
+    } else if (match[5]) {
+      tokens.push({ type: 'underline', value: match[5] });
+    }
+
+    lastIndex = pattern.lastIndex;
+  }
+
+  if (lastIndex < source.length) {
+    tokens.push({ type: 'text', value: source.slice(lastIndex) });
+  }
+
+  return tokens;
+}
+
+function renderDiscordTokens(text, keyPrefix) {
+  return tokenizeDiscordText(text).map((token, index) => {
+    const key = `${keyPrefix}-${index}`;
+
+    if (token.type === 'emoji') {
+      return (
+        <img
+          key={key}
+          className="discord-custom-emoji"
+          src={`https://cdn.discordapp.com/emojis/${token.id}.png`}
+          alt={`:${token.name}:`}
+        />
+      );
+    }
+
+    if (token.type === 'code') {
+      return <span key={key} className="discord-inline-code">{token.value}</span>;
+    }
+
+    if (token.type === 'bold') {
+      return <strong key={key}>{token.value}</strong>;
+    }
+
+    if (token.type === 'underline') {
+      return <u key={key}>{token.value}</u>;
+    }
+
+    return <React.Fragment key={key}>{token.value}</React.Fragment>;
+  });
+}
+
 export default function TicketPanels() {
   const { busy, deployPanel, openConfirm, saveSettings, snapshot } = useOutletContext();
   const [form, setForm] = useState(snapshot.settings.panelConfig);
@@ -24,6 +87,15 @@ export default function TicketPanels() {
   const updateField = (key, value) => {
     setForm((current) => ({ ...current, [key]: value }));
   };
+
+  const previewLines = (form.description || []).filter((line) => line !== undefined && line !== null && line !== '');
+  const previewTimestamp = new Date().toLocaleString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).replace(',', '');
 
   return (
     <div className="page-stack">
@@ -98,41 +170,47 @@ export default function TicketPanels() {
               <Eye size={16} />
               Discord panel preview
             </div>
+
             <div className="discord-message-preview">
               <img src={snapshot.bot.avatarUrl} alt={snapshot.bot.username} className="discord-message-avatar" />
+
               <div className="discord-message-content">
                 <div className="discord-message-header">
                   <span className="discord-message-author">{snapshot.bot.nickname || snapshot.bot.username}</span>
                   <span className="discord-message-bot-tag">APP</span>
-                  <span className="discord-message-timestamp">{new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', '')}</span>
+                  <span className="discord-message-timestamp">{previewTimestamp}</span>
                 </div>
-                
+
                 <div className="discord-message-embed">
-                  <div className="discord-message-embed-color" style={{ background: form.color || 'transparent' }} />
+                  <div className="discord-message-embed-color" style={{ background: form.color || '#5865f2' }} />
+
                   <div className="discord-message-embed-body">
-                    {form.title && (
-                      <div 
-                        className="discord-message-embed-title" 
-                        dangerouslySetInnerHTML={{ __html: form.title.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;(a?):(\w+):(\d+)&gt;/g, '<img class="discord-custom-emoji" src="https://cdn.discordapp.com/emojis/$3.png" alt=":$2:" />').replace(/`([^`]+)`/g, '<span class="discord-inline-code">$1</span>').replace(/__([^_]+)__/g, '<u>$1</u>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>') }} 
-                      />
-                    )}
+                    {form.title ? (
+                      <div className="discord-message-embed-title">
+                        {renderDiscordTokens(form.title, 'title')}
+                      </div>
+                    ) : null}
+
                     <div className="discord-message-embed-desc">
-                      {(form.description || []).map((line, index) => (
-                        <p 
-                          key={index} 
-                          dangerouslySetInnerHTML={{ __html: (line || '&nbsp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;(a?):(\w+):(\d+)&gt;/g, '<img class="discord-custom-emoji" src="https://cdn.discordapp.com/emojis/$3.png" alt=":$2:" />').replace(/`([^`]+)`/g, '<span class="discord-inline-code">$1</span>').replace(/__([^_]+)__/g, '<u>$1</u>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>') }} 
-                        />
+                      {previewLines.map((line, index) => (
+                        <div key={index} className="discord-message-embed-line">
+                          <span className="discord-message-bullet">•</span>
+                          <p>{renderDiscordTokens(line, `line-${index}`)}</p>
+                        </div>
                       ))}
                     </div>
                   </div>
-                  {form.thumbnailUrl && <img src={form.thumbnailUrl} alt="Thumbnail" style={{ width: 44, height: 44, borderRadius: 4, margin: '16px 16px 16px 0', objectFit: 'contain' }} />}
+
+                  {form.thumbnailUrl ? (
+                    <img src={form.thumbnailUrl} alt="Thumbnail" className="discord-message-embed-thumb" />
+                  ) : null}
                 </div>
 
                 <div className="discord-message-components">
                   <div className="discord-message-select">
                     <span>{form.placeholder}</span>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M8.59003 16.59L13.17 12L8.59003 7.41L10 6L16 12L10 18L8.59003 16.59Z" fill="#B5BAC1" />
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M8.59003 16.59L13.17 12L8.59003 7.41L10 6L16 12L10 18L8.59003 16.59Z" fill="#DBDEE1" />
                     </svg>
                   </div>
                 </div>
