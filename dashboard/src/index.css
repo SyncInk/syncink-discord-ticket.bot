@@ -2488,3 +2488,44 @@ canvas {
   100% { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 40px rgba(139, 92, 246, 0.4)); }
 }
 
+
+
+/* --- Phase 1: Simultaneous Burst Animation --- */
+
+.hero-particle-text {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  letter-spacing: -0.05em;
+  color: #ffffff;
+  position: relative;
+  z-index: 1;
+}
+
+/* Base state for all chars */
+.particle-char {
+  opacity: 0;
+  transition: opacity 700ms ease-in-out;
+}
+
+/* When assembling, trigger the smooth fade in over 700ms to match particles */
+.hero-particle-text.assembling .particle-char {
+  opacity: 1;
+}
+
+.highlight-char-assembling {
+  color: #C084FC;
+}
+
+/* Premium finished gradient span */
+.premium-highlight-word {
+  display: inline-block;
+  background: linear-gradient(90deg, #8B5CF6, #A855F7, #C084FC, #8B5CF6);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: 
+    gradientMove 4s linear infinite,
+    premiumGlow 3s ease-in-out infinite alternate;
+}
+
