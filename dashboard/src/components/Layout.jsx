@@ -24,7 +24,8 @@ import {
   Search,
   Shield,
   ShieldCheck,
-  SlidersHorizontal
+  SlidersHorizontal,
+  X
 } from 'lucide-react';
 import {
   ActionButton,
