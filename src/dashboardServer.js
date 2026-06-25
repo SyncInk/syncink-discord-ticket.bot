@@ -578,14 +578,38 @@ async function initDashboard(client) {
                 member: 0
             };
 
-            const guilds = req.session.adminGuilds || [];
-            for (const guild of guilds) {
-                const tier = guild.dashboardTier;
-                const score = TIER_LEVELS[tier] || 0;
+            const userGuilds = req.session.adminGuilds || [];
+            for (const sessionGuild of userGuilds) {
+                const botGuild = client.guilds.cache.get(sessionGuild.id);
+                if (!botGuild) continue;
+
+                const member = await botGuild.members.fetch(req.session.user.id).catch(() => null);
+                if (!member) continue;
+
+                const settings = await db.getGuildConfig(botGuild.id).catch(() => ({})) || {};
+                let currentTier = 'member';
+
+                if (botGuild.ownerId === req.session.user.id) {
+                    currentTier = 'owner';
+                } else {
+                    const devRoles = settings.developerRoleIds || [];
+                    const adminRoles = settings.adminRoleIds || [];
+                    const modRoles = settings.moderatorRoleIds || [];
+                    const staffRoles = settings.staffRoleIds || [];
+
+                    const hasRole = (roleIds) => roleIds.some(id => member.roles.cache.has(id));
+
+                    if (hasRole(devRoles)) currentTier = 'developer';
+                    else if (member.permissions.has('Administrator') || hasRole(adminRoles)) currentTier = 'admin';
+                    else if (hasRole(modRoles)) currentTier = 'moderator';
+                    else if (hasRole(staffRoles)) currentTier = 'staff';
+                }
+
+                const score = TIER_LEVELS[currentTier] || 0;
                 if (score > maxScore) {
                     maxScore = score;
-                    highestTier = tier;
-                    highestTierGuildName = guild.name;
+                    highestTier = currentTier;
+                    highestTierGuildName = botGuild.name;
                 }
             }
 

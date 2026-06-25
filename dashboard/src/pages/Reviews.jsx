@@ -42,6 +42,18 @@ export default function Reviews({ user }) {
     }
   };
 
+  const getTierIcon = (tier) => {
+    switch (tier?.toLowerCase()) {
+      case 'owner': return '👑';
+      case 'developer': return '💻';
+      case 'admin': return '🛡️';
+      case 'moderator': return '🔨';
+      case 'staff': return '📋';
+      case 'member': return '👤';
+      default: return '👤';
+    }
+  };
+
   const renderStars = (count) => {
     return Array.from({ length: 5 }).map((_, i) => (
       <Star key={i} size={14} fill={i < count ? 'currentColor' : 'none'} opacity={i < count ? 1 : 0.3} />
@@ -117,7 +129,8 @@ export default function Reviews({ user }) {
                 <div className="review-user-info">
                   <span className="review-username">{review.globalName || review.username}</span>
                   {review.highestTier && review.highestTierGuildName && (
-                    <span className="review-tier">
+                    <span className={`review-tier tier-${review.highestTier.toLowerCase()}`}>
+                      <span className="tier-icon">{getTierIcon(review.highestTier)}</span>
                       {review.highestTier} OF {review.highestTierGuildName}
                     </span>
                   )}
