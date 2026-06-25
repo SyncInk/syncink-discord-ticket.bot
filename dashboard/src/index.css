@@ -2336,3 +2336,86 @@ canvas {
   object-fit: cover;
 }
 
+
+
+/* --- Sand Typewriter Animation --- */
+
+.sand-typewriter-container {
+  position: relative;
+  display: inline-block;
+}
+
+.sand-typewriter-text {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  letter-spacing: -0.05em;
+  color: #ffffff; /* Base solid white */
+  position: relative;
+  z-index: 1;
+}
+
+.sand-char {
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+  display: inline-block;
+}
+
+.sand-char.revealed {
+  opacity: 1;
+}
+
+.sand-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1.1em;
+  background: #C084FC;
+  vertical-align: text-bottom;
+  margin-left: 4px;
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Specific styling for the target word during typing */
+.highlight-char-typing {
+  color: #C084FC;
+}
+
+/* Premium finished gradient span */
+.premium-highlight-word {
+  display: inline-block;
+  background: linear-gradient(90deg, #8B5CF6, #A855F7, #C084FC, #8B5CF6);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #A855F7; /* Fallback */
+  animation: 
+    gradientMove 4s linear infinite,
+    premiumGlow 3s ease-in-out infinite alternate;
+}
+
+/* Fallback for prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .premium-highlight-word {
+    animation: none;
+    background: none;
+    -webkit-background-clip: border-box;
+    -webkit-text-fill-color: currentcolor;
+    text-shadow: none;
+    color: #A855F7;
+  }
+}
+
+@keyframes gradientMove {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes premiumGlow {
+  0% { filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.4)) drop-shadow(0 0 20px rgba(139, 92, 246, 0.2)); }
+  100% { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 40px rgba(139, 92, 246, 0.4)); }
+}
+

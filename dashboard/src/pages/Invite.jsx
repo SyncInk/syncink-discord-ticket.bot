@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Shield, Ticket, X } from 'lucide-react';
+import SandTypewriter from '../components/SandTypewriter';
 
 export default function Invite() {
   const navigate = useNavigate();
@@ -18,7 +19,10 @@ export default function Invite() {
       </div>
 
       <div className="invite-hero">
-        <h1 className="sand-fade">Add <span>SyncInk Ticket</span><br />to your server</h1>
+        <SandTypewriter 
+          textLines={["Add SyncInk Ticket", "to your server"]} 
+          highlightWord="SyncInk Ticket"
+        />
         <p>
           The ultimate ticket management system.<br />
           Beautiful dashboard, complete control, zero clutter.
