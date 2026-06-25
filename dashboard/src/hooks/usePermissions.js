@@ -9,8 +9,8 @@ const TIER_LEVELS = {
 };
 
 export default function usePermissions() {
-  const { selectedGuild } = useOutletContext();
-  const userTier = selectedGuild?.dashboardTier || (selectedGuild?.owner ? 'owner' : 'staff');
+  const { selectedGuild, snapshot } = useOutletContext();
+  const userTier = snapshot?.userTier || selectedGuild?.dashboardTier || (selectedGuild?.owner ? 'owner' : 'staff');
 
   const hasPermission = (requiredTier) => {
     return (TIER_LEVELS[userTier] || 0) >= TIER_LEVELS[requiredTier];

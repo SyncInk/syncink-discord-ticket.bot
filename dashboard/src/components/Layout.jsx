@@ -247,7 +247,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
     guild.name.toLowerCase().includes(serverSearch.toLowerCase())
   );
 
-  const userTier = selectedGuild?.dashboardTier || (selectedGuild?.owner ? 'owner' : 'staff');
+  const userTier = snapshot?.userTier || selectedGuild?.dashboardTier || (selectedGuild?.owner ? 'owner' : 'staff');
   const userLevel = TIER_LEVELS[userTier] || 0;
 
   const allowedNavItems = ALL_NAV_ITEMS.filter((item) => {

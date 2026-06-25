@@ -259,26 +259,30 @@ function ensureGuildAccess(client) {
         }
 
         const member = await botGuild.members.fetch(req.session.user.id).catch(() => null);
-        const hasLiveAccess = Boolean(member) && (
-            allowedGuild.dashboardTier || 
-            botGuild.ownerId === req.session.user.id || 
-            member.permissions.has('Administrator')
-        );
+        
+        let tier = null;
+        if (botGuild.ownerId === req.session.user.id) {
+            tier = 'owner';
+        } else if (member) {
+            const settings = await db.getGuildConfig(guildId).catch(() => ({})) || {};
+            const devRoles = settings.developerRoleIds || [];
+            const adminRoles = settings.adminRoleIds || [];
+            const modRoles = settings.moderatorRoleIds || [];
+            const staffRoles = settings.staffRoleIds || [];
+            
+            const hasRole = (ids) => ids && ids.length > 0 && member.roles.cache.hasAny(...ids);
+            
+            if (hasRole(devRoles)) tier = 'developer';
+            else if (member.permissions.has('Administrator') || hasRole(adminRoles)) tier = 'admin';
+            else if (hasRole(modRoles)) tier = 'moderator';
+            else if (hasRole(staffRoles)) tier = 'staff';
+        }
 
-        if (!hasLiveAccess) {
+        if (!tier) {
             return res.status(403).json({ error: 'Your server permissions no longer allow dashboard access.' });
         }
 
-        if (!allowedGuild.dashboardTier) {
-            if (botGuild.ownerId === req.session.user.id) {
-                allowedGuild.dashboardTier = 'owner';
-            } else if (member.permissions.has('Administrator')) {
-                allowedGuild.dashboardTier = 'admin';
-            } else {
-                allowedGuild.dashboardTier = 'staff';
-            }
-        }
-
+        allowedGuild.dashboardTier = tier;
         req.dashboardGuild = botGuild;
         req.allowedGuild = allowedGuild;
         return next();
@@ -547,6 +551,7 @@ async function initDashboard(client) {
     app.get('/api/guilds/:guildId/bootstrap', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
         try {
             const snapshot = await createDashboardSnapshot(client, req.params.guildId);
+            snapshot.userTier = req.allowedGuild.dashboardTier;
             res.json(snapshot);
         } catch (error) {
             console.error('[DASHBOARD] Failed to build snapshot:', error);
