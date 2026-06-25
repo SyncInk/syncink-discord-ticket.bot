@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap');
 
 :root {
   color-scheme: dark;
@@ -327,10 +327,14 @@ img {
   border-radius: 0;
 }
 
-.role-badge.owner,
-.role-badge.admin {
+.role-badge.owner {
   color: #ffb2c3;
   background: rgba(255, 125, 156, 0.1);
+}
+
+.role-badge.admin {
+  color: #ff4d4d;
+  background: rgba(255, 77, 77, 0.15);
 }
 
 .role-badge.developer {
@@ -344,8 +348,8 @@ img {
 }
 
 .role-badge.staff {
-  color: #b8c8ff;
-  background: rgba(84, 116, 255, 0.1);
+  color: #c084fc;
+  background: rgba(192, 132, 252, 0.15);
 }
 
 .pulsing-dot {

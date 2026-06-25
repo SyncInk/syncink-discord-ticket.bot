@@ -37,24 +37,27 @@ import { titleFromEvent } from '../format';
 
 const SUPPORT_URL = 'https://syncink.github.io/syncink-portfolio/#contact';
 
-const navGroups = [
-  {
-    label: 'Server Settings',
-    items: [
-      { path: '/', label: 'Dashboard Overview', icon: LayoutDashboard },
-      { path: '/panels', label: 'Ticket Panels', icon: PanelsTopLeft },
-      { path: '/categories', label: 'Ticket Categories', icon: MessageSquareMore },
-      { path: '/ticket-logs', label: 'Ticket Logs', icon: ClipboardList },
-      { path: '/transcripts', label: 'Transcripts', icon: FileText },
-      { path: '/analytics', label: 'Analytics', icon: ChartColumnBig },
-      { path: '/activity', label: 'Activity Feed', icon: Activity },
-      { path: '/audit-logs', label: 'Audit Logs', icon: ScrollText },
-      { path: '/dashboard-access', label: 'Dashboard Access', icon: Shield },
-      { path: '/miscellaneous', label: 'Miscellaneous', icon: SlidersHorizontal },
-      { path: '/bot-profile', label: 'Bot Profile', icon: Bot },
-      { path: '/interface', label: 'Interface', icon: BrushCleaning }
-    ]
-  }
+const TIER_LEVELS = {
+  owner: 5,
+  developer: 4,
+  admin: 3,
+  moderator: 2,
+  staff: 1
+};
+
+const ALL_NAV_ITEMS = [
+  { path: '/', label: 'Dashboard Overview', icon: LayoutDashboard, minTier: 'staff' },
+  { path: '/panels', label: 'Ticket Panels', icon: PanelsTopLeft, minTier: 'moderator' },
+  { path: '/categories', label: 'Ticket Categories', icon: MessageSquareMore, minTier: 'moderator' },
+  { path: '/ticket-logs', label: 'Ticket Logs', icon: ClipboardList, minTier: 'staff' },
+  { path: '/transcripts', label: 'Transcripts', icon: FileText, minTier: 'moderator' },
+  { path: '/analytics', label: 'Analytics', icon: ChartColumnBig, minTier: 'moderator' },
+  { path: '/activity', label: 'Activity Feed', icon: Activity, minTier: 'staff' },
+  { path: '/audit-logs', label: 'Audit Logs', icon: ScrollText, minTier: 'moderator' },
+  { path: '/dashboard-access', label: 'Dashboard Access', icon: Shield, minTier: 'admin' },
+  { path: '/miscellaneous', label: 'Miscellaneous', icon: SlidersHorizontal, minTier: 'admin' },
+  { path: '/bot-profile', label: 'Bot Profile', icon: Bot, minTier: 'admin' },
+  { path: '/interface', label: 'Interface', icon: BrushCleaning, minTier: 'admin' }
 ];
 
 const helpItems = [
@@ -244,9 +247,22 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
     guild.name.toLowerCase().includes(serverSearch.toLowerCase())
   );
 
-  const currentLabel = navGroups
-    .flatMap((group) => group.items)
-    .find((item) => item.path === location.pathname)?.label || 'Dashboard';
+  const userTier = selectedGuild?.dashboardTier || (selectedGuild?.owner ? 'owner' : 'staff');
+  const userLevel = TIER_LEVELS[userTier] || 0;
+
+  const allowedNavItems = ALL_NAV_ITEMS.filter((item) => {
+    const requiredLevel = TIER_LEVELS[item.minTier] || 0;
+    return userLevel >= requiredLevel;
+  });
+
+  const navGroups = [
+    {
+      label: 'Server Settings',
+      items: allowedNavItems
+    }
+  ];
+
+  const currentLabel = allowedNavItems.find((item) => item.path === location.pathname)?.label || 'Dashboard';
 
   const renderTierBadge = (tier) => {
     switch (tier) {

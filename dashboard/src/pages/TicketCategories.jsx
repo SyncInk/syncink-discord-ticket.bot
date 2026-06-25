@@ -9,9 +9,12 @@ import {
   TextArea,
   TextInput
 } from '../components/Common';
+import usePermissions from '../hooks/usePermissions';
+import LockedOverlay from '../components/LockedOverlay';
 
 export default function TicketCategories() {
   const { busy, saveSettings, snapshot } = useOutletContext();
+  const { canEditSettings, getLockTooltip } = usePermissions();
   const [categories, setCategories] = useState(snapshot.settings.categoryOverrides);
 
   useEffect(() => {
@@ -25,6 +28,7 @@ export default function TicketCategories() {
   };
 
   const toggleRole = (value, roleId) => {
+    if (!canEditSettings) return;
     setCategories((current) => current.map((category) => {
       if (category.value !== value) return category;
       const hasRole = category.roleIds.includes(roleId);
@@ -51,7 +55,7 @@ export default function TicketCategories() {
         eyebrow="Safe Category Editing"
         title="Customize ticket categories"
         description="Rename labels, rewrite descriptions, swap emojis, and assign destination staff roles while keeping the existing bot logic intact."
-        action={(
+        action={canEditSettings && (
           <ActionButton tone="primary" busy={busy} onClick={() => saveSettings({ categoryOverrides: categories }, 'Categories saved')}>
             Save category settings
           </ActionButton>
@@ -60,33 +64,36 @@ export default function TicketCategories() {
 
       <div className="card-grid">
         {categories.map((category) => (
-          <SectionCard
-            key={category.value}
-            title={<>{renderEmoji(category.emoji)} {category.label}</>}
-            description={`Internal value: ${category.value}`}
-          >
-            <div className="form-grid">
-              <Field label="Emoji">
-                <TextInput value={category.emoji} onChange={(event) => updateCategory(category.value, 'emoji', event.target.value)} />
-              </Field>
+          <div key={category.value} style={{ position: 'relative' }}>
+            {!canEditSettings && <LockedOverlay tooltip={getLockTooltip('admin')} />}
+            <SectionCard
+              title={<>{renderEmoji(category.emoji)} {category.label}</>}
+              description={`Internal value: ${category.value}`}
+            >
+              <div className="form-grid">
+                <Field label="Emoji">
+                  <TextInput value={category.emoji} onChange={(event) => updateCategory(category.value, 'emoji', event.target.value)} disabled={!canEditSettings} />
+                </Field>
 
-              <Field label="Label">
-                <TextInput value={category.label} onChange={(event) => updateCategory(category.value, 'label', event.target.value)} />
-              </Field>
+                <Field label="Label">
+                  <TextInput value={category.label} onChange={(event) => updateCategory(category.value, 'label', event.target.value)} disabled={!canEditSettings} />
+                </Field>
 
-              <Field label="Description">
-                <TextArea rows={4} value={category.description} onChange={(event) => updateCategory(category.value, 'description', event.target.value)} />
-              </Field>
+                <Field label="Description">
+                  <TextArea rows={4} value={category.description} onChange={(event) => updateCategory(category.value, 'description', event.target.value)} disabled={!canEditSettings} />
+                </Field>
 
-              <Field label="Staff roles for this category" hint="(If left empty, the bot falls back to the original role routing.)">
-                <RolePicker
-                  roles={snapshot.resources.roles}
-                  selectedIds={category.roleIds}
-                  onToggle={(roleId) => toggleRole(category.value, roleId)}
-                />
-              </Field>
-            </div>
-          </SectionCard>
+                <Field label="Staff roles for this category" hint="(If left empty, the bot falls back to the original role routing.)">
+                  <RolePicker
+                    roles={snapshot.resources.roles}
+                    selectedIds={category.roleIds}
+                    onToggle={(roleId) => toggleRole(category.value, roleId)}
+                    disabled={!canEditSettings}
+                  />
+                </Field>
+              </div>
+            </SectionCard>
+          </div>
         ))}
       </div>
     </div>

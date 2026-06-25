@@ -8,9 +8,12 @@ import {
   SelectInput,
   Toggle
 } from '../components/Common';
+import usePermissions from '../hooks/usePermissions';
+import LockedOverlay from '../components/LockedOverlay';
 
 export default function InterfacePage() {
   const { busy, saveSettings, snapshot } = useOutletContext();
+  const { canEditSettings, getLockTooltip } = usePermissions();
   const defaultPrefs = { accentColor: '#9d7cff', density: 'comfortable', motion: 'full', glass: true, theme: 'dark', sidebarBehavior: 'auto', toastDuration: 'medium' };
   const [prefs, setPrefs] = useState(snapshot.settings?.dashboardPreferences || defaultPrefs);
 
@@ -28,39 +31,40 @@ export default function InterfacePage() {
         eyebrow="Personalized UI"
         title="Dashboard interface preferences"
         description="These are safe dashboard-only presentation settings. They do not change the bot's ticket behavior."
-        action={(
+        action={canEditSettings && (
           <ActionButton tone="primary" busy={busy} onClick={() => saveSettings({ dashboardPreferences: prefs }, 'Interface preferences saved')}>
             Save interface
           </ActionButton>
         )}
       />
 
-      <div className="split-grid">
+      <div className="split-grid" style={{ position: 'relative' }}>
+        {!canEditSettings && <LockedOverlay tooltip={getLockTooltip('admin')} />}
         <SectionCard title="Interface" description="Tune the visual experience of the dashboard.">
           <div className="form-grid">
             <Field label="Theme">
-              <SelectInput value={prefs.theme || 'dark'} onChange={(event) => updateField('theme', event.target.value)}>
+              <SelectInput value={prefs.theme || 'dark'} onChange={(event) => updateField('theme', event.target.value)} disabled={!canEditSettings}>
                 <option value="dark">Dark Theme (Default)</option>
                 <option value="light" disabled>Light Theme (Coming Soon)</option>
               </SelectInput>
             </Field>
 
             <Field label="Animation">
-              <SelectInput value={prefs.motion || 'full'} onChange={(event) => updateField('motion', event.target.value)}>
+              <SelectInput value={prefs.motion || 'full'} onChange={(event) => updateField('motion', event.target.value)} disabled={!canEditSettings}>
                 <option value="full">Full motion (Smooth transitions)</option>
                 <option value="reduced">Reduced motion (Instant)</option>
               </SelectInput>
             </Field>
 
             <Field label="Density">
-              <SelectInput value={prefs.density || 'comfortable'} onChange={(event) => updateField('density', event.target.value)}>
+              <SelectInput value={prefs.density || 'comfortable'} onChange={(event) => updateField('density', event.target.value)} disabled={!canEditSettings}>
                 <option value="comfortable">Comfortable</option>
                 <option value="compact">Compact (More items on screen)</option>
               </SelectInput>
             </Field>
 
             <Field label="Sidebar Behavior">
-              <SelectInput value={prefs.sidebarBehavior || 'auto'} onChange={(event) => updateField('sidebarBehavior', event.target.value)}>
+              <SelectInput value={prefs.sidebarBehavior || 'auto'} onChange={(event) => updateField('sidebarBehavior', event.target.value)} disabled={!canEditSettings}>
                 <option value="auto">Auto-collapse on narrow screens</option>
                 <option value="always">Always keep visible</option>
               </SelectInput>
@@ -72,7 +76,7 @@ export default function InterfacePage() {
           <SectionCard title="Notification Settings" description="Control how dashboard alerts are shown.">
             <div className="form-grid">
               <Field label="Toast Duration">
-                <SelectInput value={prefs.toastDuration || 'medium'} onChange={(event) => updateField('toastDuration', event.target.value)}>
+                <SelectInput value={prefs.toastDuration || 'medium'} onChange={(event) => updateField('toastDuration', event.target.value)} disabled={!canEditSettings}>
                   <option value="short">Short (2.5 seconds)</option>
                   <option value="medium">Medium (4.2 seconds)</option>
                   <option value="long">Long (8 seconds)</option>
@@ -83,6 +87,7 @@ export default function InterfacePage() {
                 onChange={(value) => updateField('glass', value)}
                 label="Glassmorphism surfaces"
                 description="Keep the translucent card styling for toasts and modals."
+                disabled={!canEditSettings}
               />
             </div>
           </SectionCard>

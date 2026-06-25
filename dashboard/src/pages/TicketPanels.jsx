@@ -10,6 +10,8 @@ import {
   TextArea,
   TextInput
 } from '../components/Common';
+import usePermissions from '../hooks/usePermissions';
+import LockedOverlay from '../components/LockedOverlay';
 
 function tokenizeDiscordText(text) {
   const source = String(text || '');
@@ -76,6 +78,7 @@ function renderDiscordTokens(text, keyPrefix) {
 
 export default function TicketPanels() {
   const { busy, deployPanel, openConfirm, saveSettings, snapshot } = useOutletContext();
+  const { canEditSettings, getLockTooltip } = usePermissions();
   const [form, setForm] = useState(snapshot.settings.panelConfig);
   const [panelChannelId, setPanelChannelId] = useState(snapshot.settings.panelChannelId || '');
 
@@ -103,7 +106,7 @@ export default function TicketPanels() {
         eyebrow="Panel Configuration"
         title="Design the ticket entry panel"
         description="Adjust the panel copy and appearance without changing the underlying ticket workflow or bot logic."
-        action={(
+        action={canEditSettings && (
           <div className="action-row">
             <ActionButton tone="primary" busy={busy} onClick={() => saveSettings({ panelConfig: form }, 'Panel styling saved')}>
               Save panel style
@@ -127,42 +130,46 @@ export default function TicketPanels() {
       />
 
       <div className="split-grid">
-        <SectionCard title="Panel settings" description="These values shape the embed members see before opening a ticket.">
-          <div className="form-grid">
-            <Field label="Ticket panel channel">
-              <SelectInput value={panelChannelId} onChange={(event) => setPanelChannelId(event.target.value)}>
-                <option value="">Select a text channel</option>
-                {snapshot.resources.panelChannels.map((channel) => (
-                  <option key={channel.id} value={channel.id}>{channel.name}</option>
-                ))}
-              </SelectInput>
-            </Field>
+        <div style={{ position: 'relative' }}>
+          {!canEditSettings && <LockedOverlay tooltip={getLockTooltip('admin')} />}
+          <SectionCard title="Panel settings" description="These values shape the embed members see before opening a ticket.">
+            <div className="form-grid">
+              <Field label="Ticket panel channel">
+                <SelectInput value={panelChannelId} onChange={(event) => setPanelChannelId(event.target.value)} disabled={!canEditSettings}>
+                  <option value="">Select a text channel</option>
+                  {snapshot.resources.panelChannels.map((channel) => (
+                    <option key={channel.id} value={channel.id}>{channel.name}</option>
+                  ))}
+                </SelectInput>
+              </Field>
 
-            <Field label="Panel title">
-              <TextInput value={form.title} onChange={(event) => updateField('title', event.target.value)} />
-            </Field>
+              <Field label="Panel title">
+                <TextInput value={form.title} onChange={(event) => updateField('title', event.target.value)} disabled={!canEditSettings} />
+              </Field>
 
-            <Field label="Panel placeholder">
-              <TextInput value={form.placeholder} onChange={(event) => updateField('placeholder', event.target.value)} />
-            </Field>
+              <Field label="Panel placeholder">
+                <TextInput value={form.placeholder} onChange={(event) => updateField('placeholder', event.target.value)} disabled={!canEditSettings} />
+              </Field>
 
-            <Field label="Embed color">
-              <TextInput value={form.color} onChange={(event) => updateField('color', event.target.value)} />
-            </Field>
+              <Field label="Embed color">
+                <TextInput value={form.color} onChange={(event) => updateField('color', event.target.value)} disabled={!canEditSettings} />
+              </Field>
 
-            <Field label="Thumbnail URL">
-              <TextInput value={form.thumbnailUrl} onChange={(event) => updateField('thumbnailUrl', event.target.value)} />
-            </Field>
+              <Field label="Thumbnail URL">
+                <TextInput value={form.thumbnailUrl} onChange={(event) => updateField('thumbnailUrl', event.target.value)} disabled={!canEditSettings} />
+              </Field>
 
-            <Field label="Panel description" hint="Use one line per bullet shown in the embed.">
-              <TextArea
-                rows={7}
-                value={(form.description || []).join('\n')}
-                onChange={(event) => updateField('description', event.target.value.split('\n'))}
-              />
-            </Field>
-          </div>
-        </SectionCard>
+              <Field label="Panel description" hint="Use one line per bullet shown in the embed.">
+                <TextArea
+                  rows={7}
+                  value={(form.description || []).join('\n')}
+                  onChange={(event) => updateField('description', event.target.value.split('\n'))}
+                  disabled={!canEditSettings}
+                />
+              </Field>
+            </div>
+          </SectionCard>
+        </div>
 
         <SectionCard title="Live preview" description="A dashboard-side preview of the Discord-facing ticket panel.">
           <div className="panel-preview">

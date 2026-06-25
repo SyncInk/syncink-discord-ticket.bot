@@ -3,9 +3,12 @@ import { useOutletContext } from 'react-router-dom';
 import axios from 'axios';
 import { ActionButton, MetricCard, PageHeader, SectionCard, Field, TextInput } from '../components/Common';
 import { formatDuration } from '../format';
+import usePermissions from '../hooks/usePermissions';
+import LockedOverlay from '../components/LockedOverlay';
 
 export default function BotProfile() {
   const { snapshot, selectedGuild, refreshSnapshot } = useOutletContext();
+  const { isDeveloper, getLockTooltip } = usePermissions();
   const [nickname, setNickname] = useState(snapshot.bot?.nickname || '');
   const [busy, setBusy] = useState(false);
 
@@ -14,6 +17,7 @@ export default function BotProfile() {
   }, [snapshot]);
 
   const handleSaveNickname = async () => {
+    if (!isDeveloper) return;
     setBusy(true);
     try {
       await axios.post(`/api/guilds/${selectedGuild.id}/nickname`, { nickname });
@@ -53,24 +57,28 @@ export default function BotProfile() {
           </div>
         </SectionCard>
 
-        <SectionCard 
-          title="Server Nickname" 
-          description="Change the bot's display name specifically for this server."
-          action={
-            <ActionButton tone="primary" busy={busy} onClick={handleSaveNickname}>
-              Update Nickname
-            </ActionButton>
-          }
-        >
-          <Field label="Nickname" hint="Leave blank to reset to the default bot username.">
-            <TextInput 
-              value={nickname} 
-              onChange={(e) => setNickname(e.target.value)} 
-              placeholder={snapshot.bot.username}
-              maxLength={32}
-            />
-          </Field>
-        </SectionCard>
+        <div style={{ position: 'relative' }}>
+          {!isDeveloper && <LockedOverlay tooltip={getLockTooltip('developer')} />}
+          <SectionCard 
+            title="Server Nickname" 
+            description="Change the bot's display name specifically for this server."
+            action={isDeveloper && (
+              <ActionButton tone="primary" busy={busy} onClick={handleSaveNickname}>
+                Update Nickname
+              </ActionButton>
+            )}
+          >
+            <Field label="Nickname" hint="Leave blank to reset to the default bot username.">
+              <TextInput 
+                value={nickname} 
+                onChange={(e) => setNickname(e.target.value)} 
+                placeholder={snapshot.bot.username}
+                maxLength={32}
+                disabled={!isDeveloper}
+              />
+            </Field>
+          </SectionCard>
+        </div>
       </div>
     </div>
   );

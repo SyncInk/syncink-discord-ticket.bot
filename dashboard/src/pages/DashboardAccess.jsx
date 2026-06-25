@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Crown, ShieldCheck, X } from 'lucide-react';
 import { ActionButton, PageHeader } from '../components/Common';
+import usePermissions from '../hooks/usePermissions';
+import LockedOverlay from '../components/LockedOverlay';
 
 const TIERS = [
   { id: 'owner', label: 'OWNER', accessLabel: 'Owner (Full Access)', emojiId: '1513803214674464788', color: 'linear-gradient(135deg, #FF6B9A 0%, #9D7CFF 100%)', desc: 'everything' },
@@ -13,6 +15,7 @@ const TIERS = [
 
 export default function DashboardAccess() {
   const { busy, saveSettings, snapshot } = useOutletContext();
+  const { canEditAccess, getLockTooltip } = usePermissions();
   const [roleMap, setRoleMap] = useState([]);
   const [selectedNewRole, setSelectedNewRole] = useState('');
 
@@ -44,17 +47,19 @@ export default function DashboardAccess() {
   }, [snapshot]);
 
   const handleUpdateRole = (roleId, newTier) => {
+    if (!canEditAccess) return;
     setRoleMap((current) => current.map((role) => (
       role.id === roleId ? { ...role, tier: newTier } : role
     )));
   };
 
   const handleRemoveRole = (roleId) => {
+    if (!canEditAccess) return;
     setRoleMap((current) => current.filter((role) => role.id !== roleId));
   };
 
   const handleAddRole = () => {
-    if (!selectedNewRole) return;
+    if (!canEditAccess || !selectedNewRole) return;
     const roleData = snapshot.resources?.roles?.find((role) => role.id === selectedNewRole);
     if (roleData && !roleMap.find((role) => role.id === selectedNewRole)) {
       setRoleMap([...roleMap, { ...roleData, tier: 'staff' }]);
@@ -63,6 +68,7 @@ export default function DashboardAccess() {
   };
 
   const handleSave = () => {
+    if (!canEditAccess) return;
     const payload = {
       ownerRoleIds: roleMap.filter((role) => role.tier === 'owner').map((role) => role.id),
       developerRoleIds: roleMap.filter((role) => role.tier === 'developer').map((role) => role.id),
@@ -82,7 +88,7 @@ export default function DashboardAccess() {
         eyebrow="Permission Management"
         title="Dashboard access tiers"
         description="Control which Discord roles are allowed into the dashboard and how much operational access each role should have."
-        action={(
+        action={canEditAccess && (
           <ActionButton tone="primary" busy={busy} onClick={handleSave}>
             Save Changes
           </ActionButton>
@@ -116,7 +122,8 @@ export default function DashboardAccess() {
         ))}
       </div>
 
-      <section className="section-card">
+      <section className="section-card" style={{ position: 'relative' }}>
+        {!canEditAccess && <LockedOverlay tooltip={getLockTooltip('developer')} />}
         <div className="section-head access-roles-head">
           <div className="allowed-roles-title">
             <ShieldCheck size={20} className="accent-icon" />
@@ -130,13 +137,14 @@ export default function DashboardAccess() {
               className="role-select-input"
               value={selectedNewRole}
               onChange={(event) => setSelectedNewRole(event.target.value)}
+              disabled={!canEditAccess}
             >
               <option value="">Select a role...</option>
               {availableRolesToAdd.map((role) => (
                 <option key={role.id} value={role.id}>{role.name}</option>
               ))}
             </select>
-            <button className="add-role-btn" onClick={handleAddRole}>Add Role</button>
+            <button className="add-role-btn" onClick={handleAddRole} disabled={!canEditAccess}>Add Role</button>
           </div>
         </div>
 
@@ -158,12 +166,13 @@ export default function DashboardAccess() {
                     value={role.tier}
                     onChange={(event) => handleUpdateRole(role.id, event.target.value)}
                     className="tier-select"
+                    disabled={!canEditAccess}
                   >
                     {TIERS.map((tier) => (
                       <option key={tier.id} value={tier.id}>{tier.accessLabel}</option>
                     ))}
                   </select>
-                  <button className="remove-role-btn" onClick={() => handleRemoveRole(role.id)}>
+                  <button className="remove-role-btn" onClick={() => handleRemoveRole(role.id)} disabled={!canEditAccess}>
                     <X size={18} />
                   </button>
                 </div>

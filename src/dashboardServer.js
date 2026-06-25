@@ -526,18 +526,31 @@ async function initDashboard(client) {
         }
     });
 
+    const TIER_LEVELS = {
+        owner: 5,
+        developer: 4,
+        admin: 3,
+        moderator: 2,
+        staff: 1
+    };
+
+    function hasPermission(userTier, requiredTier) {
+        return (TIER_LEVELS[userTier] || 0) >= TIER_LEVELS[requiredTier];
+    }
+
     app.patch('/api/guilds/:guildId/settings', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
         try {
-            const allowedKeys = [
+            const userTier = req.allowedGuild.dashboardTier;
+            
+            if (!hasPermission(userTier, 'admin')) {
+                return res.status(403).json({ error: 'You do not have permission to modify settings.' });
+            }
+
+            let allowedKeys = [
                 'ticketCategoryId',
                 'logChannelId',
                 'transcriptChannelId',
                 'panelChannelId',
-                'staffRoleIds',
-                'adminRoleIds',
-                'ownerRoleIds',
-                'developerRoleIds',
-                'moderatorRoleIds',
                 'inactivityReminderMinutes',
                 'panelConfig',
                 'defaultTicketMessages',
@@ -545,9 +558,26 @@ async function initDashboard(client) {
                 'categoryOverrides'
             ];
 
+            // Only owners and developers can modify role mappings
+            if (hasPermission(userTier, 'developer')) {
+                allowedKeys.push(
+                    'staffRoleIds',
+                    'adminRoleIds',
+                    'ownerRoleIds',
+                    'developerRoleIds',
+                    'moderatorRoleIds'
+                );
+            }
+
             const updateData = Object.fromEntries(
                 Object.entries(req.body || {}).filter(([key]) => allowedKeys.includes(key))
             );
+
+            if (Object.keys(updateData).length === 0) {
+                // If they tried to update restricted fields, do nothing but return 200 (graceful fail)
+                const snapshot = await createDashboardSnapshot(client, req.params.guildId);
+                return res.json(snapshot);
+            }
 
             const previousConfig = await db.getGuildConfig(req.params.guildId);
             const nextConfig = await db.updateGuildConfig(req.params.guildId, updateData);
@@ -574,6 +604,11 @@ async function initDashboard(client) {
 
     app.post('/api/guilds/:guildId/panel/deploy', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
         try {
+            const userTier = req.allowedGuild.dashboardTier;
+            if (!hasPermission(userTier, 'admin')) {
+                return res.status(403).json({ error: 'You do not have permission to deploy panels.' });
+            }
+
             const guild = req.dashboardGuild;
             const targetChannelId = req.body?.channelId;
             const targetChannel = guild.channels.cache.get(targetChannelId);
@@ -623,6 +658,11 @@ async function initDashboard(client) {
 
     app.post('/api/guilds/:guildId/nickname', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
         try {
+            const userTier = req.allowedGuild.dashboardTier;
+            if (!hasPermission(userTier, 'developer')) {
+                return res.status(403).json({ error: 'Only Owners and Developers can change the bot nickname.' });
+            }
+
             const nickname = req.body?.nickname || '';
             const guild = req.dashboardGuild;
             const botMember = guild.members.cache.get(client.user.id);

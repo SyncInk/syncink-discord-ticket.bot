@@ -9,9 +9,12 @@ import {
   TextInput,
   SelectInput
 } from '../components/Common';
+import usePermissions from '../hooks/usePermissions';
+import LockedOverlay from '../components/LockedOverlay';
 
 export default function Miscellaneous() {
   const { busy, saveSettings, snapshot } = useOutletContext();
+  const { canEditSettings, getLockTooltip } = usePermissions();
   const [minutes, setMinutes] = useState(snapshot.settings.inactivityReminderMinutes || 1440);
   const [messages, setMessages] = useState(snapshot.settings.defaultTicketMessages || { openingLine: '', inactivityReminderText: '' });
   const [logChannelId, setLogChannelId] = useState(snapshot.settings.logChannelId || '');
@@ -28,7 +31,7 @@ export default function Miscellaneous() {
         eyebrow="Safe Bot Preferences"
         title="Miscellaneous settings"
         description="Small operational settings that are safe to change from the dashboard and take effect immediately."
-        action={(
+        action={canEditSettings && (
           <ActionButton
             tone="primary"
             busy={busy}
@@ -43,10 +46,11 @@ export default function Miscellaneous() {
         )}
       />
 
-      <div className="split-grid">
+      <div className="split-grid" style={{ position: 'relative' }}>
+        {!canEditSettings && <LockedOverlay tooltip={getLockTooltip('admin')} />}
         <SectionCard title="Log Channel" description="Select which text channel receives ticket log messages.">
           <Field label="Target Channel" hint="Where the bot should log new tickets and closures.">
-            <SelectInput value={logChannelId} onChange={(event) => setLogChannelId(event.target.value)}>
+            <SelectInput value={logChannelId} onChange={(event) => setLogChannelId(event.target.value)} disabled={!canEditSettings}>
               <option value="">No log channel selected</option>
               {snapshot.resources?.textChannels?.map((ch) => (
                 <option key={ch.id} value={ch.id}>#{ch.name}</option>
@@ -57,13 +61,14 @@ export default function Miscellaneous() {
 
         <SectionCard title="Inactivity reminders" description="Controls how quickly the bot nudges idle ticket threads.">
           <Field label="Reminder interval (minutes)">
-            <TextInput value={minutes} onChange={(event) => setMinutes(event.target.value)} />
+            <TextInput value={minutes} onChange={(event) => setMinutes(event.target.value)} disabled={!canEditSettings} />
           </Field>
 
           <Field label="Reminder embed text">
             <TextInput
               value={messages.inactivityReminderText || ''}
               onChange={(event) => setMessages((current) => ({ ...current, inactivityReminderText: event.target.value }))}
+              disabled={!canEditSettings}
             />
           </Field>
         </SectionCard>
@@ -74,6 +79,7 @@ export default function Miscellaneous() {
               rows={6}
               value={messages.openingLine || ''}
               onChange={(event) => setMessages((current) => ({ ...current, openingLine: event.target.value }))}
+              disabled={!canEditSettings}
             />
           </Field>
         </SectionCard>
