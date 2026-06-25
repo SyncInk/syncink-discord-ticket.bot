@@ -59,7 +59,7 @@ export default function Transcripts() {
               key: 'link',
               label: 'Transcript',
               render: (row) => row.transcriptMessageUrl
-                ? <a href={row.transcriptMessageUrl} target="_blank" rel="noreferrer">Open archive</a>
+                ? <a href={row.transcriptMessageUrl} target="_blank" rel="noreferrer">Online Transcript</a>
                 : 'Not uploaded yet'
             }
           ]}

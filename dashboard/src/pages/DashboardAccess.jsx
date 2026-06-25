@@ -4,11 +4,11 @@ import { Crown, Settings, ShieldCheck, Star, Wrench, X } from 'lucide-react';
 import { ActionButton, PageHeader, SelectInput } from '../components/Common';
 
 const TIERS = [
-  { id: 'owner', label: 'Owner', icon: Crown, color: '#ff7d9c', desc: 'Manage server settings, toggles, and most dashboard sections.' },
-  { id: 'developer', label: 'Developer', icon: Settings, color: '#9d7cff', desc: 'Manage server settings, toggles, and most dashboard sections.' },
-  { id: 'admin', label: 'Administrator', icon: ShieldCheck, color: '#ff7d9c', desc: 'Manage server settings, toggles, and most dashboard sections.' },
-  { id: 'moderator', label: 'Moderator', icon: Star, color: '#6dc1ff', desc: 'Manage voice room tools and approved moderation pages.' },
-  { id: 'staff', label: 'Staff', icon: Wrench, color: '#6d8bff', desc: 'Access low-level dashboard settings such as Interface.' }
+  { id: 'owner', label: 'OWNER', emojiId: '1517253606686986323', color: '#ff7d9c', desc: 'everything' },
+  { id: 'developer', label: 'DEVELOPER', emojiId: '1519379532409344142', color: '#9d7cff', desc: 'everything' },
+  { id: 'admin', label: 'ADMINISTRATOR', emojiId: '1518924309668823160', color: '#ff7d9c', desc: 'almost everything' },
+  { id: 'moderator', label: 'MODERATOR', emojiId: '1518924931482779809', color: '#6dc1ff', desc: 'higher tear changes' },
+  { id: 'staff', label: 'STAFF', emojiId: '1513328514529624185', color: '#6d8bff', desc: 'low level things not very dangerous' }
 ];
 
 export default function DashboardAccess() {
@@ -95,13 +95,12 @@ export default function DashboardAccess() {
 
       <div className="access-tiers-grid">
         {TIERS.map(tier => {
-          const Icon = tier.icon;
           return (
             <div key={tier.id} className="access-tier-card">
               <div className="tier-eyebrow">ACCESS TIER</div>
               <div className="tier-header">
                 <div className="tier-title" style={{ color: tier.color }}>
-                  <Icon size={18} />
+                  <img src={`https://cdn.discordapp.com/emojis/${tier.emojiId}.png`} alt={tier.label} style={{ width: 18, height: 18 }} />
                   {tier.label}
                 </div>
                 <div className="tier-count">{getTierCount(tier.id)}</div>

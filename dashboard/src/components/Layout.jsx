@@ -94,6 +94,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
   const [confirmBusy, setConfirmBusy] = useState(false);
   const [serverDropdownOpen, setServerDropdownOpen] = useState(false);
   const [serverSearch, setServerSearch] = useState('');
+  const [showAnnouncement, setShowAnnouncement] = useState(true);
   const refreshTimer = useRef(null);
   const socketRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -262,12 +263,26 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
           <button type="button" className="guild-switcher" onClick={() => setServerDropdownOpen(!serverDropdownOpen)}>
             <div className="guild-switcher-left">
               {selectedGuild?.icon ? (
-                <img
-                  src={`https://cdn.discordapp.com/icons/${selectedGuild.id}/${selectedGuild.icon}.png`}
-                  alt={selectedGuild.name}
-                />
+                <div className="guild-icon-wrap">
+                  <img
+                    src={`https://cdn.discordapp.com/icons/${selectedGuild.id}/${selectedGuild.icon}.png`}
+                    alt={selectedGuild.name}
+                  />
+                  {snapshot?.stats?.openTickets > 0 ? (
+                    <span className="pulsing-dot green" />
+                  ) : (
+                    <span className="pulsing-dot red" />
+                  )}
+                </div>
               ) : (
-                <div className="guild-avatar-fallback">{selectedGuild?.name?.charAt(0) || 'S'}</div>
+                <div className="guild-avatar-fallback guild-icon-wrap">
+                  {selectedGuild?.name?.charAt(0) || 'S'}
+                  {snapshot?.stats?.openTickets > 0 ? (
+                    <span className="pulsing-dot green" />
+                  ) : (
+                    <span className="pulsing-dot red" />
+                  )}
+                </div>
               )}
               <div>
                 <strong>{selectedGuild?.name || 'Select a server'}</strong>
@@ -405,10 +420,13 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
         </header>
 
         <div className="content-shell">
-          <div className="announcement-bar">
-            <span className="announcement-icon">ℹ</span>
-            If you encounter any issues, please <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">Contact Support</a> or send us a message with your issue.
-          </div>
+          {showAnnouncement && (
+            <div className="announcement-bar">
+              <span className="announcement-icon">ℹ</span>
+              If you encounter any issues, please <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">Contact Support</a> or send us a message with your issue.
+              <button className="announcement-close" onClick={() => setShowAnnouncement(false)}><X size={14} /></button>
+            </div>
+          )}
 
           {loading && !snapshot ? (
             <LoadingPanel label="Loading your Ticket Bot workspace..." />

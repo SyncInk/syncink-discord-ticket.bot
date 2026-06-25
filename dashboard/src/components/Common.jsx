@@ -142,25 +142,38 @@ export function Toggle({ checked, onChange, label, description }) {
 }
 
 export function RolePicker({ roles, selectedIds, onToggle }) {
+  const activeRoles = selectedIds.map(id => roles.find(r => r.id === id) || { id, name: 'Unknown Role', color: '#666' });
+  const availableRoles = roles.filter(r => !selectedIds.includes(r.id));
+
   return (
-    <div className="token-grid">
-      {roles.map((role) => {
-        const active = selectedIds.includes(role.id);
-        return (
-          <button
-            key={role.id}
-            type="button"
-            className={`token-chip ${active ? 'active' : ''}`}
-            onClick={() => onToggle(role.id)}
-          >
-            <span
-              className="token-dot"
-              style={{ backgroundColor: role.color && role.color !== '#000000' ? role.color : '#9d7cff' }}
-            />
-            {role.name}
-          </button>
-        );
-      })}
+    <div className="role-picker-container">
+      <div className="role-picker-active">
+        {activeRoles.length === 0 && <span className="muted-note" style={{ padding: '8px' }}>No staff roles assigned.</span>}
+        {activeRoles.map(role => (
+          <div key={role.id} className="role-picker-chip">
+            <span className="token-dot" style={{ backgroundColor: role.color && role.color !== '#000000' ? role.color : '#9d7cff' }} />
+            <span>{role.name}</span>
+            <button type="button" onClick={() => onToggle(role.id)}><X size={14} /></button>
+          </div>
+        ))}
+      </div>
+      <div className="role-picker-add">
+        <select 
+          className="select-input" 
+          onChange={(e) => {
+            if (e.target.value) {
+              onToggle(e.target.value);
+              e.target.value = '';
+            }
+          }}
+          defaultValue=""
+        >
+          <option value="" disabled>+ Add Staff Role...</option>
+          {availableRoles.map(r => (
+            <option key={r.id} value={r.id}>{r.name}</option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 }

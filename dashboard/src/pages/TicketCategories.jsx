@@ -37,6 +37,14 @@ export default function TicketCategories() {
     }));
   };
 
+  const renderEmoji = (emoji) => {
+    if (!emoji) return null;
+    if (/^\d+$/.test(emoji)) {
+      return <img src={`https://cdn.discordapp.com/emojis/${emoji}.png`} alt="emoji" style={{ width: 24, height: 24, verticalAlign: 'middle', marginRight: 8 }} />;
+    }
+    return <span style={{ marginRight: 8 }}>{emoji}</span>;
+  };
+
   return (
     <div className="page-stack">
       <PageHeader
@@ -54,7 +62,7 @@ export default function TicketCategories() {
         {categories.map((category) => (
           <SectionCard
             key={category.value}
-            title={`${category.emoji} ${category.label}`}
+            title={<>{renderEmoji(category.emoji)} {category.label}</>}
             description={`Internal value: ${category.value}`}
           >
             <div className="form-grid">

@@ -95,7 +95,7 @@ export default function TicketLogs() {
               key: 'transcript',
               label: 'Transcript',
               render: (row) => row.transcriptAvailable
-                ? <a href={row.transcriptMessageUrl} target="_blank" rel="noreferrer">Available</a>
+                ? <a href={row.transcriptMessageUrl} target="_blank" rel="noreferrer">Online Transcript</a>
                 : 'Pending'
             }
           ]}
