@@ -43,9 +43,9 @@ export default function Invite() {
 
         {/* Logos */}
         <div className="inv-logos inv-entrance" style={{ '--d': '0ms' }}>
-          <img src="/syncink-main-logo.png" alt="SyncInk" className="inv-logo-img" loading="lazy" />
+          <img src="/syncink-main-logo.png" alt="SyncInk" className="inv-logo-img inv-logo-main" loading="lazy" />
           <div className="inv-logo-x"><X size={18} /></div>
-          <img src="/ticket-logo.png" alt="SyncInk Ticket" className="inv-logo-img" loading="lazy" />
+          <img src="/ticket-logo.png" alt="SyncInk Ticket" className="inv-logo-img inv-logo-ticket" loading="lazy" />
         </div>
 
         {/* Hero title */}
