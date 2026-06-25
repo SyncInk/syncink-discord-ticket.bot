@@ -110,20 +110,22 @@ export default function TicketPanels() {
                 <div className="discord-message-embed">
                   <div className="discord-message-embed-color" style={{ background: form.color || 'transparent' }} />
                   <div className="discord-message-embed-body">
-                    <div 
-                      className="discord-message-embed-title" 
-                      dangerouslySetInnerHTML={{ __html: (form.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;(a?):(\w+):(\d+)&gt;/g, '<img class="discord-custom-emoji" src="https://cdn.discordapp.com/emojis/$3.png" alt=":$2:" />').replace(/`([^`]+)`/g, '<span class="discord-inline-code">$1</span>').replace(/__([^_]+)__/g, '<u>$1</u>') }} 
-                    />
+                    {form.title && (
+                      <div 
+                        className="discord-message-embed-title" 
+                        dangerouslySetInnerHTML={{ __html: form.title.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;(a?):(\w+):(\d+)&gt;/g, '<img class="discord-custom-emoji" src="https://cdn.discordapp.com/emojis/$3.png" alt=":$2:" />').replace(/`([^`]+)`/g, '<span class="discord-inline-code">$1</span>').replace(/__([^_]+)__/g, '<u>$1</u>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>') }} 
+                      />
+                    )}
                     <div className="discord-message-embed-desc">
-                      {(form.description || []).filter(Boolean).map((line, index) => (
+                      {(form.description || []).map((line, index) => (
                         <p 
                           key={index} 
-                          dangerouslySetInnerHTML={{ __html: line.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;(a?):(\w+):(\d+)&gt;/g, '<img class="discord-custom-emoji" src="https://cdn.discordapp.com/emojis/$3.png" alt=":$2:" />').replace(/`([^`]+)`/g, '<span class="discord-inline-code">$1</span>').replace(/__([^_]+)__/g, '<u>$1</u>') }} 
+                          dangerouslySetInnerHTML={{ __html: (line || '&nbsp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;(a?):(\w+):(\d+)&gt;/g, '<img class="discord-custom-emoji" src="https://cdn.discordapp.com/emojis/$3.png" alt=":$2:" />').replace(/`([^`]+)`/g, '<span class="discord-inline-code">$1</span>').replace(/__([^_]+)__/g, '<u>$1</u>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>') }} 
                         />
                       ))}
                     </div>
                   </div>
-                  {form.thumbnailUrl && <img src={form.thumbnailUrl} alt="Thumbnail" style={{ width: 80, height: 80, borderRadius: 4, margin: '16px 16px 16px 0', objectFit: 'contain' }} />}
+                  {form.thumbnailUrl && <img src={form.thumbnailUrl} alt="Thumbnail" style={{ width: 44, height: 44, borderRadius: 4, margin: '16px 16px 16px 0', objectFit: 'contain' }} />}
                 </div>
 
                 <div className="discord-message-components">
