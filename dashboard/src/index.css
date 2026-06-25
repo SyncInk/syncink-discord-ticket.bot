@@ -2308,3 +2308,31 @@ canvas {
   margin-right: 2px;
 }
 
+
+
+@keyframes sandFade {
+  0% {
+    opacity: 0;
+    filter: blur(8px) contrast(150%);
+    transform: translateY(15px);
+    letter-spacing: 4px;
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) contrast(100%);
+    transform: translateY(0);
+    letter-spacing: normal;
+  }
+}
+
+.sand-fade {
+  animation: sandFade 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.invite-logo-circle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+

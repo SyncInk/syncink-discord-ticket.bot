@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Shield, Ticket } from 'lucide-react';
+import { LayoutDashboard, Shield, Ticket, X } from 'lucide-react';
 
 export default function Invite() {
   const navigate = useNavigate();
@@ -10,13 +10,15 @@ export default function Invite() {
   return (
     <div className="invite-shell">
       <div className="invite-logos">
-        <img src="/syncink-main-logo.png" alt="SyncInk" className="invite-logo-img" />
-        <div className="invite-logo-divider" />
-        <img src="/ticket-logo.png" alt="SyncInk Ticket" className="invite-logo-circle" />
+        <img src="/syncink-main-logo.png" alt="SyncInk" className="invite-logo-circle" loading="lazy" />
+        <div className="invite-logo-divider" style={{ background: 'transparent', width: 'auto', color: 'var(--text-muted)' }}>
+          <X size={20} />
+        </div>
+        <img src="/ticket-logo.png" alt="SyncInk Ticket" className="invite-logo-circle" loading="lazy" />
       </div>
 
       <div className="invite-hero">
-        <h1>Add <span>SyncInk Ticket</span><br />to your server</h1>
+        <h1 className="sand-fade">Add <span>SyncInk Ticket</span><br />to your server</h1>
         <p>
           The ultimate ticket management system.<br />
           Beautiful dashboard, complete control, zero clutter.
