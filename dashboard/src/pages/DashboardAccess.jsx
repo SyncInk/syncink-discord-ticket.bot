@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Crown, Settings, ShieldCheck, Star, Wrench, X } from 'lucide-react';
-import { ActionButton, PageHeader, SelectInput } from '../components/Common';
+import { Crown, ShieldCheck, X } from 'lucide-react';
+import { ActionButton, PageHeader } from '../components/Common';
 
 const TIERS = [
-  { id: 'owner', label: 'Owner', accessLabel: 'Owner (Full Access)', emojiId: '1513803214674464788', color: '#ff7d9c', desc: 'everything' },
-  { id: 'developer', label: 'Developer', accessLabel: 'Developer (Full Access)', emojiId: '1519379532409344142', color: '#9d7cff', desc: 'everything' },
-  { id: 'admin', label: 'Administrator', accessLabel: 'Administrator (Manage Server)', emojiId: '1518924309668823160', color: '#ff7d9c', desc: 'almost everything' },
-  { id: 'moderator', label: 'Moderator', accessLabel: 'Moderator (Voice & Moderation)', emojiId: '1518924931482779809', color: '#6dc1ff', desc: 'higher tear changes' },
-  { id: 'staff', label: 'Staff', accessLabel: 'Staff (Limited UI)', emojiId: '1513328514529624185', color: '#6d8bff', desc: 'low level things not very dangerous' }
+  { id: 'owner', label: 'Owner', accessLabel: 'Owner (Full Access)', emojiId: '1513803214674464788', color: '#ff9eb5', desc: 'Reserved for the server owner and the most trusted roles.' },
+  { id: 'developer', label: 'Developer', accessLabel: 'Developer (Full Access)', emojiId: '1519379532409344142', color: '#b497ff', desc: 'Ideal for technical maintainers managing advanced setup.' },
+  { id: 'admin', label: 'Administrator', accessLabel: 'Administrator (Manage Server)', emojiId: '1518924309668823160', color: '#ffb6c8', desc: 'Best for senior staff managing categories, channels, and operations.' },
+  { id: 'moderator', label: 'Moderator', accessLabel: 'Moderator (Managed Access)', emojiId: '1518924931482779809', color: '#8fd7ff', desc: 'Useful for trusted team members with narrower dashboard scope.' },
+  { id: 'staff', label: 'Staff', accessLabel: 'Staff (Limited Access)', emojiId: '1513328514529624185', color: '#a2b8ff', desc: 'Lowest operational tier for safe visibility and light actions.' }
 ];
 
 export default function DashboardAccess() {
@@ -17,19 +17,18 @@ export default function DashboardAccess() {
   const [selectedNewRole, setSelectedNewRole] = useState('');
 
   useEffect(() => {
-    const newRoleMap = [];
+    const nextRoleMap = [];
     const settings = snapshot.settings;
-    
-    // Map roles to their configured tier
+
     const addRoles = (roleIds, tierId) => {
       if (!roleIds) return;
-      roleIds.forEach(id => {
-        if (!newRoleMap.find(r => r.id === id)) {
-          const roleData = snapshot.resources?.roles?.find(r => r.id === id);
+      roleIds.forEach((id) => {
+        if (!nextRoleMap.find((role) => role.id === id)) {
+          const roleData = snapshot.resources?.roles?.find((role) => role.id === id);
           if (roleData) {
-            newRoleMap.push({ ...roleData, tier: tierId });
+            nextRoleMap.push({ ...roleData, tier: tierId });
           } else {
-            newRoleMap.push({ id, name: 'Deleted Role', color: '#666', tier: tierId });
+            nextRoleMap.push({ id, name: 'Deleted Role', color: '#666', tier: tierId });
           }
         }
       });
@@ -41,21 +40,23 @@ export default function DashboardAccess() {
     addRoles(settings.moderatorRoleIds, 'moderator');
     addRoles(settings.staffRoleIds, 'staff');
 
-    setRoleMap(newRoleMap);
+    setRoleMap(nextRoleMap);
   }, [snapshot]);
 
   const handleUpdateRole = (roleId, newTier) => {
-    setRoleMap(current => current.map(r => r.id === roleId ? { ...r, tier: newTier } : r));
+    setRoleMap((current) => current.map((role) => (
+      role.id === roleId ? { ...role, tier: newTier } : role
+    )));
   };
 
   const handleRemoveRole = (roleId) => {
-    setRoleMap(current => current.filter(r => r.id !== roleId));
+    setRoleMap((current) => current.filter((role) => role.id !== roleId));
   };
 
   const handleAddRole = () => {
     if (!selectedNewRole) return;
-    const roleData = snapshot.resources?.roles?.find(r => r.id === selectedNewRole);
-    if (roleData && !roleMap.find(r => r.id === selectedNewRole)) {
+    const roleData = snapshot.resources?.roles?.find((role) => role.id === selectedNewRole);
+    if (roleData && !roleMap.find((role) => role.id === selectedNewRole)) {
       setRoleMap([...roleMap, { ...roleData, tier: 'staff' }]);
     }
     setSelectedNewRole('');
@@ -63,96 +64,97 @@ export default function DashboardAccess() {
 
   const handleSave = () => {
     const payload = {
-      ownerRoleIds: roleMap.filter(r => r.tier === 'owner').map(r => r.id),
-      developerRoleIds: roleMap.filter(r => r.tier === 'developer').map(r => r.id),
-      adminRoleIds: roleMap.filter(r => r.tier === 'admin').map(r => r.id),
-      moderatorRoleIds: roleMap.filter(r => r.tier === 'moderator').map(r => r.id),
-      staffRoleIds: roleMap.filter(r => r.tier === 'staff').map(r => r.id)
+      ownerRoleIds: roleMap.filter((role) => role.tier === 'owner').map((role) => role.id),
+      developerRoleIds: roleMap.filter((role) => role.tier === 'developer').map((role) => role.id),
+      adminRoleIds: roleMap.filter((role) => role.tier === 'admin').map((role) => role.id),
+      moderatorRoleIds: roleMap.filter((role) => role.tier === 'moderator').map((role) => role.id),
+      staffRoleIds: roleMap.filter((role) => role.tier === 'staff').map((role) => role.id)
     };
     saveSettings(payload, 'Access tiers saved');
   };
 
-  const getTierCount = (tierId) => roleMap.filter(r => r.tier === tierId).length;
-
-  const availableRolesToAdd = snapshot.resources?.roles?.filter(r => !roleMap.find(rm => rm.id === r.id)) || [];
+  const getTierCount = (tierId) => roleMap.filter((role) => role.tier === tierId).length;
+  const availableRolesToAdd = snapshot.resources?.roles?.filter((role) => !roleMap.find((mappedRole) => mappedRole.id === role.id)) || [];
 
   return (
     <div className="page-stack">
-      <div className="announcement-bar">
-        <span className="announcement-icon">i</span>
-        Owner, Administrator, and Moderator access is tiered automatically. Higher tiers always outrank lower tiers.
-      </div>
-
       <PageHeader
-        title="Dashboard Access Manager"
-        description="Select which Discord roles can open the dashboard and assign them the right access tier."
-        action={
+        eyebrow="Permission Management"
+        title="Dashboard access tiers"
+        description="Control which Discord roles are allowed into the dashboard and how much operational access each role should have."
+        action={(
           <ActionButton tone="primary" busy={busy} onClick={handleSave}>
             Save Changes
           </ActionButton>
-        }
+        )}
       />
 
+      <div className="announcement-bar">
+        <span className="announcement-icon">i</span>
+        Higher access tiers should stay limited to your most trusted roles. Review these assignments carefully before saving.
+      </div>
+
       <div className="access-tiers-grid">
-        {TIERS.map(tier => {
-          return (
-            <div key={tier.id} className="access-tier-card">
-              <div className="tier-eyebrow">ACCESS TIER</div>
-              <div className="tier-header">
-                <div className="tier-title" style={{ color: tier.color }}>
-                  <img src={`https://cdn.discordapp.com/emojis/${tier.emojiId}.png`} alt={tier.label} style={{ width: 18, height: 18 }} />
-                  {tier.label}
-                </div>
-                <div className="tier-count">{getTierCount(tier.id)}</div>
+        {TIERS.map((tier) => (
+          <div key={tier.id} className="access-tier-card">
+            <div className="tier-eyebrow">Access Tier</div>
+            <div className="tier-header">
+              <div className="tier-title" style={{ color: tier.color }}>
+                {tier.id === 'owner' ? <Crown size={17} /> : <ShieldCheck size={17} />}
+                {tier.label}
               </div>
-              <p className="tier-desc">{tier.desc}</p>
+              <div className="tier-count">{getTierCount(tier.id)}</div>
             </div>
-          );
-        })}
+            <p className="tier-desc">{tier.desc}</p>
+          </div>
+        ))}
       </div>
 
       <section className="section-card">
         <div className="section-head access-roles-head">
           <div className="allowed-roles-title">
             <ShieldCheck size={20} className="accent-icon" />
-            <h2>Allowed Roles</h2>
+            <div>
+              <h2>Allowed roles</h2>
+              <p>Assign roles to the tier that best matches the level of trust and responsibility they should have.</p>
+            </div>
           </div>
           <div className="add-role-controls">
-            <select 
+            <select
               className="role-select-input"
               value={selectedNewRole}
-              onChange={(e) => setSelectedNewRole(e.target.value)}
+              onChange={(event) => setSelectedNewRole(event.target.value)}
             >
               <option value="">Select a role...</option>
-              {availableRolesToAdd.map(r => (
-                <option key={r.id} value={r.id}>{r.name}</option>
+              {availableRolesToAdd.map((role) => (
+                <option key={role.id} value={role.id}>{role.name}</option>
               ))}
             </select>
-            <button className="add-role-btn" onClick={handleAddRole}>+ Add Role</button>
+            <button className="add-role-btn" onClick={handleAddRole}>Add Role</button>
           </div>
         </div>
 
         <div className="role-list">
           {roleMap.length === 0 ? (
-            <div className="muted-note" style={{ padding: '20px' }}>No roles configured. Only Server Owners have access.</div>
+            <div className="muted-note" style={{ padding: 20 }}>No custom roles are configured. Server Owners remain the default access holders.</div>
           ) : (
-            roleMap.map(role => (
+            roleMap.map((role) => (
               <div key={role.id} className="role-list-item">
                 <div className="role-list-info">
                   <span className="token-dot" style={{ backgroundColor: role.color && role.color !== '#000000' ? role.color : '#9d7cff' }} />
                   <div>
                     <strong>{role.name}</strong>
-                    <span>{TIERS.find(t => t.id === role.tier)?.label} tier</span>
+                    <span>{TIERS.find((tier) => tier.id === role.tier)?.label} tier</span>
                   </div>
                 </div>
                 <div className="role-list-actions">
-                  <select 
-                    value={role.tier} 
-                    onChange={(e) => handleUpdateRole(role.id, e.target.value)}
+                  <select
+                    value={role.tier}
+                    onChange={(event) => handleUpdateRole(role.id, event.target.value)}
                     className="tier-select"
                   >
-                    {TIERS.map(t => (
-                      <option key={t.id} value={t.id}>{t.accessLabel}</option>
+                    {TIERS.map((tier) => (
+                      <option key={tier.id} value={tier.id}>{tier.accessLabel}</option>
                     ))}
                   </select>
                   <button className="remove-role-btn" onClick={() => handleRemoveRole(role.id)}>

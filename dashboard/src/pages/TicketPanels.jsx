@@ -30,7 +30,7 @@ export default function TicketPanels() {
       <PageHeader
         eyebrow="Panel Configuration"
         title="Design the ticket entry panel"
-        description="Adjust the panel copy and appearance without touching the underlying ticket workflow."
+        description="Adjust the panel copy and appearance without changing the underlying ticket workflow or bot logic."
         action={(
           <div className="action-row">
             <ActionButton tone="primary" busy={busy} onClick={() => saveSettings({ panelConfig: form }, 'Panel styling saved')}>
@@ -55,7 +55,7 @@ export default function TicketPanels() {
       />
 
       <div className="split-grid">
-        <SectionCard title="Panel settings" description="These values shape the embed that members see before creating a ticket.">
+        <SectionCard title="Panel settings" description="These values shape the embed members see before opening a ticket.">
           <div className="form-grid">
             <Field label="Ticket panel channel">
               <SelectInput value={panelChannelId} onChange={(event) => setPanelChannelId(event.target.value)}>
@@ -92,7 +92,7 @@ export default function TicketPanels() {
           </div>
         </SectionCard>
 
-        <SectionCard title="Live preview" description="A dashboard-side preview of the embed layout and panel choices.">
+        <SectionCard title="Live preview" description="A dashboard-side preview of the Discord-facing ticket panel.">
           <div className="panel-preview">
             <div className="panel-preview-header">
               <Eye size={16} />

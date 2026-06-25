@@ -8,76 +8,76 @@ export default function Guide() {
   return (
     <div className="page-stack guide-page">
       <div className="guide-header-nav">
-        <button type="button" onClick={() => navigate('/')}>← Back to Dashboard</button>
+        <button type="button" onClick={() => navigate('/')}>Back to Dashboard</button>
       </div>
 
       <PageHeader
         eyebrow="Documentation"
         title="Dashboard Guide"
-        description="Learn how to configure and use the SyncInk Ticket bot to manage your server's support system."
+        description="Learn how to configure SyncInk Ticket professionally while keeping the existing bot workflow exactly as it is."
       />
 
       <div className="split-grid">
-        <SectionCard title="1. Initial Setup" description="Getting started with the bot.">
+        <SectionCard title="1. Getting Started" description="Connect the bot and open the dashboard.">
           <div className="guide-steps">
             <div className="guide-step">
               <strong>Invite the bot</strong>
-              <p>Add SyncInk Ticket to your server using the Invite Bot link in the top navigation. Ensure it has the Administrator permission.</p>
+              <p>Add SyncInk Ticket to your server from the Invite Bot page and ensure it has the permissions it needs to operate correctly.</p>
             </div>
             <div className="guide-step">
-              <strong>Access the Dashboard</strong>
-              <p>Log in to this dashboard with your Discord account. You must be the Server Owner or have the Administrator permission to view your server.</p>
-            </div>
-          </div>
-        </SectionCard>
-
-        <SectionCard title="2. Configuring Tickets" description="Customizing your ticket system.">
-          <div className="guide-steps">
-            <div className="guide-step">
-              <strong>Create Categories</strong>
-              <p>Navigate to "Ticket Categories" to define what types of tickets users can open (e.g., General Support, Billing, Bug Reports).</p>
-            </div>
-            <div className="guide-step">
-              <strong>Set up Panels</strong>
-              <p>Go to "Ticket Panels", select a channel, and click Deploy. A beautiful embed with buttons for each category will be sent to that channel.</p>
+              <strong>Sign in securely</strong>
+              <p>Log in with Discord OAuth2. Only the server owner and users with Administrator access can enter the dashboard.</p>
             </div>
           </div>
         </SectionCard>
 
-        <SectionCard title="3. Access & Permissions" description="Securing your system.">
+        <SectionCard title="2. Configure Ticket Entry" description="Shape the way users open tickets.">
           <div className="guide-steps">
             <div className="guide-step">
-              <strong>Dashboard Access</strong>
-              <p>Use the Dashboard Access page to assign access tiers (Developer, Admin, Moderator, Staff) to your Discord roles. This controls who can see which dashboard pages.</p>
+              <strong>Customize categories</strong>
+              <p>Use Ticket Categories to rename options, update descriptions, assign emojis, and map staff-facing roles where needed.</p>
             </div>
             <div className="guide-step">
-              <strong>Ticket Permissions</strong>
-              <p>Staff members will automatically be given access to ticket channels so they can assist users. You can transfer tickets between staff or escalate them.</p>
+              <strong>Deploy the panel</strong>
+              <p>Use Ticket Panels to style the embed, select a destination channel, and deploy the live panel instantly.</p>
             </div>
           </div>
         </SectionCard>
 
-        <SectionCard title="4. Logging & Archives" description="Keeping records.">
+        <SectionCard title="3. Manage Access and Safety" description="Keep control in the right hands.">
           <div className="guide-steps">
             <div className="guide-step">
-              <strong>Ticket Logs</strong>
-              <p>Configure a log channel in "Miscellaneous" to receive notifications whenever a ticket is opened or closed.</p>
+              <strong>Dashboard access</strong>
+              <p>Review which roles are allowed to manage the dashboard and keep high-trust actions limited to the right people.</p>
             </div>
             <div className="guide-step">
-              <strong>Transcripts</strong>
-              <p>When a ticket is closed, an HTML transcript is generated. Set a specific Transcript Channel to store these securely for future reference.</p>
+              <strong>Safe configuration only</strong>
+              <p>The dashboard is designed as a configuration layer. It should improve management and visibility without replacing core bot systems.</p>
+            </div>
+          </div>
+        </SectionCard>
+
+        <SectionCard title="4. Logs, Transcripts, and Monitoring" description="Stay informed as tickets move.">
+          <div className="guide-steps">
+            <div className="guide-step">
+              <strong>Ticket logs</strong>
+              <p>Choose a log channel to receive ticket events immediately after they happen in Discord.</p>
+            </div>
+            <div className="guide-step">
+              <strong>Transcripts and analytics</strong>
+              <p>Use the Transcripts, Analytics, Activity Feed, and Audit Logs pages to monitor the support system with confidence.</p>
             </div>
           </div>
         </SectionCard>
       </div>
 
-      <SectionCard title="Need Help?" description="Can't find what you're looking for?">
-        <p style={{ marginTop: '10px' }}>
-          If you encounter bugs, need help with configuration, or want to suggest new features, our support team is ready to help.
+      <SectionCard title="Need Help?" description="Our support team is available if you run into issues or need guidance.">
+        <p style={{ marginTop: 10 }}>
+          If something looks off or you want help refining your setup, reach out and we will help you sort it out quickly.
         </p>
-        <a 
-          href="https://syncink.github.io/syncink-portfolio/#contact" 
-          target="_blank" 
+        <a
+          href="https://syncink.github.io/syncink-portfolio/#contact"
+          target="_blank"
           rel="noopener noreferrer"
           className="guide-support-btn"
         >
