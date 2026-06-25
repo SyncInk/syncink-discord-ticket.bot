@@ -2419,3 +2419,72 @@ canvas {
   100% { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 40px rgba(139, 92, 246, 0.4)); }
 }
 
+
+
+/* --- Phase 1: True Hero Particle Engine --- */
+
+.hero-particle-container {
+  position: relative;
+  display: inline-block;
+}
+
+.hero-particle-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hero-particle-text {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  letter-spacing: -0.05em;
+  color: #ffffff; /* Base solid white */
+  position: relative;
+  z-index: 1;
+}
+
+.particle-char {
+  visibility: hidden; /* Takes up space but perfectly invisible */
+  display: inline-block;
+}
+
+.particle-char.revealed {
+  visibility: visible;
+}
+
+.particle-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1.1em;
+  background: #C084FC;
+  vertical-align: text-bottom;
+  margin-left: 4px;
+  animation: blink 0.8s step-end infinite;
+}
+
+/* Phase 5: Animated Premium Gradient for SyncInk Ticket */
+.highlight-char.revealed {
+  background: linear-gradient(90deg, #8B5CF6, #A855F7, #C084FC, #8B5CF6);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: 
+    gradientMove 4s linear infinite,
+    premiumGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes premiumGlow {
+  0% { filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.4)) drop-shadow(0 0 20px rgba(139, 92, 246, 0.2)); }
+  100% { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 40px rgba(139, 92, 246, 0.4)); }
+}
+
