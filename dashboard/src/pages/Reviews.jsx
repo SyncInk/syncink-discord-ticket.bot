@@ -44,13 +44,24 @@ export default function Reviews({ user }) {
 
   const getTierIcon = (tier) => {
     switch (tier?.toLowerCase()) {
-      case 'owner': return '👑';
-      case 'developer': return '💻';
-      case 'admin': return '🛡️';
-      case 'moderator': return '🔨';
-      case 'staff': return '📋';
-      case 'member': return '👤';
-      default: return '👤';
+      case 'owner':
+        return <img src="https://cdn.discordapp.com/emojis/1513803214674464788.webp?size=48" alt="Owner" style={{ width: '16px', height: '16px' }} />;
+      case 'developer':
+        return <img src="https://cdn.discordapp.com/emojis/1519379532409344142.webp?size=48" alt="Developer" style={{ width: '16px', height: '16px' }} />;
+      case 'admin':
+        return <img src="https://cdn.discordapp.com/emojis/1518924309668823160.webp?size=48" alt="Administrator" style={{ width: '16px', height: '16px' }} />;
+      case 'moderator':
+        return <img src="https://cdn.discordapp.com/emojis/1518924931482779809.webp?size=48" alt="Moderator" style={{ width: '16px', height: '16px' }} />;
+      case 'staff':
+        return <img src="https://cdn.discordapp.com/emojis/1513328514529624185.webp?size=48" alt="Staff" style={{ width: '16px', height: '16px' }} />;
+      case 'member':
+      default:
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        );
     }
   };
 
