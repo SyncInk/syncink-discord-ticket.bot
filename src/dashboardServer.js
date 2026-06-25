@@ -446,16 +446,50 @@ async function initDashboard(client) {
                 })
             ]);
 
-            const adminGuilds = guildsResponse.data
-                .filter((guild) => guild.owner || (BigInt(guild.permissions) & BigInt(0x8)) === BigInt(0x8))
-                .filter((guild) => client.guilds.cache.has(guild.id))
-                .map((guild) => ({
-                    id: guild.id,
-                    name: guild.name,
-                    icon: guild.icon,
-                    owner: guild.owner,
-                    permissions: guild.permissions
-                }));
+            const allSharedGuilds = guildsResponse.data.filter((guild) => client.guilds.cache.has(guild.id));
+            const adminGuilds = [];
+
+            for (const guild of allSharedGuilds) {
+                try {
+                    const clientGuild = client.guilds.cache.get(guild.id);
+                    if (!clientGuild) continue;
+
+                    let tier = null;
+                    if (guild.owner) {
+                        tier = 'owner';
+                    } else {
+                        const member = await clientGuild.members.fetch(userResponse.data.id).catch(() => null);
+                        if (member) {
+                            const settings = await db.getGuildConfig(guild.id).catch(() => ({})) || {};
+                            
+                            const devRoles = settings.developerRoleIds || [];
+                            const adminRoles = settings.adminRoleIds || [];
+                            const modRoles = settings.moderatorRoleIds || [];
+                            const staffRoles = settings.staffRoleIds || [];
+                            
+                            const hasRole = (ids) => ids && ids.length > 0 && member.roles.cache.hasAny(...ids);
+                            
+                            if (hasRole(devRoles)) tier = 'developer';
+                            else if ((BigInt(guild.permissions) & BigInt(0x8)) === BigInt(0x8) || hasRole(adminRoles)) tier = 'admin';
+                            else if (hasRole(modRoles)) tier = 'moderator';
+                            else if (hasRole(staffRoles)) tier = 'staff';
+                        }
+                    }
+
+                    if (tier) {
+                        adminGuilds.push({
+                            id: guild.id,
+                            name: guild.name,
+                            icon: guild.icon,
+                            owner: guild.owner,
+                            permissions: guild.permissions,
+                            dashboardTier: tier
+                        });
+                    }
+                } catch (err) {
+                    console.error('Error evaluating guild tier:', err);
+                }
+            }
 
             req.session.user = userResponse.data;
             req.session.adminGuilds = adminGuilds;
@@ -471,7 +505,7 @@ async function initDashboard(client) {
     app.get('/api/auth/me', ensureAuthenticated, (req, res) => {
         res.json({
             user: req.session.user,
-            guilds: req.session.adminGuilds || []
+            guilds: (req.session.adminGuilds || []).filter(g => client.guilds.cache.has(g.id))
         });
     });
 
