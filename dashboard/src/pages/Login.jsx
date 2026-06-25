@@ -1,36 +1,58 @@
 import React from 'react';
-import { LogIn, ShieldCheck, Sparkles } from 'lucide-react';
+import { Settings, ShieldCheck, Ticket } from 'lucide-react';
 
 export default function Login() {
+  const handleLogin = () => {
+    window.location.href = '/api/auth/login';
+  };
+
   return (
-    <div className="auth-shell">
-      <div className="auth-backdrop auth-left">
-        <div className="auth-brand">SyncInk Ticket Bot</div>
-        <h1>Premium control for your Discord support workflow.</h1>
-        <p>
-          Manage ticket panels, categories, logs, transcripts, analytics, and live activity without
-          changing the bot&apos;s proven backend behavior.
-        </p>
-        <div className="auth-feature-list">
-          <div><Sparkles size={16} /> SaaS-grade dark interface inspired by Discord</div>
-          <div><ShieldCheck size={16} /> Owner and Administrator access only</div>
-          <div><LogIn size={16} /> OAuth2 login with live bot synchronization</div>
+    <div className="login-wrapper">
+      <div className="login-ambient-glow" />
+      
+      <div className="login-card">
+        <div className="login-header">
+          <img src="/ticket-logo.png" alt="SyncInk Ticket Logo" className="login-logo" />
+          <h1>SyncInk Ticket</h1>
+          <p>
+            The premium ticket management bot. Manage your servers, customize your ticket panels, and take full control.
+          </p>
         </div>
+
+        <div className="login-features">
+          <div className="login-feature">
+            <div className="feature-icon"><Ticket size={16} /></div>
+            <div className="feature-text">
+              <strong>Premium Ticket Panels</strong>
+              <span>Create and manage dynamic support systems</span>
+            </div>
+          </div>
+          
+          <div className="login-feature">
+            <div className="feature-icon"><Settings size={16} /></div>
+            <div className="feature-text">
+              <strong>Granular Permissions</strong>
+              <span>Full role and server-level toggle control</span>
+            </div>
+          </div>
+          
+          <div className="login-feature">
+            <div className="feature-icon"><ShieldCheck size={16} /></div>
+            <div className="feature-text">
+              <strong>Secure & Private</strong>
+              <span>Discord OAuth2 protected dashboard</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" className="login-button" onClick={handleLogin}>
+          <img src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" alt="Discord" style={{ width: 18, filter: 'brightness(0) invert(1)' }} />
+          Login with Discord
+        </button>
       </div>
 
-      <div className="auth-card">
-        <div className="brand-mark large">S</div>
-        <h2>Sign in with Discord</h2>
-        <p>
-          Only the server owner and members with the Administrator permission can access this dashboard.
-        </p>
-
-        <button type="button" className="action-button tone-primary wide" onClick={() => {
-          window.location.href = '/api/auth/login';
-        }}>
-          <LogIn size={18} />
-          Continue with Discord
-        </button>
+      <div className="login-footer">
+        SyncInk Ticket Dashboard • Free for everyone • Built with ♥
       </div>
     </div>
   );
