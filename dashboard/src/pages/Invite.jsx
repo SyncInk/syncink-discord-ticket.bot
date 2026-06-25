@@ -83,19 +83,25 @@ export default function Invite() {
         {/* Feature cards */}
         <div className="inv-cards">
           <div className="inv-card inv-entrance" style={{ '--d': '400ms' }}>
-            <div className="inv-card-icon"><Ticket size={20} /></div>
-            <h3>Ticket Management</h3>
-            <p>Automatic temporary ticket channels with customizable categories.</p>
+            <div className="inv-card-content">
+              <div className="inv-card-icon"><Ticket size={20} /></div>
+              <h3>Ticket Management</h3>
+              <p>Automatic temporary ticket channels with customizable categories.</p>
+            </div>
           </div>
           <div className="inv-card inv-entrance" style={{ '--d': '490ms' }}>
-            <div className="inv-card-icon"><LayoutDashboard size={20} /></div>
-            <h3>Web Dashboard</h3>
-            <p>Manage settings, permissions, and features from a sleek web UI.</p>
+            <div className="inv-card-content">
+              <div className="inv-card-icon"><LayoutDashboard size={20} /></div>
+              <h3>Web Dashboard</h3>
+              <p>Manage settings, permissions, and features from a sleek web UI.</p>
+            </div>
           </div>
           <div className="inv-card inv-entrance" style={{ '--d': '580ms' }}>
-            <div className="inv-card-icon"><Shield size={20} /></div>
-            <h3>Full Control</h3>
-            <p>Give staff control over their tickets: claim, transfer, close, and more.</p>
+            <div className="inv-card-content">
+              <div className="inv-card-icon"><Shield size={20} /></div>
+              <h3>Full Control</h3>
+              <p>Give staff control over their tickets: claim, transfer, close, and more.</p>
+            </div>
           </div>
         </div>
 
