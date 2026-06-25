@@ -203,7 +203,7 @@ export default function TicketPanels() {
                         return (
                           <div key={index} className="discord-message-embed-line">
                             {!isTitleLine && <span className="discord-message-bullet">•</span>}
-                            <p style={isTitleLine ? { fontSize: '1.25em', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' } : {}}>
+                            <p style={isTitleLine ? { fontSize: '1.25em', fontWeight: 'bold', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: '8px' } : {}}>
                               {renderDiscordTokens(textToRender, `line-${index}`)}
                             </p>
                           </div>
