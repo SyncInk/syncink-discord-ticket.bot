@@ -16,7 +16,8 @@ class Particle {
     this.color = color;
     
     this.progress = 0;
-    this.duration = 600 + Math.random() * 400; // 600-1000ms
+    // 2x faster: 300-500ms (was 600-1000ms)
+    this.duration = 300 + Math.random() * 200; 
     this.delay = delay;
     
     // Physics swirl
@@ -58,7 +59,8 @@ class Particle {
       // stay settled until external trigger sets state to fading
     } else if (this.state === 'fading') {
       this.progress += deltaTime;
-      let t = Math.min(this.progress / 300, 1); // 300ms fade
+      // 2x faster fade: 150ms (was 300ms)
+      let t = Math.min(this.progress / 150, 1); 
       this.opacity = 1 - t;
     }
   }
@@ -184,13 +186,15 @@ export default function HeroParticleText({
       
       if (currentChar.isBr || currentChar.char === ' ') {
         setRevealedIndex(currentIndex);
-        timeoutId = setTimeout(typeNextChar, currentChar.isBr ? 0 : 40);
+        // 2x faster: 20ms delay for spaces
+        timeoutId = setTimeout(typeNextChar, currentChar.isBr ? 0 : 20);
         return;
       }
 
       const span = spansRef.current[currentIndex];
       if (!span || !containerRef.current || !canvasRef.current) {
-        timeoutId = setTimeout(typeNextChar, 50);
+        // 2x faster: 25ms fallback delay
+        timeoutId = setTimeout(typeNextChar, 25);
         return;
       }
 
@@ -251,7 +255,8 @@ export default function HeroParticleText({
         const startX = targetX + (Math.random() - 0.5) * 300;
         const startY = targetY + 100 + Math.random() * 200; // Come from bottom
         
-        newParticles.push(new Particle(targetX, targetY, startX, startY, color, Math.random() * 100));
+        // 2x faster start delay: 0-50ms (was 0-100ms)
+        newParticles.push(new Particle(targetX, targetY, startX, startY, color, Math.random() * 50));
       }
 
       particlesRef.current.push(...newParticles);
@@ -266,13 +271,14 @@ export default function HeroParticleText({
           if (p.state === 'settled') p.state = 'fading';
         });
 
-        // Trigger next letter
-        timeoutId = setTimeout(typeNextChar, 50);
-      }, 1100); // Wait 1.1s for the 600-1000ms duration particles to settle
+        // Trigger next letter - 2x faster: 25ms delay (was 50ms)
+        timeoutId = setTimeout(typeNextChar, 25);
+      }, 550); // 2x faster: 550ms wait for the 300-500ms duration particles to settle (was 1100ms)
       
     };
 
-    timeoutId = setTimeout(typeNextChar, 500);
+    // 2x faster start delay
+    timeoutId = setTimeout(typeNextChar, 250);
 
     return () => clearTimeout(timeoutId);
   }, [fontsLoaded]);
