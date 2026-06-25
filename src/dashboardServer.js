@@ -550,6 +550,63 @@ async function initDashboard(client) {
         });
     });
 
+    app.get('/api/reviews', async (req, res) => {
+        try {
+            const reviews = await db.listReviews(50);
+            res.json(reviews);
+        } catch (error) {
+            console.error('[REVIEWS] Failed to fetch reviews:', error);
+            res.status(500).json({ error: 'Failed to load reviews.' });
+        }
+    });
+
+    app.post('/api/reviews', ensureAuthenticated, async (req, res) => {
+        try {
+            const { rating, content } = req.body;
+            if (!rating || !content) return res.status(400).json({ error: 'Rating and content are required.' });
+
+            let highestTier = null;
+            let highestTierGuildName = null;
+            let maxScore = -1;
+
+            const TIER_LEVELS = {
+                owner: 5,
+                developer: 4,
+                admin: 3,
+                moderator: 2,
+                staff: 1,
+                member: 0
+            };
+
+            const guilds = req.session.adminGuilds || [];
+            for (const guild of guilds) {
+                const tier = guild.dashboardTier;
+                const score = TIER_LEVELS[tier] || 0;
+                if (score > maxScore) {
+                    maxScore = score;
+                    highestTier = tier;
+                    highestTierGuildName = guild.name;
+                }
+            }
+
+            const review = await db.createReview({
+                userId: req.session.user.id,
+                username: req.session.user.username,
+                globalName: req.session.user.global_name,
+                avatar: req.session.user.avatar,
+                highestTier,
+                highestTierGuildName,
+                rating,
+                content
+            });
+
+            res.json(review);
+        } catch (error) {
+            console.error('[REVIEWS] Failed to post review:', error);
+            res.status(500).json({ error: 'Failed to submit review.' });
+        }
+    });
+
     app.get('/api/guilds/:guildId/bootstrap', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
         try {
             const snapshot = await createDashboardSnapshot(client, req.params.guildId);

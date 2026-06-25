@@ -418,6 +418,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
         <header className="topbar">
           <div className="topbar-nav">
             <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">Support</a>
+            <button type="button" onClick={() => navigate('/reviews')}>Reviews</button>
             <button type="button" onClick={() => navigate('/invite')}>Invite Bot</button>
             <button type="button" onClick={() => navigate('/guide')}>Guide</button>
             <strong className="topbar-active">Dashboard</strong>

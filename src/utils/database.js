@@ -383,11 +383,46 @@ function getAuditLogModel() {
     return mongoose.model('AuditLog', schema);
 }
 
+function getReviewModel() {
+    if (mongoose.models.Review) {
+        return mongoose.models.Review;
+    }
+
+    const schema = new mongoose.Schema({
+        userId: { type: String, required: true },
+        username: { type: String, required: true },
+        globalName: { type: String, default: null },
+        avatar: { type: String, default: null },
+        highestTier: { type: String, default: null },
+        highestTierGuildName: { type: String, default: null },
+        rating: { type: Number, required: true, min: 1, max: 5 },
+        content: { type: String, required: true },
+        createdAt: { type: Number, default: Date.now }
+    });
+
+    return mongoose.model('Review', schema);
+}
+
+async function createReview(data) {
+    const Review = getReviewModel();
+    const review = await new Review({
+        ...data,
+        createdAt: Date.now()
+    }).save();
+    return toPlainDocument(review);
+}
+
+async function listReviews(limit = 100) {
+    const Review = getReviewModel();
+    return await Review.find({}).sort({ createdAt: -1 }).limit(limit);
+}
+
 module.exports = {
     backfillTicketGuildIds,
     buildDefaultGuildSettings,
     createActivityLog,
     createAuditLog,
+    createReview,
     createTicket,
     getAllOpenTickets,
     getAuditLogModel,
@@ -395,10 +430,12 @@ module.exports = {
     getGuildConfig,
     getGuildSettingsModel,
     getMongoModel,
+    getReviewModel,
     getTicket,
     initDatabase,
     listActivityLogs,
     listAuditLogs,
+    listReviews,
     listTicketsByGuild,
     normalizeGuildConfig,
     toPlainDocument,
