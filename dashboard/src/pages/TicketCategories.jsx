@@ -78,7 +78,7 @@ export default function TicketCategories() {
                 <TextArea rows={4} value={category.description} onChange={(event) => updateCategory(category.value, 'description', event.target.value)} />
               </Field>
 
-              <Field label="Staff roles for this category" hint="If left empty, the bot falls back to the original role routing.">
+              <Field label="Staff roles for this category" hint="(If left empty, the bot falls back to the original role routing.)">
                 <RolePicker
                   roles={snapshot.resources.roles}
                   selectedIds={category.roleIds}

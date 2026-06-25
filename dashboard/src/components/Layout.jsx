@@ -248,11 +248,22 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
     .flatMap((group) => group.items)
     .find((item) => item.path === location.pathname)?.label || 'Dashboard';
 
+  const renderTierBadge = (tier) => {
+    switch (tier) {
+      case 'owner': return <span className="role-badge owner"><img src="https://cdn.discordapp.com/emojis/1513803214674464788.png" style={{ width: 12, height: 12 }} alt="Owner" /> Owner</span>;
+      case 'developer': return <span className="role-badge developer"><img src="https://cdn.discordapp.com/emojis/1519379532409344142.png" style={{ width: 12, height: 12 }} alt="Developer" /> Developer</span>;
+      case 'admin': return <span className="role-badge admin"><img src="https://cdn.discordapp.com/emojis/1518924309668823160.png" style={{ width: 12, height: 12 }} alt="Admin" /> Administrator</span>;
+      case 'moderator': return <span className="role-badge moderator"><img src="https://cdn.discordapp.com/emojis/1518924931482779809.png" style={{ width: 12, height: 12 }} alt="Mod" /> Moderator</span>;
+      case 'staff': return <span className="role-badge staff"><img src="https://cdn.discordapp.com/emojis/1513328514529624185.png" style={{ width: 12, height: 12 }} alt="Staff" /> Staff</span>;
+      default: return <span className="role-badge admin"><ShieldCheck size={10} /> Administrator</span>;
+    }
+  };
+
   return (
     <div className="dashboard-shell">
       <aside className="sidebar">
         <div className="brand-row">
-          <div className="brand-mark">S</div>
+          <img src="/ticket-logo.png" alt="SyncInk Ticket" style={{ width: 32, height: 32, borderRadius: 8 }} />
           <div>
             <strong>SyncInk Ticket</strong>
             <span>Premium Ticket System</span>
@@ -288,11 +299,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
               <div>
                 <strong>{selectedGuild?.name || 'Select a server'}</strong>
                 <span className="guild-role-badge">
-                  {selectedGuild?.owner ? (
-                    <><Crown size={12} /> Owner</>
-                  ) : (
-                    <><ShieldCheck size={12} /> Administrator</>
-                  )}
+                  {renderTierBadge(selectedGuild?.dashboardTier || (selectedGuild?.owner ? 'owner' : 'admin'))}
                 </span>
               </div>
             </div>
@@ -329,9 +336,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                     )}
                     <div className="server-dropdown-info">
                       <strong>{guild.name}</strong>
-                      <span className={`role-badge ${guild.owner ? 'owner' : 'admin'}`}>
-                        {guild.owner ? <><Crown size={10} /> Owner</> : <><ShieldCheck size={10} /> Administrator</>}
-                      </span>
+                      {renderTierBadge(guild.dashboardTier || (guild.owner ? 'owner' : 'admin'))}
                     </div>
                   </button>
                 ))}

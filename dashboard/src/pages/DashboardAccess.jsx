@@ -4,11 +4,11 @@ import { Crown, Settings, ShieldCheck, Star, Wrench, X } from 'lucide-react';
 import { ActionButton, PageHeader, SelectInput } from '../components/Common';
 
 const TIERS = [
-  { id: 'owner', label: 'OWNER', emojiId: '1517253606686986323', color: '#ff7d9c', desc: 'everything' },
-  { id: 'developer', label: 'DEVELOPER', emojiId: '1519379532409344142', color: '#9d7cff', desc: 'everything' },
-  { id: 'admin', label: 'ADMINISTRATOR', emojiId: '1518924309668823160', color: '#ff7d9c', desc: 'almost everything' },
-  { id: 'moderator', label: 'MODERATOR', emojiId: '1518924931482779809', color: '#6dc1ff', desc: 'higher tear changes' },
-  { id: 'staff', label: 'STAFF', emojiId: '1513328514529624185', color: '#6d8bff', desc: 'low level things not very dangerous' }
+  { id: 'owner', label: 'Owner', accessLabel: 'Owner (Full Access)', emojiId: '1513803214674464788', color: '#ff7d9c', desc: 'everything' },
+  { id: 'developer', label: 'Developer', accessLabel: 'Developer (Full Access)', emojiId: '1519379532409344142', color: '#9d7cff', desc: 'everything' },
+  { id: 'admin', label: 'Administrator', accessLabel: 'Administrator (Manage Server)', emojiId: '1518924309668823160', color: '#ff7d9c', desc: 'almost everything' },
+  { id: 'moderator', label: 'Moderator', accessLabel: 'Moderator (Voice & Moderation)', emojiId: '1518924931482779809', color: '#6dc1ff', desc: 'higher tear changes' },
+  { id: 'staff', label: 'Staff', accessLabel: 'Staff (Limited UI)', emojiId: '1513328514529624185', color: '#6d8bff', desc: 'low level things not very dangerous' }
 ];
 
 export default function DashboardAccess() {
@@ -152,7 +152,7 @@ export default function DashboardAccess() {
                     className="tier-select"
                   >
                     {TIERS.map(t => (
-                      <option key={t.id} value={t.id}>{t.label} (Full Access)</option>
+                      <option key={t.id} value={t.id}>{t.accessLabel}</option>
                     ))}
                   </select>
                   <button className="remove-role-btn" onClick={() => handleRemoveRole(role.id)}>
