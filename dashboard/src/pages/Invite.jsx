@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Shield, Ticket, X } from 'lucide-react';
-import HeroParticleText from '../components/HeroParticleText';
+import HeroParticleReveal from '../components/HeroParticleReveal';
 
 export default function Invite() {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ export default function Invite() {
       </div>
 
       <div className="invite-hero">
-        <HeroParticleText 
+        <HeroParticleReveal 
           textLines={["Add SyncInk Ticket", "to your server"]} 
           highlightWord="SyncInk Ticket"
         />

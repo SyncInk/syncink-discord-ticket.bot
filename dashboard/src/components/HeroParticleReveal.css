@@ -1,0 +1,71 @@
+/* ─── HeroParticleReveal ──────────────────────────────────────────────────── */
+
+.hpr-root {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
+.hpr-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hpr-heading {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  letter-spacing: -0.05em;
+  line-height: 1.15;
+  color: #ffffff;
+  will-change: opacity;
+}
+
+/* ─── Gradient highlight: only "SyncInk Ticket" ──────────────────────────── */
+
+.hpr-hl {
+  background: linear-gradient(90deg, #8B5CF6, #A855F7, #C084FC, #8B5CF6);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation:
+    hpr-gradient 6s linear infinite,
+    hpr-glow 3s ease-in-out infinite alternate;
+  will-change: background-position, filter;
+}
+
+@keyframes hpr-gradient {
+  0%   { background-position: 100% 50%; }
+  100% { background-position:   0% 50%; }
+}
+
+@keyframes hpr-glow {
+  0%   {
+    filter:
+      drop-shadow(0 0  8px rgba(168, 85, 247, 0.30))
+      drop-shadow(0 0 20px rgba(139, 92, 246, 0.15));
+  }
+  100% {
+    filter:
+      drop-shadow(0 0 16px rgba(168, 85, 247, 0.60))
+      drop-shadow(0 0 36px rgba(139, 92, 246, 0.30));
+  }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .hpr-hl {
+    animation: none;
+    background: none;
+    -webkit-background-clip: border-box;
+    -webkit-text-fill-color: currentcolor;
+    color: #A855F7;
+    filter: none;
+  }
+}
