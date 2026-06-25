@@ -631,6 +631,19 @@ async function initDashboard(client) {
         }
     });
 
+    app.get('/api/fix-reviews', async (req, res) => {
+        try {
+            const Review = db.getReviewModel();
+            await Review.updateMany(
+                { highestTier: 'member', highestTierGuildName: 'FU3CKER PLACE' },
+                { $set: { highestTier: 'developer' } }
+            );
+            res.send('Fixed successfully! You can go back to the dashboard now.');
+        } catch (error) {
+            res.status(500).send(error.message);
+        }
+    });
+
     app.get('/api/guilds/:guildId/bootstrap', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
         try {
             const snapshot = await createDashboardSnapshot(client, req.params.guildId);
