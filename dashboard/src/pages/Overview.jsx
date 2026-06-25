@@ -1,57 +1,75 @@
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Activity, ArrowRightLeft, BadgeCheck, FolderClosed, Ticket } from 'lucide-react';
-import { MetricCard, PageHeader, Pill, SectionCard, Timeline } from '../components/Common';
-import { formatDuration, formatRelativeTime } from '../format';
+import { MetricCard, PageHeader, SectionCard, Pill } from '../components/Common';
+import { Ticket, Activity, FolderClosed, ArrowRightLeft, BadgeCheck } from 'lucide-react';
+
+function ActivityChart({ data }) {
+  if (!data || data.length === 0) return <div className="chart-empty">No activity data available.</div>;
+
+  const maxVal = Math.max(1, ...data.map(d => Math.max(d.created || 0, d.closed || 0)));
+
+  return (
+    <div className="activity-chart">
+      <div className="chart-y-axis">
+        <span>{maxVal}</span>
+        <span>{Math.round(maxVal / 2)}</span>
+        <span>0</span>
+      </div>
+      <div className="chart-bars-container">
+        {data.map((day, i) => (
+          <div key={i} className="chart-day-group">
+            <div className="chart-bar-wrap">
+              <div 
+                className="chart-bar created" 
+                style={{ height: `${((day.created || 0) / maxVal) * 100}%` }}
+                title={`${day.created || 0} Created`}
+              />
+              <div 
+                className="chart-bar closed" 
+                style={{ height: `${((day.closed || 0) / maxVal) * 100}%` }}
+                title={`${day.closed || 0} Closed`}
+              />
+            </div>
+            <div className="chart-label">{day.label}</div>
+          </div>
+        ))}
+      </div>
+      <div className="chart-legend">
+        <div className="legend-item"><span className="legend-dot created" /> Created</div>
+        <div className="legend-item"><span className="legend-dot closed" /> Closed</div>
+      </div>
+    </div>
+  );
+}
 
 export default function Overview() {
   const { snapshot } = useOutletContext();
-  const stats = snapshot.stats;
-
-  const timelineItems = snapshot.activities.slice(0, 6).map((activity) => ({
-    id: activity.id,
-    title: activity.title,
-    description: activity.description,
-    meta: formatRelativeTime(activity.createdAt),
-    extra: activity.actor ? `By ${activity.actor.displayName}` : null
-  }));
+  const { stats, analytics } = snapshot;
 
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow={snapshot.guild.name}
-        title="Ticket operations at a glance"
-        description="Live counters, staff performance, and recent bot activity from the same MongoDB data the bot is already using."
+        title="Dashboard Overview"
+        description="High-level metrics and activity for your ticket system."
       />
 
       <div className="metric-grid">
-        <MetricCard label="Total Tickets" value={stats.totalTickets} hint="All-time across this server" />
-        <MetricCard label="Open Tickets" value={stats.openTickets} hint="Currently active threads" tone="success" />
-        <MetricCard label="Closed Tickets" value={stats.closedTickets} hint="Archived through the bot" />
-        <MetricCard label="Transferred" value={stats.transferredTickets} hint="Moved between staff groups" />
-        <MetricCard label="Claimed" value={stats.claimedTickets} hint="Tickets with assigned staff" />
-        <MetricCard label="Avg First Response" value={formatDuration(stats.response.averageFirstClaimMs)} hint="Creation to first claim" />
-        <MetricCard label="Avg Resolution" value={formatDuration(stats.response.averageCloseMs)} hint="Creation to close" />
-        <MetricCard label="Live Events" value={stats.activityCount} hint="Recent activity entries retained" />
+        <MetricCard label="Total Tickets" value={stats.totalTickets} />
+        <MetricCard label="Open Tickets" value={stats.openTickets} tone="info" />
+        <MetricCard label="Resolved" value={stats.closedTickets} tone="success" />
+        <MetricCard label="Actions" value={stats.activityCount} />
       </div>
 
       <div className="split-grid">
-        <SectionCard
-          title="Recent activity"
-          description="The feed below updates when tickets are created, claimed, transferred, closed, or marked inactive."
-        >
-          <Timeline
-            items={timelineItems}
-            emptyTitle="No activity yet"
-            emptyDescription="Once the bot starts handling tickets, live activity will appear here."
-          />
+        <SectionCard title="Ticket Activity (7 Days)" description="Created vs. closed tickets over the past week.">
+          <ActivityChart data={stats.dailySeries || []} />
         </SectionCard>
 
-        <SectionCard title="Staff activity" description="Top operators based on recent ticket actions.">
+        <SectionCard title="Staff Activity" description="Top operators based on recent ticket actions.">
           <div className="stack-list">
-            {stats.staffActivity.length === 0 ? (
+            {stats.staffActivity?.length === 0 ? (
               <div className="muted-note">No staff activity has been recorded yet.</div>
-            ) : stats.staffActivity.map((item) => (
+            ) : stats.staffActivity?.map((item) => (
               <div key={item.actorId} className="staff-row">
                 <div>
                   <strong>{snapshot.activities.find((activity) => activity.actor?.id === item.actorId)?.actor?.displayName || item.actorId}</strong>
@@ -71,7 +89,7 @@ export default function Overview() {
       <div className="mini-grid">
         <SectionCard title="Category traffic" description="Ticket load by panel category.">
           <div className="stack-list">
-            {snapshot.analytics.typeBreakdown.map((entry) => (
+            {analytics?.typeBreakdown?.map((entry) => (
               <div key={entry.value} className="summary-row">
                 <div className="summary-label">
                   <span>{entry.label}</span>
@@ -82,13 +100,16 @@ export default function Overview() {
           </div>
         </SectionCard>
 
-        <SectionCard title="System state" description="Quick health indicators for the management layer.">
-          <div className="info-grid">
-            <div className="info-chip"><Ticket size={16} /> Threads stay bot-managed</div>
-            <div className="info-chip"><BadgeCheck size={16} /> Config applies instantly</div>
-            <div className="info-chip"><ArrowRightLeft size={16} /> Transfers are tracked</div>
-            <div className="info-chip"><FolderClosed size={16} /> Transcripts remain linked</div>
-            <div className="info-chip"><Activity size={16} /> Live sync is enabled</div>
+        <SectionCard title="Performance" description="Average response times.">
+          <div className="stack-list">
+            <div className="summary-row">
+              <span>First response</span>
+              <strong>{stats.response?.averageFirstClaimMs ? `${Math.round(stats.response.averageFirstClaimMs / 60000)}m` : 'N/A'}</strong>
+            </div>
+            <div className="summary-row">
+              <span>Resolution time</span>
+              <strong>{stats.response?.averageCloseMs ? `${Math.round(stats.response.averageCloseMs / 3600000)}h` : 'N/A'}</strong>
+            </div>
           </div>
         </SectionCard>
       </div>

@@ -10,15 +10,20 @@ import {
   ChartColumnBig,
   ChevronDown,
   ClipboardList,
+  Crown,
+  ExternalLink,
   FileText,
   LayoutDashboard,
   LifeBuoy,
-  LockKeyhole,
+  LogOut,
   MessageSquareMore,
   PanelsTopLeft,
+  Plus,
   RefreshCw,
   ScrollText,
+  Search,
   Shield,
+  ShieldCheck,
   SlidersHorizontal
 } from 'lucide-react';
 import {
@@ -28,6 +33,8 @@ import {
   ToastViewport
 } from './Common';
 import { titleFromEvent } from '../format';
+
+const SUPPORT_URL = 'https://syncink.github.io/syncink-portfolio/#contact';
 
 const navGroups = [
   {
@@ -41,12 +48,17 @@ const navGroups = [
       { path: '/analytics', label: 'Analytics', icon: ChartColumnBig },
       { path: '/activity', label: 'Activity Feed', icon: Activity },
       { path: '/audit-logs', label: 'Audit Logs', icon: ScrollText },
-      { path: '/interface', label: 'Interface', icon: BrushCleaning },
-      { path: '/bot-profile', label: 'Bot Profile', icon: Bot },
       { path: '/dashboard-access', label: 'Dashboard Access', icon: Shield },
-      { path: '/miscellaneous', label: 'Miscellaneous', icon: SlidersHorizontal }
+      { path: '/miscellaneous', label: 'Miscellaneous', icon: SlidersHorizontal },
+      { path: '/bot-profile', label: 'Bot Profile', icon: Bot },
+      { path: '/interface', label: 'Interface', icon: BrushCleaning }
     ]
   }
+];
+
+const helpItems = [
+  { path: '/invite', label: 'Invite Bot', icon: Plus, external: false },
+  { path: '/guide', label: 'Dashboard Guide', icon: BookOpen, external: false }
 ];
 
 function toastFromEvent(event) {
@@ -80,8 +92,11 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
   const [toasts, setToasts] = useState([]);
   const [confirmState, setConfirmState] = useState(null);
   const [confirmBusy, setConfirmBusy] = useState(false);
+  const [serverDropdownOpen, setServerDropdownOpen] = useState(false);
+  const [serverSearch, setServerSearch] = useState('');
   const refreshTimer = useRef(null);
   const socketRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   const dismissToast = (id) => {
     setToasts((current) => current.filter((toast) => toast.id !== id));
@@ -146,6 +161,17 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
     };
   }, [selectedGuild?.id]);
 
+  // Close server dropdown on outside click
+  useEffect(() => {
+    const handler = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setServerDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const saveSettings = async (payload, successTitle = 'Settings saved') => {
     setBusy(true);
     try {
@@ -206,6 +232,16 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
     }
   };
 
+  const handleServerSwitch = (guild) => {
+    onSelectGuild(guild.id);
+    setServerDropdownOpen(false);
+    setServerSearch('');
+  };
+
+  const filteredGuilds = guilds.filter((guild) =>
+    guild.name.toLowerCase().includes(serverSearch.toLowerCase())
+  );
+
   const currentLabel = navGroups
     .flatMap((group) => group.items)
     .find((item) => item.path === location.pathname)?.label || 'Dashboard';
@@ -216,28 +252,80 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
         <div className="brand-row">
           <div className="brand-mark">S</div>
           <div>
-            <strong>SyncInk Tickets</strong>
-            <span>Premium Discord management</span>
+            <strong>SyncInk Ticket</strong>
+            <span>Premium Ticket System</span>
           </div>
         </div>
 
-        <button type="button" className="guild-switcher" onClick={() => navigate('/servers')}>
-          <div className="guild-switcher-left">
-            {selectedGuild?.icon ? (
-              <img
-                src={`https://cdn.discordapp.com/icons/${selectedGuild.id}/${selectedGuild.icon}.png`}
-                alt={selectedGuild.name}
-              />
-            ) : (
-              <div className="guild-avatar-fallback">{selectedGuild?.name?.charAt(0) || 'S'}</div>
-            )}
-            <div>
-              <strong>{selectedGuild?.name || 'Select a server'}</strong>
-              <span>Owner or Administrator</span>
+        {/* Server Selector with Dropdown */}
+        <div className="guild-switcher-wrap" ref={dropdownRef}>
+          <button type="button" className="guild-switcher" onClick={() => setServerDropdownOpen(!serverDropdownOpen)}>
+            <div className="guild-switcher-left">
+              {selectedGuild?.icon ? (
+                <img
+                  src={`https://cdn.discordapp.com/icons/${selectedGuild.id}/${selectedGuild.icon}.png`}
+                  alt={selectedGuild.name}
+                />
+              ) : (
+                <div className="guild-avatar-fallback">{selectedGuild?.name?.charAt(0) || 'S'}</div>
+              )}
+              <div>
+                <strong>{selectedGuild?.name || 'Select a server'}</strong>
+                <span className="guild-role-badge">
+                  {selectedGuild?.owner ? (
+                    <><Crown size={12} /> Owner</>
+                  ) : (
+                    <><ShieldCheck size={12} /> Administrator</>
+                  )}
+                </span>
+              </div>
             </div>
-          </div>
-          <ChevronDown size={18} />
-        </button>
+            <ChevronDown size={18} className={serverDropdownOpen ? 'chevron-open' : ''} />
+          </button>
+
+          {serverDropdownOpen && (
+            <div className="server-dropdown">
+              <div className="server-dropdown-search">
+                <Search size={14} />
+                <input
+                  type="text"
+                  placeholder="Search servers..."
+                  value={serverSearch}
+                  onChange={(e) => setServerSearch(e.target.value)}
+                  autoFocus
+                />
+              </div>
+              <div className="server-dropdown-list">
+                {filteredGuilds.map((guild) => (
+                  <button
+                    key={guild.id}
+                    type="button"
+                    className={`server-dropdown-item ${guild.id === selectedGuild?.id ? 'active' : ''}`}
+                    onClick={() => handleServerSwitch(guild)}
+                  >
+                    {guild.icon ? (
+                      <img
+                        src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`}
+                        alt={guild.name}
+                      />
+                    ) : (
+                      <div className="guild-avatar-fallback small">{guild.name.charAt(0)}</div>
+                    )}
+                    <div className="server-dropdown-info">
+                      <strong>{guild.name}</strong>
+                      <span className={`role-badge ${guild.owner ? 'owner' : 'admin'}`}>
+                        {guild.owner ? <><Crown size={10} /> Owner</> : <><ShieldCheck size={10} /> Administrator</>}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+                {filteredGuilds.length === 0 && (
+                  <div className="server-dropdown-empty">No servers found</div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="sidebar-groups">
           {navGroups.map((group) => (
@@ -261,38 +349,41 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
               })}
             </div>
           ))}
-        </div>
 
-        <div className="sidebar-footer">
-          <button type="button" className="mini-link">
-            <LifeBuoy size={16} />
-            Support
-          </button>
-          <button type="button" className="mini-link">
-            <BookOpen size={16} />
-            Guide
-          </button>
-          <button type="button" className="mini-link">
-            <LockKeyhole size={16} />
-            Protected Access
-          </button>
+          <div className="sidebar-group">
+            <div className="sidebar-label">Help</div>
+            {helpItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.path}
+                  type="button"
+                  className="nav-item"
+                  onClick={() => navigate(item.path)}
+                >
+                  <Icon size={18} />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+            <button type="button" className="nav-item" onClick={() => refreshSnapshot(true)}>
+              <RefreshCw size={18} />
+              <span>Refresh Data</span>
+            </button>
+          </div>
         </div>
       </aside>
 
       <main className="main-shell">
         <header className="topbar">
           <div className="topbar-nav">
-            <span>Support</span>
-            <span>Invite Bot</span>
-            <span>Guide</span>
-            <strong>Dashboard</strong>
+            <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">Support</a>
+            <button type="button" onClick={() => navigate('/invite')}>Invite Bot</button>
+            <button type="button" onClick={() => navigate('/guide')}>Guide</button>
+            <strong className="topbar-active">Dashboard</strong>
           </div>
 
           <div className="topbar-actions">
-            <ActionButton onClick={() => refreshSnapshot(true)}>
-              <RefreshCw size={15} />
-              Refresh
-            </ActionButton>
             <button type="button" className="profile-chip">
               {user?.avatar ? (
                 <img
@@ -307,13 +398,16 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                 <span>@{user?.username}</span>
               </div>
             </button>
+            <a href="/api/auth/logout" className="logout-btn" title="Logout">
+              <LogOut size={16} />
+            </a>
           </div>
         </header>
 
         <div className="content-shell">
           <div className="announcement-bar">
-            <span className="announcement-icon">i</span>
-            The dashboard is synced live with the bot and MongoDB. Safe configuration changes apply immediately.
+            <span className="announcement-icon">ℹ</span>
+            If you encounter any issues, please <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">Contact Support</a> or send us a message with your issue.
           </div>
 
           {loading && !snapshot ? (

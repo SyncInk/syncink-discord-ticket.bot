@@ -333,7 +333,8 @@ async function createDashboardSnapshot(client, guildId) {
             username: client.user.username,
             avatarUrl: client.user.displayAvatarURL({ size: 128 }),
             uptimeMs: client.uptime,
-            guildCount: client.guilds.cache.size
+            guildCount: client.guilds.cache.size,
+            nickname: guild.members.cache.get(client.user.id)?.nickname || ''
         },
         settings: guildConfig,
         resources: {
@@ -501,6 +502,7 @@ async function initDashboard(client) {
                 'adminRoleIds',
                 'ownerRoleIds',
                 'developerRoleIds',
+                'moderatorRoleIds',
                 'inactivityReminderMinutes',
                 'panelConfig',
                 'defaultTicketMessages',
@@ -581,6 +583,32 @@ async function initDashboard(client) {
         } catch (error) {
             console.error('[DASHBOARD] Failed to deploy panel:', error);
             res.status(500).json({ error: 'Failed to deploy the ticket panel.' });
+        }
+    });
+
+    app.post('/api/guilds/:guildId/nickname', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
+        try {
+            const nickname = req.body?.nickname || '';
+            const guild = req.dashboardGuild;
+            const botMember = guild.members.cache.get(client.user.id);
+            if (!botMember) {
+                return res.status(400).json({ error: 'Bot is not in this server.' });
+            }
+            await botMember.setNickname(nickname || null);
+
+            await db.createAuditLog({
+                guildId: req.params.guildId,
+                actorId: req.session.user.id,
+                actorTag: req.session.user.username,
+                action: 'Changed bot nickname',
+                changes: [{ field: 'botNickname', before: botMember.nickname, after: nickname || null }]
+            });
+
+            const snapshot = await createDashboardSnapshot(client, req.params.guildId);
+            res.json(snapshot);
+        } catch (error) {
+            console.error('[DASHBOARD] Failed to change nickname:', error);
+            res.status(500).json({ error: 'Failed to change the bot nickname.' });
         }
     });
 

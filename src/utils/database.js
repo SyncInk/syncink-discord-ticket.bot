@@ -308,6 +308,7 @@ function getGuildSettingsModel() {
         adminRoleIds: { type: [String], default: [] },
         ownerRoleIds: { type: [String], default: [] },
         developerRoleIds: { type: [String], default: [] },
+        moderatorRoleIds: { type: [String], default: [] },
         inactivityReminderMinutes: { type: Number, default: 120 },
         panelConfig: {
             title: { type: String, default: getDefaultPanelConfig().title },

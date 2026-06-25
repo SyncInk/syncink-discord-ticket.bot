@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { MetricCard, PageHeader, SectionCard } from '../components/Common';
+import axios from 'axios';
+import { ActionButton, MetricCard, PageHeader, SectionCard, Field, TextInput } from '../components/Common';
 import { formatDuration } from '../format';
 
 export default function BotProfile() {
-  const { snapshot } = useOutletContext();
+  const { snapshot, selectedGuild, refreshSnapshot } = useOutletContext();
+  const [nickname, setNickname] = useState(snapshot.bot?.nickname || '');
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    setNickname(snapshot.bot?.nickname || '');
+  }, [snapshot]);
+
+  const handleSaveNickname = async () => {
+    setBusy(true);
+    try {
+      await axios.post(`/api/guilds/${selectedGuild.id}/nickname`, { nickname });
+      await refreshSnapshot(true);
+    } catch (error) {
+      console.error('Failed to change nickname:', error);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div className="page-stack">
@@ -21,17 +40,37 @@ export default function BotProfile() {
         <MetricCard label="Guild Members" value={snapshot.guild.memberCount} hint="Current selected server" />
       </div>
 
-      <SectionCard title="Profile details" description="Useful metadata for support or verification.">
-        <div className="profile-panel">
-          <img src={snapshot.bot.avatarUrl} alt={snapshot.bot.username} className="profile-panel-avatar" />
-          <div className="profile-panel-copy">
-            <strong>{snapshot.bot.username}</strong>
-            <span>Bot ID: {snapshot.bot.id}</span>
-            <span>Guild: {snapshot.guild.name}</span>
-            <span>Owner: {snapshot.guild.owner?.displayName || 'Unknown'}</span>
+      <div className="split-grid">
+        <SectionCard title="Profile details" description="Useful metadata for support or verification.">
+          <div className="profile-panel">
+            <img src={snapshot.bot.avatarUrl} alt={snapshot.bot.username} className="profile-panel-avatar" />
+            <div className="profile-panel-copy">
+              <strong>{snapshot.bot.username}</strong>
+              <span>Bot ID: {snapshot.bot.id}</span>
+              <span>Guild: {snapshot.guild.name}</span>
+            </div>
           </div>
-        </div>
-      </SectionCard>
+        </SectionCard>
+
+        <SectionCard 
+          title="Server Nickname" 
+          description="Change the bot's display name specifically for this server."
+          action={
+            <ActionButton tone="primary" busy={busy} onClick={handleSaveNickname}>
+              Update Nickname
+            </ActionButton>
+          }
+        >
+          <Field label="Nickname" hint="Leave blank to reset to the default bot username.">
+            <TextInput 
+              value={nickname} 
+              onChange={(e) => setNickname(e.target.value)} 
+              placeholder={snapshot.bot.username}
+              maxLength={32}
+            />
+          </Field>
+        </SectionCard>
+      </div>
     </div>
   );
 }

@@ -16,6 +16,8 @@ import InterfacePage from './pages/InterfacePage';
 import BotProfile from './pages/BotProfile';
 import DashboardAccess from './pages/DashboardAccess';
 import Miscellaneous from './pages/Miscellaneous';
+import Invite from './pages/Invite';
+import Guide from './pages/Guide';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -67,6 +69,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+      <Route path="/invite" element={<Invite />} />
+      <Route path="/guide" element={user ? <Guide /> : <Navigate to="/login" />} />
       <Route
         path="/servers"
         element={user ? (
