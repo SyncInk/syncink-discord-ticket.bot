@@ -6,11 +6,11 @@ import usePermissions from '../hooks/usePermissions';
 import LockedOverlay from '../components/LockedOverlay';
 
 const TIERS = [
-  { id: 'owner', label: 'Owner', accessLabel: 'Owner (Full Access)', emojiId: '1513803214674464788', color: 'linear-gradient(135deg, #FF6B9A 0%, #9D7CFF 100%)', borderColor: '#FF6B9A', desc: 'Manage server settings, toggles, and most dashboard sections.' },
-  { id: 'developer', label: 'Developer', accessLabel: 'Developer (Full Access)', emojiId: '1519379532409344142', color: '#9d7cff', borderColor: '#9d7cff', desc: 'Manage server settings, toggles, and most dashboard sections.' },
-  { id: 'admin', label: 'Administrator', accessLabel: 'Administrator (Manage Server)', emojiId: '1518924309668823160', color: '#ff4d4d', borderColor: '#ff4d4d', desc: 'Manage server settings, toggles, and most dashboard sections.' },
-  { id: 'moderator', label: 'Moderator', accessLabel: 'Moderator (Managed Access)', emojiId: '1518924931482779809', color: '#00e5ff', borderColor: '#00e5ff', desc: 'Manage voice room tools and approved moderation pages.' },
-  { id: 'staff', label: 'Staff', accessLabel: 'Staff (Limited Access)', emojiId: '1513328514529624185', color: '#7b61ff', borderColor: '#7b61ff', desc: 'Access low-level dashboard settings such as Interface.' }
+  { id: 'owner', label: 'Owner', accessLabel: 'Owner (Full Access)', emojiId: '1513803214674464788', color: 'linear-gradient(135deg, #FF6B9A 0%, #9D7CFF 100%)', borderColor: '#FF6B9A', desc: 'Full unrestricted access to the dashboard and all server settings.' },
+  { id: 'developer', label: 'Developer', accessLabel: 'Developer (Full Access)', emojiId: '1519379532409344142', color: '#9d7cff', borderColor: '#9d7cff', desc: 'Full unrestricted access to the dashboard and all server settings.' },
+  { id: 'admin', label: 'Administrator', accessLabel: 'Administrator (Manage Server)', emojiId: '1518924309668823160', color: '#ff4d4d', borderColor: '#ff4d4d', desc: 'Manage ticket categories, panel configurations, and server preferences.' },
+  { id: 'moderator', label: 'Moderator', accessLabel: 'Moderator (Managed Access)', emojiId: '1518924931482779809', color: '#00e5ff', borderColor: '#00e5ff', desc: 'View ticket logs, transcripts, and dashboard analytics.' },
+  { id: 'staff', label: 'Staff', accessLabel: 'Staff (Limited Access)', emojiId: '1513328514529624185', color: '#7b61ff', borderColor: '#7b61ff', desc: 'View basic dashboard statistics and activity feeds.' }
 ];
 
 export default function DashboardAccess() {
@@ -132,16 +132,22 @@ export default function DashboardAccess() {
           <div className="add-role-controls">
             <select
               className="role-select-input"
-              value={selectedNewRole}
-              onChange={(event) => setSelectedNewRole(event.target.value)}
+              value=""
+              onChange={(event) => {
+                const roleId = event.target.value;
+                if (!roleId || !canEditAccess) return;
+                const roleData = snapshot.resources?.roles?.find((role) => role.id === roleId);
+                if (roleData && !roleMap.find((role) => role.id === roleId)) {
+                  setRoleMap([...roleMap, { ...roleData, tier: 'staff' }]);
+                }
+              }}
               disabled={!canEditAccess}
             >
-              <option value="">Select a role...</option>
+              <option value="">+ Add Role</option>
               {availableRolesToAdd.map((role) => (
                 <option key={role.id} value={role.id}>{role.name}</option>
               ))}
             </select>
-            <button className="add-role-btn" onClick={handleAddRole} disabled={!canEditAccess}>+ Add Role</button>
           </div>
         </div>
 

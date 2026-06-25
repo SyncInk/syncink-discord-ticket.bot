@@ -107,13 +107,13 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
     setToasts((current) => current.filter((toast) => toast.id !== id));
   };
 
-  const pushToast = useEffectEvent((toast) => {
+  const pushToast = React.useCallback((toast) => {
     const id = `${Date.now()}-${Math.random()}`;
     setToasts((current) => [...current, { id, ...toast }].slice(-5));
     window.setTimeout(() => dismissToast(id), 4200);
-  });
+  }, []);
 
-  const refreshSnapshot = useEffectEvent(async (showLoader = false) => {
+  const refreshSnapshot = React.useCallback(async (showLoader = false) => {
     if (!selectedGuild?.id) return;
     if (showLoader) setLoading(true);
 
@@ -131,13 +131,13 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
     } finally {
       setLoading(false);
     }
-  });
+  }, [selectedGuild?.id, pushToast]);
 
   useEffect(() => {
     setSnapshot(null);
     setLoading(true);
     refreshSnapshot(true);
-  }, [selectedGuild?.id]);
+  }, [selectedGuild?.id, refreshSnapshot]);
 
   useEffect(() => {
     if (!selectedGuild?.id) return;
@@ -431,7 +431,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                 <div className="profile-fallback">{user?.username?.charAt(0) || 'U'}</div>
               )}
               <div>
-                <strong>{user?.username}</strong>
+                <strong>{user?.global_name || user?.username}</strong>
                 <span>@{user?.username}</span>
               </div>
             </button>

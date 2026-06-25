@@ -269,6 +269,16 @@ function ensureGuildAccess(client) {
             return res.status(403).json({ error: 'Your server permissions no longer allow dashboard access.' });
         }
 
+        if (!allowedGuild.dashboardTier) {
+            if (botGuild.ownerId === req.session.user.id) {
+                allowedGuild.dashboardTier = 'owner';
+            } else if (member.permissions.has('Administrator')) {
+                allowedGuild.dashboardTier = 'admin';
+            } else {
+                allowedGuild.dashboardTier = 'staff';
+            }
+        }
+
         req.dashboardGuild = botGuild;
         req.allowedGuild = allowedGuild;
         return next();
@@ -503,10 +513,28 @@ async function initDashboard(client) {
         }
     });
 
-    app.get('/api/auth/me', ensureAuthenticated, (req, res) => {
+    app.get('/api/auth/me', ensureAuthenticated, async (req, res) => {
+        const guilds = (req.session.adminGuilds || []).filter(g => client.guilds.cache.has(g.id));
+        
+        for (const guild of guilds) {
+            if (!guild.dashboardTier) {
+                const botGuild = client.guilds.cache.get(guild.id);
+                if (botGuild.ownerId === req.session.user.id) {
+                    guild.dashboardTier = 'owner';
+                } else {
+                    const member = await botGuild.members.fetch(req.session.user.id).catch(() => null);
+                    if (member && member.permissions.has('Administrator')) {
+                        guild.dashboardTier = 'admin';
+                    } else {
+                        guild.dashboardTier = 'staff';
+                    }
+                }
+            }
+        }
+        
         res.json({
             user: req.session.user,
-            guilds: (req.session.adminGuilds || []).filter(g => client.guilds.cache.has(g.id))
+            guilds
         });
     });
 
