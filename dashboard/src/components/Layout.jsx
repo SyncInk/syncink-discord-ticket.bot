@@ -25,6 +25,7 @@ import {
   Shield,
   ShieldCheck,
   SlidersHorizontal,
+  User,
   X
 } from 'lucide-react';
 import {
@@ -272,7 +273,8 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
       case 'admin': return <span className="role-badge admin"><img src="https://cdn.discordapp.com/emojis/1518924309668823160.png" style={{ width: 12, height: 12 }} alt="Admin" /> Administrator</span>;
       case 'moderator': return <span className="role-badge moderator"><img src="https://cdn.discordapp.com/emojis/1518924931482779809.png" style={{ width: 12, height: 12 }} alt="Mod" /> Moderator</span>;
       case 'staff': return <span className="role-badge staff"><img src="https://cdn.discordapp.com/emojis/1513328514529624185.png" style={{ width: 12, height: 12 }} alt="Staff" /> Staff</span>;
-      default: return <span className="role-badge admin"><ShieldCheck size={10} /> Administrator</span>;
+      case 'member': 
+      default: return <span className="role-badge member" style={{ color: 'var(--text-muted)' }}><User size={10} /> Member</span>;
     }
   };
 

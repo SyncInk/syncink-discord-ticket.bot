@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Crown, ShieldCheck } from 'lucide-react';
+import { Crown, ShieldCheck, User } from 'lucide-react';
 
 export default function ServerSelect({ guilds, onSelect, selectedGuildId }) {
   const navigate = useNavigate();
@@ -16,12 +16,15 @@ export default function ServerSelect({ guilds, onSelect, selectedGuildId }) {
         return <span className="role-badge owner"><Crown size={11} /> Server Owner</span>;
       case 'developer':
         return <span className="role-badge developer"><ShieldCheck size={11} /> Developer</span>;
+      case 'admin':
+        return <span className="role-badge admin"><ShieldCheck size={11} /> Administrator</span>;
       case 'moderator':
         return <span className="role-badge moderator"><ShieldCheck size={11} /> Moderator</span>;
       case 'staff':
         return <span className="role-badge staff"><ShieldCheck size={11} /> Staff</span>;
+      case 'member':
       default:
-        return <span className="role-badge admin"><ShieldCheck size={11} /> Administrator</span>;
+        return <span className="role-badge member" style={{ color: 'var(--text-muted)' }}><User size={11} /> Member</span>;
     }
   };
 
@@ -31,8 +34,8 @@ export default function ServerSelect({ guilds, onSelect, selectedGuildId }) {
         <img src="/ticket-logo.png" alt="SyncInk Ticket" style={{ width: 56, height: 56, borderRadius: 18, marginBottom: 18 }} />
         <h1>Select your workspace</h1>
         <p>
-          Choose the Discord server you want to manage. Only servers where you are the owner or have
-          Administrator-level dashboard access are shown here.
+          Choose the Discord server you want to view or manage. Only servers where you are the owner, developer, or have 
+          dashboard access are shown here.
         </p>
       </div>
 
