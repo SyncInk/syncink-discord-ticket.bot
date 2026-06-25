@@ -256,6 +256,8 @@ function ensureGuildAccess(client) {
 
         if (!allowedGuild || !botGuild) {
             return res.status(403).json({ error: 'Access denied for this server.' });
+        }
+
         const member = await botGuild.members.fetch(req.session.user.id).catch(() => null);
         const hasLiveAccess = Boolean(member) && (
             allowedGuild.dashboardTier || 
