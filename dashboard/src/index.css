@@ -2216,3 +2216,18 @@ canvas {
   cursor: default;
 }
 
+
+
+.discord-inline-code {
+  background: #1e1f22;
+  border-radius: 3px;
+  padding: 0.2em;
+  font-family: Consolas, monospace;
+}
+
+.discord-custom-emoji {
+  width: 1.375em;
+  height: 1.375em;
+  vertical-align: -0.25em;
+}
+

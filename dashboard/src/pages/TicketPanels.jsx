@@ -108,18 +108,22 @@ export default function TicketPanels() {
                 </div>
                 
                 <div className="discord-message-embed">
-                  <div className="discord-message-embed-color" style={{ background: form.color || '#2B2D31' }} />
+                  <div className="discord-message-embed-color" style={{ background: form.color || 'transparent' }} />
                   <div className="discord-message-embed-body">
-                    <div className="discord-message-embed-title">
-                      {form.title}
-                      <img src="https://cdn.discordapp.com/emojis/1513337285024677899.png" alt="Shield" style={{ width: 20, height: 20 }} />
-                    </div>
+                    <div 
+                      className="discord-message-embed-title" 
+                      dangerouslySetInnerHTML={{ __html: (form.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;(a?):(\w+):(\d+)&gt;/g, '<img class="discord-custom-emoji" src="https://cdn.discordapp.com/emojis/$3.png" alt=":$2:" />').replace(/`([^`]+)`/g, '<span class="discord-inline-code">$1</span>').replace(/__([^_]+)__/g, '<u>$1</u>') }} 
+                    />
                     <div className="discord-message-embed-desc">
                       {(form.description || []).filter(Boolean).map((line, index) => (
-                        <p key={index}>{line.startsWith('•') ? line : `• ${line}`}</p>
+                        <p 
+                          key={index} 
+                          dangerouslySetInnerHTML={{ __html: line.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;(a?):(\w+):(\d+)&gt;/g, '<img class="discord-custom-emoji" src="https://cdn.discordapp.com/emojis/$3.png" alt=":$2:" />').replace(/`([^`]+)`/g, '<span class="discord-inline-code">$1</span>').replace(/__([^_]+)__/g, '<u>$1</u>') }} 
+                        />
                       ))}
                     </div>
                   </div>
+                  {form.thumbnailUrl && <img src={form.thumbnailUrl} alt="Thumbnail" style={{ width: 80, height: 80, borderRadius: 4, margin: '16px 16px 16px 0', objectFit: 'contain' }} />}
                 </div>
 
                 <div className="discord-message-components">
