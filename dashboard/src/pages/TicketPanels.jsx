@@ -192,12 +192,23 @@ export default function TicketPanels() {
                     ) : null}
 
                     <div className="discord-message-embed-desc">
-                      {previewLines.map((line, index) => (
-                        <div key={index} className="discord-message-embed-line">
-                          <span className="discord-message-bullet">•</span>
-                          <p>{renderDiscordTokens(line, `line-${index}`)}</p>
-                        </div>
-                      ))}
+                      {previewLines.map((line, index) => {
+                        let textToRender = line;
+                        const isTitleLine = index === 0 && !form.title;
+                        
+                        if (isTitleLine) {
+                           textToRender = textToRender.replace(/\*\*/g, '').replace(/__/g, '');
+                        }
+
+                        return (
+                          <div key={index} className="discord-message-embed-line">
+                            {!isTitleLine && <span className="discord-message-bullet">•</span>}
+                            <p style={isTitleLine ? { fontSize: '1.25em', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' } : {}}>
+                              {renderDiscordTokens(textToRender, `line-${index}`)}
+                            </p>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
