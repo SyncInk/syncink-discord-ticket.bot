@@ -436,6 +436,12 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
 
           {loading && !snapshot ? (
             <LoadingPanel label="Loading your Ticket Bot workspace..." />
+          ) : !snapshot ? (
+            <div className="layout-error" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '16px', color: 'var(--text)' }}>
+              <h2>Failed to load server data</h2>
+              <p style={{ color: 'var(--text-muted)' }}>We could not retrieve the configuration for this server. You may not have the required access, or the bot might be offline.</p>
+              <button className="action-button tone-primary" onClick={() => navigate('/servers')}>Return to Server List</button>
+            </div>
           ) : (
             <Outlet
               context={{
