@@ -6,11 +6,11 @@ import usePermissions from '../hooks/usePermissions';
 import LockedOverlay from '../components/LockedOverlay';
 
 const TIERS = [
-  { id: 'owner', label: 'OWNER', accessLabel: 'Owner (Full Access)', emojiId: '1513803214674464788', color: 'linear-gradient(135deg, #FF6B9A 0%, #9D7CFF 100%)', desc: 'everything' },
-  { id: 'developer', label: 'DEVELOPER', accessLabel: 'Developer (Full Access)', emojiId: '1519379532409344142', color: '#9d7cff', desc: 'everything' },
-  { id: 'admin', label: 'ADMINISTRATOR', accessLabel: 'Administrator (Manage Server)', emojiId: '1518924309668823160', color: '#ffb6c8', desc: 'almost everything' },
-  { id: 'moderator', label: 'MODERATOR', accessLabel: 'Moderator (Managed Access)', emojiId: '1518924931482779809', color: '#8fd7ff', desc: 'higher tear changes' },
-  { id: 'staff', label: 'STAFF', accessLabel: 'Staff (Limited Access)', emojiId: '1513328514529624185', color: '#a2b8ff', desc: 'low level things not very dangerous' }
+  { id: 'owner', label: 'Owner', accessLabel: 'Owner (Full Access)', emojiId: '1513803214674464788', color: 'linear-gradient(135deg, #FF6B9A 0%, #9D7CFF 100%)', borderColor: '#FF6B9A', desc: 'Manage server settings, toggles, and most dashboard sections.' },
+  { id: 'developer', label: 'Developer', accessLabel: 'Developer (Full Access)', emojiId: '1519379532409344142', color: '#9d7cff', borderColor: '#9d7cff', desc: 'Manage server settings, toggles, and most dashboard sections.' },
+  { id: 'admin', label: 'Administrator', accessLabel: 'Administrator (Manage Server)', emojiId: '1518924309668823160', color: '#ff4d4d', borderColor: '#ff4d4d', desc: 'Manage server settings, toggles, and most dashboard sections.' },
+  { id: 'moderator', label: 'Moderator', accessLabel: 'Moderator (Managed Access)', emojiId: '1518924931482779809', color: '#00e5ff', borderColor: '#00e5ff', desc: 'Manage voice room tools and approved moderation pages.' },
+  { id: 'staff', label: 'Staff', accessLabel: 'Staff (Limited Access)', emojiId: '1513328514529624185', color: '#7b61ff', borderColor: '#7b61ff', desc: 'Access low-level dashboard settings such as Interface.' }
 ];
 
 export default function DashboardAccess() {
@@ -103,19 +103,19 @@ export default function DashboardAccess() {
       <div className="access-tiers-grid">
         {TIERS.map((tier) => (
           <div key={tier.id} className="access-tier-card">
-            <div className="tier-eyebrow">Access Tier</div>
+            <div className="tier-eyebrow">ACCESS TIER</div>
             <div className="tier-header">
               <div 
                 className="tier-title" 
                 style={tier.color.includes('gradient') 
-                  ? { backgroundImage: tier.color, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', display: 'flex', alignItems: 'center', gap: '8px' } 
-                  : { color: tier.color, display: 'flex', alignItems: 'center', gap: '8px' }
+                  ? { backgroundImage: tier.color, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', fontWeight: 'bold' } 
+                  : { color: tier.color, display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', fontWeight: 'bold' }
                 }
               >
                 <img src={`https://cdn.discordapp.com/emojis/${tier.emojiId}.png`} alt={tier.label} style={{ width: 18, height: 18 }} />
                 {tier.label}
               </div>
-              <div className="tier-count">{getTierCount(tier.id)}</div>
+              <div className="tier-count" style={{ borderColor: tier.borderColor }}>{getTierCount(tier.id)}</div>
             </div>
             <p className="tier-desc">{tier.desc}</p>
           </div>
@@ -127,10 +127,7 @@ export default function DashboardAccess() {
         <div className="section-head access-roles-head">
           <div className="allowed-roles-title">
             <ShieldCheck size={20} className="accent-icon" />
-            <div>
-              <h2>Allowed roles</h2>
-              <p>Assign roles to the tier that best matches the level of trust and responsibility they should have.</p>
-            </div>
+            <h2 style={{ fontSize: '16px', margin: 0 }}>Allowed Roles</h2>
           </div>
           <div className="add-role-controls">
             <select
@@ -144,7 +141,7 @@ export default function DashboardAccess() {
                 <option key={role.id} value={role.id}>{role.name}</option>
               ))}
             </select>
-            <button className="add-role-btn" onClick={handleAddRole} disabled={!canEditAccess}>Add Role</button>
+            <button className="add-role-btn" onClick={handleAddRole} disabled={!canEditAccess}>+ Add Role</button>
           </div>
         </div>
 

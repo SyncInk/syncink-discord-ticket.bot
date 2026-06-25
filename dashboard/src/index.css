@@ -779,7 +779,6 @@ img {
 .select-input,
 .text-area,
 .role-select-input,
-.tier-select,
 .server-dropdown-search input {
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -789,8 +788,7 @@ img {
 
 .text-input,
 .select-input,
-.role-select-input,
-.tier-select {
+.role-select-input {
   width: 100%;
   padding: 13px 14px;
 }
@@ -805,8 +803,7 @@ img {
 .text-input:focus,
 .select-input:focus,
 .text-area:focus,
-.role-select-input:focus,
-.tier-select:focus {
+.role-select-input:focus {
   outline: none;
   border-color: rgba(165, 136, 255, 0.34);
   box-shadow: 0 0 0 4px rgba(165, 136, 255, 0.1);
@@ -1330,16 +1327,18 @@ img {
 }
 
 .access-tier-card {
-  padding: 18px;
-  border-radius: 20px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .tier-eyebrow {
   margin-bottom: 12px;
   color: var(--text-muted);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
 }
 
 .tier-header,
@@ -1367,7 +1366,7 @@ img {
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .tier-title {
@@ -1384,12 +1383,12 @@ img {
 }
 
 .tier-count {
-  padding: 6px 10px;
-  border-radius: 999px;
+  padding: 4px 10px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
-  font-size: 12px;
-  font-weight: 800;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .tier-desc {
@@ -1480,20 +1479,41 @@ img {
   gap: 10px;
 }
 
-.remove-role-btn {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 141, 167, 0.14);
-  background: rgba(255, 141, 167, 0.06);
-  color: var(--danger);
+.tier-select {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 6px 32px 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
   cursor: pointer;
 }
 
+.tier-select:focus {
+  outline: none;
+  border-color: #9d7cff;
+}
+
+.remove-role-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #ff4d4d;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
 .remove-role-btn:hover {
-  background: rgba(255, 141, 167, 0.1);
+  background: rgba(255, 77, 77, 0.1);
 }
 
 .activity-chart {
