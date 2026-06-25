@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap');
 
 :root {
   color-scheme: dark;
@@ -2527,5 +2527,73 @@ canvas {
   animation: 
     gradientMove 4s linear infinite,
     premiumGlow 3s ease-in-out infinite alternate;
+}
+
+
+
+/* --- HeroParticleText -------------------------------------------------------- */
+
+.hpc-root {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
+.hpc-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hpc-heading {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  letter-spacing: -0.05em;
+  line-height: 1.15;
+  color: #ffffff;
+  /* opacity is animated imperatively via JS � do not set here */
+}
+
+/* Each individual char span */
+.hpc-char {
+  color: #ffffff;
+}
+
+/* Highlight chars � purple while particles are forming */
+.hpc-highlight-char {
+  display: inline-block;
+  background: linear-gradient(90deg, #8B5CF6, #A855F7, #C084FC, #8B5CF6);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: hpc-grad-move 4s linear infinite, hpc-glow-breathe 3s ease-in-out infinite alternate;
+  will-change: background-position, filter;
+}
+
+@keyframes hpc-grad-move {
+  0%   { background-position: 100% 50%; }
+  100% { background-position:   0% 50%; }
+}
+
+@keyframes hpc-glow-breathe {
+  0%   { filter: drop-shadow(0 0  8px rgba(168,85,247,0.35)) drop-shadow(0 0 16px rgba(139,92,246,0.20)); }
+  100% { filter: drop-shadow(0 0 18px rgba(168,85,247,0.75)) drop-shadow(0 0 36px rgba(139,92,246,0.40)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hpc-highlight-char {
+    animation: none;
+    background: none;
+    -webkit-background-clip: border-box;
+    -webkit-text-fill-color: currentcolor;
+    color: #A855F7;
+    filter: none;
+  }
 }
 

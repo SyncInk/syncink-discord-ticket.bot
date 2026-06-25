@@ -1,306 +1,340 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
-const easeOutExpo = (t) => {
-  return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-};
+// ─── Easing ───────────────────────────────────────────────────────────────────
+const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
+// ─── Particle ─────────────────────────────────────────────────────────────────
 class Particle {
-  constructor(targetX, targetY, startX, startY, color, duration, delay) {
-    this.targetX = targetX;
-    this.targetY = targetY;
-    this.startX = startX;
-    this.startY = startY;
-    this.x = startX;
-    this.y = startY;
-    this.color = color;
-    
-    this.progress = 0;
-    this.duration = duration; // 400-700ms
-    this.delay = delay;
-    
-    this.size = Math.random() * 1.5 + 0.5;
-    this.opacity = 0;
-    this.state = 'traveling';
+  constructor() {
+    this.x = 0; this.y = 0;
+    this.vx = 0; this.vy = 0;
+    this.tx = 0; this.ty = 0;
+    this.size = 1;
+    this.alpha = 0;
+    this.color = '#C084FC';
+    this.phase = 'idle';   // idle | converging | dissolving | dead
+    this.progress = 0;     // ms elapsed in current phase
+    this.delay = 0;
+    this.noiseX = 0;
   }
 
-  update(deltaTime) {
-    if (this.delay > 0) {
-      this.delay -= deltaTime;
+  update(dt) {
+    if (this.phase === 'idle') {
+      this.delay -= dt;
+      if (this.delay <= 0) {
+        this.delay = 0;
+        this.phase = 'converging';
+        this.progress = 0;
+      }
       return;
     }
-    
-    if (this.state === 'traveling') {
-      this.progress += deltaTime;
-      let t = Math.min(this.progress / this.duration, 1);
-      
-      // Fast fade in
-      if (t < 0.1) this.opacity = t / 0.1;
-      else this.opacity = 1;
 
-      let easeT = easeOutExpo(t);
-      
-      this.x = this.startX + (this.targetX - this.startX) * easeT;
-      this.y = this.startY + (this.targetY - this.startY) * easeT;
+    if (this.phase === 'converging') {
+      this.progress += dt;
 
-      if (t >= 1) {
-        this.state = 'fading';
+      const dx = this.tx - this.x;
+      const dy = this.ty - this.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Spring attraction with noise curvature
+      const spring   = 0.10;
+      const friction = 0.80;
+      this.vx = (this.vx + dx * spring + this.noiseX) * friction;
+      this.vy = (this.vy + dy * spring) * friction;
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // Fade alpha in over 300ms
+      this.alpha = clamp(easeOutExpo(this.progress / 300), 0, 1);
+
+      // Settle check
+      if (dist < 0.4 && Math.abs(this.vx) < 0.2 && Math.abs(this.vy) < 0.2) {
+        this.x = this.tx; this.y = this.ty;
+        this.vx = 0; this.vy = 0;
+        this.phase = 'dissolving';
         this.progress = 0;
-        this.x = this.targetX;
-        this.y = this.targetY;
       }
-    } else if (this.state === 'fading') {
-      this.progress += deltaTime;
-      let t = Math.min(this.progress / 300, 1); // 300ms fade out
-      this.opacity = 1 - t;
+    }
+
+    if (this.phase === 'dissolving') {
+      this.progress += dt;
+      const dur = 350;
+      this.alpha = clamp(1 - easeOutExpo(this.progress / dur), 0, 1);
+      if (this.progress >= dur) this.phase = 'dead';
     }
   }
 
   draw(ctx) {
-    if (this.opacity <= 0 || this.delay > 0) return;
-    ctx.globalAlpha = this.opacity;
-    ctx.fillStyle = this.color;
-    ctx.shadowBlur = 8;
-    ctx.shadowColor = this.color;
+    if (this.phase === 'idle' || this.phase === 'dead' || this.alpha <= 0) return;
+    ctx.globalAlpha  = this.alpha;
+    ctx.fillStyle    = this.color;
+    ctx.shadowBlur   = 7;
+    ctx.shadowColor  = this.color;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fill();
-    ctx.globalAlpha = 1;
-    ctx.shadowBlur = 0;
   }
 }
 
-export default function HeroParticleText({ 
-  textLines,
-  highlightWord
-}) {
-  const containerRef = useRef(null);
+// ─── Component ────────────────────────────────────────────────────────────────
+export default function HeroParticleText({ textLines, highlightWord }) {
   const canvasRef = useRef(null);
-  const spansRef = useRef([]);
-  
-  const [phase, setPhase] = useState('invisible'); // invisible -> assembling -> finished
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-  
-  const particlesRef = useRef([]);
-  const animationFrameRef = useRef(null);
-  const lastTimeRef = useRef(0);
-  const offscreenCanvasRef = useRef(document.createElement('canvas'));
+  const h1Ref     = useRef(null);
+  const spansRef  = useRef([]);  // indexed by flat chars[] index
 
+  // Build a flat chars array — same structure used in both render + extraction
   const chars = [];
-  let charGlobalIndex = 0;
-  
-  textLines.forEach((line, lineIndex) => {
-    const highlightStartIndex = line.indexOf(highlightWord);
-    const highlightEndIndex = highlightStartIndex !== -1 ? highlightStartIndex + highlightWord.length : -1;
-    
+  textLines.forEach((line, li) => {
+    const hStart = line.indexOf(highlightWord);
+    const hEnd   = hStart >= 0 ? hStart + highlightWord.length : -1;
     for (let i = 0; i < line.length; i++) {
-      const isHighlight = highlightStartIndex !== -1 && i >= highlightStartIndex && i < highlightEndIndex;
       chars.push({
         char: line[i],
-        globalIndex: charGlobalIndex++,
-        isHighlight,
-        isBr: false
+        isHighlight: hStart >= 0 && i >= hStart && i < hEnd,
+        isBr: false,
       });
     }
-    if (lineIndex < textLines.length - 1) {
-      chars.push({ char: '\n', globalIndex: charGlobalIndex++, isHighlight: false, isBr: true });
-    }
+    if (li < textLines.length - 1)
+      chars.push({ char: '\n', isHighlight: false, isBr: true });
   });
 
-  useEffect(() => {
-    document.fonts.ready.then(() => {
-      setFontsLoaded(true);
-    });
-  }, []);
-
+  // ── Engine ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const h1     = h1Ref.current;
+    if (!canvas || !h1) return;
+
     const ctx = canvas.getContext('2d');
-    
-    const resizeCanvas = () => {
-      const parent = containerRef.current;
-      if (parent) {
-        canvas.width = parent.offsetWidth;
-        canvas.height = parent.offsetHeight;
-      }
-    };
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    const dpr = window.devicePixelRatio || 1;
 
-    const render = (time) => {
-      if (!lastTimeRef.current) lastTimeRef.current = time;
-      const deltaTime = time - lastTimeRef.current;
-      lastTimeRef.current = time;
+    let raf;
+    let last = 0;
+    let paused = false;
+    let particles = [];
+    let animating = false;
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      const activeParticles = [];
-      for (let i = 0; i < particlesRef.current.length; i++) {
-        const p = particlesRef.current[i];
-        p.update(deltaTime);
-        if (p.opacity > 0 || p.state !== 'fading' || p.progress < 300) {
-          p.draw(ctx);
-          activeParticles.push(p);
-        }
-      }
-      particlesRef.current = activeParticles;
+    // ── Size canvas ───────────────────────────────────────────────────────────
+    function resize() {
+      const r = h1.getBoundingClientRect();
+      canvas.width  = Math.ceil(r.width  * dpr);
+      canvas.height = Math.ceil(r.height * dpr);
+      canvas.style.width  = r.width  + 'px';
+      canvas.style.height = r.height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
 
-      animationFrameRef.current = requestAnimationFrame(render);
-    };
-    
-    animationFrameRef.current = requestAnimationFrame(render);
-    
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-    };
-  }, []);
+    // ── Extract pixel targets from real rendered spans ─────────────────────
+    async function extractTargets() {
+      await document.fonts.ready;
+      resize();
 
-  useEffect(() => {
-    if (!fontsLoaded) return;
-    
-    // Give layout a brief moment to stabilize
-    const initTimer = setTimeout(() => {
-      const container = containerRef.current;
-      if (!container) return;
-      const containerRect = container.getBoundingClientRect();
-      
-      const offCanvas = offscreenCanvasRef.current;
-      const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
-      const dpi = 2;
-      
-      let allTargetPixels = [];
+      const containerRect = h1.getBoundingClientRect();
+      const off    = document.createElement('canvas');
+      const offCtx = off.getContext('2d', { willReadFrequently: true });
+      const pxDpr  = 3; // high-res sampling
 
-      // Extract pixels for ALL characters simultaneously
-      chars.forEach((c, i) => {
-        if (c.isBr || c.char === ' ') return;
-        
-        const span = spansRef.current[i];
+      const targets = []; // { x, y, color }
+
+      spansRef.current.forEach((span, ci) => {
         if (!span) return;
+        const c = chars[ci];
+        if (!c || c.isBr || c.char === ' ') return;
 
-        const spanRect = span.getBoundingClientRect();
-        const style = window.getComputedStyle(span);
-        const fontSize = parseFloat(style.fontSize);
-        
-        const spanLeft = spanRect.left - containerRect.left;
-        const spanTop = spanRect.top - containerRect.top;
-        
-        const boxSize = fontSize * 2;
-        offCanvas.width = boxSize * dpi;
-        offCanvas.height = boxSize * dpi;
-        
-        offCtx.scale(dpi, dpi);
-        offCtx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-        offCtx.fillStyle = 'white';
-        // By drawing from top and offsetting by leading/2, we bypass kerning/shape misalignment completely!
+        const sr = span.getBoundingClientRect();
+        const cs = getComputedStyle(span);
+        const fSize  = parseFloat(cs.fontSize);
+        const fw     = cs.fontWeight;
+        const ff     = cs.fontFamily;
+
+        // Offscreen canvas: large enough to capture the full glyph
+        const W = Math.ceil(sr.width  * pxDpr) + 20;
+        const H = Math.ceil(sr.height * pxDpr) + 20;
+        off.width  = W;
+        off.height = H;
+        offCtx.clearRect(0, 0, W, H);
+
+        offCtx.font         = `${fw} ${fSize * pxDpr}px ${ff}`;
+        offCtx.fillStyle    = 'white';
         offCtx.textBaseline = 'top';
-        offCtx.textAlign = 'left';
-        
-        const pad = fontSize * 0.5;
-        offCtx.clearRect(0, 0, boxSize, boxSize);
-        offCtx.fillText(c.char, pad, pad);
-        
-        const imgData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height).data;
-        const color = c.isHighlight ? '#C084FC' : '#ffffff';
-        
-        const leading = spanRect.height - fontSize;
-        const topOffset = leading / 2;
+        offCtx.textAlign    = 'left';
+        offCtx.fillText(c.char, 10, 8);
 
-        for (let y = 0; y < offCanvas.height; y += 2) {
-          for (let x = 0; x < offCanvas.width; x += 2) {
-            const alpha = imgData[(y * offCanvas.width + x) * 4 + 3];
-            if (alpha > 128) {
-              const logicalX = x / dpi - pad;
-              const logicalY = y / dpi - pad;
-              
-              allTargetPixels.push({
-                x: spanLeft + logicalX,
-                y: spanTop + topOffset + logicalY,
-                color
+        const data = offCtx.getImageData(0, 0, W, H).data;
+
+        // Accent white sparkles mixed in for non-highlight chars
+        const baseColor = c.isHighlight ? '#C084FC' : '#A855F7';
+        const sparkle   = !c.isHighlight && Math.random() < 0.2;
+        const color     = sparkle ? '#ffffff' : baseColor;
+
+        // Map each sampled pixel back to screen space
+        for (let py = 0; py < H; py += pxDpr) {
+          for (let px = 0; px < W; px += pxDpr) {
+            if (data[(py * W + px) * 4 + 3] > 100) {
+              targets.push({
+                x: (sr.left - containerRect.left) + (px - 10) / pxDpr,
+                y: (sr.top  - containerRect.top)  + (py -  8) / pxDpr,
+                color,
               });
             }
           }
         }
       });
 
-      // Downsample to ~2500 particles max to maintain 60 FPS
-      const MAX_PARTICLES = 2500;
-      const step = Math.max(1, Math.floor(allTargetPixels.length / MAX_PARTICLES));
-      
-      const newParticles = [];
-      
-      for (let i = 0; i < allTargetPixels.length; i += step) {
-        const px = allTargetPixels[i];
-        
-        // Spawn from random positions scattered around the entire heading
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 100 + Math.random() * 300;
-        const startX = px.x + Math.cos(angle) * distance;
-        const startY = px.y + Math.sin(angle) * distance + (Math.random() * 100);
-        
-        const duration = 400 + Math.random() * 300; // 400-700ms
-        const delay = Math.random() * 100; // Fast initial burst
-        
-        newParticles.push(new Particle(px.x, px.y, startX, startY, px.color, duration, delay));
+      return targets;
+    }
+
+    // ── Build particle pool ────────────────────────────────────────────────
+    async function buildParticles() {
+      const targets = await extractTargets();
+
+      const MAX  = 2800;
+      const step = Math.max(1, Math.floor(targets.length / MAX));
+
+      particles = [];
+      for (let i = 0; i < targets.length; i += step) {
+        const t = targets[i];
+        const p = new Particle();
+
+        // Spawn in a cloud around the heading
+        const ang  = Math.random() * Math.PI * 2;
+        const dist = 80 + Math.random() * 280;
+        p.x  = t.x + Math.cos(ang) * dist;
+        p.y  = t.y + Math.sin(ang) * dist - Math.random() * 100;
+        p.vx = (Math.random() - 0.5) * 3;
+        p.vy = (Math.random() - 0.5) * 3;
+        p.tx    = t.x;
+        p.ty    = t.y;
+        p.color = t.color;
+        p.size  = 0.5 + Math.random() * 1.6;
+        p.alpha = 0;
+        p.phase = 'idle';
+        p.delay = Math.random() * 100; // 0-100ms stagger burst
+        p.noiseX = (Math.random() - 0.5) * 0.35;
+
+        particles.push(p);
+      }
+    }
+
+    // ── Text alpha ramp ───────────────────────────────────────────────────
+    function fadeTextIn() {
+      const start = performance.now();
+      const dur   = 650;
+      function step(now) {
+        const t = clamp((now - start) / dur, 0, 1);
+        h1.style.opacity = String(easeOutExpo(t));
+        if (t < 1) requestAnimationFrame(step);
+        else h1.style.opacity = '1';
+      }
+      requestAnimationFrame(step);
+    }
+
+    // ── Main loop ─────────────────────────────────────────────────────────
+    function loop(ts) {
+      raf = requestAnimationFrame(loop);
+      if (paused || !animating) return;
+
+      const dt = clamp(ts - last, 0, 50);
+      last = ts;
+
+      const logW = canvas.width  / dpr;
+      const logH = canvas.height / dpr;
+      ctx.clearRect(0, 0, logW, logH);
+
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+
+      let allDone = true;
+      for (const p of particles) {
+        p.update(dt);
+        if (p.phase !== 'dead') {
+          allDone = false;
+          p.draw(ctx);
+        }
       }
 
-      particlesRef.current = newParticles;
-      
-      // Start the simultaneous fade-in + formation
-      setPhase('assembling');
-      
-      // Once particles finish forming (max ~800ms), mark as finished
-      setTimeout(() => {
-        setPhase('finished');
-      }, 800);
-      
-    }, 100);
-
-    return () => clearTimeout(initTimer);
-  }, [fontsLoaded]);
-
-  // Construct final DOM for the continuous gradient highlight
-  const finalDom = [];
-  textLines.forEach((line, lineIndex) => {
-    const start = line.indexOf(highlightWord);
-    if (start !== -1) {
-      finalDom.push(<span key={`t1-${lineIndex}`}>{line.substring(0, start)}</span>);
-      finalDom.push(<span key={`h-${lineIndex}`} className="premium-highlight-word">{highlightWord}</span>);
-      finalDom.push(<span key={`t2-${lineIndex}`}>{line.substring(start + highlightWord.length)}</span>);
-    } else {
-      finalDom.push(<span key={`t-${lineIndex}`}>{line}</span>);
+      ctx.restore();
+      if (allDone) animating = false;
     }
-    if (lineIndex < textLines.length - 1) finalDom.push(<br key={`br-${lineIndex}`} />);
+
+    // ── Visibility pause ──────────────────────────────────────────────────
+    const onViz = () => { paused = document.hidden; };
+    document.addEventListener('visibilitychange', onViz);
+
+    // ── ResizeObserver ────────────────────────────────────────────────────
+    const ro = new ResizeObserver(resize);
+    ro.observe(h1);
+
+    // ── Kick off ──────────────────────────────────────────────────────────
+    h1.style.opacity = '0';
+    last = performance.now();
+    raf  = requestAnimationFrame(loop);
+
+    buildParticles().then(() => {
+      animating = true;
+      fadeTextIn();
+      // Trigger dissolve after 750ms — particles finish and text is solid
+      setTimeout(() => {
+        for (const p of particles) {
+          if (p.phase !== 'dead') {
+            p.phase    = 'dissolving';
+            p.progress = 0;
+          }
+        }
+      }, 750);
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      document.removeEventListener('visibilitychange', onViz);
+      ro.disconnect();
+    };
+  }, []);
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  //
+  // Each char gets a <span> ref'd by its index in the flat chars[] array.
+  // The highlight word is wrapped once more so the gradient span can be used
+  // in the finished state without switching to a different DOM structure.
+
+  let flatIndex = 0;
+  const renderedLines = textLines.map((line, li) => {
+    const hStart = line.indexOf(highlightWord);
+    const hEnd   = hStart >= 0 ? hStart + highlightWord.length : -1;
+    const nodes  = [];
+
+    for (let i = 0; i < line.length; i++) {
+      const fi = flatIndex++;          // capture current flat index
+      const ch = line[i];
+      const isH = hStart >= 0 && i >= hStart && i < hEnd;
+
+      nodes.push(
+        <span
+          key={`${li}-${i}`}
+          ref={el => { spansRef.current[fi] = el; }}
+          className={isH ? 'hpc-highlight-char' : 'hpc-char'}
+        >
+          {ch === ' ' ? '\u00A0' : ch}
+        </span>
+      );
+    }
+
+    // Advance flatIndex past the <br> placeholder in chars[]
+    if (li < textLines.length - 1) flatIndex++;
+
+    return (
+      <React.Fragment key={li}>
+        {nodes}
+        {li < textLines.length - 1 && <br />}
+      </React.Fragment>
+    );
   });
 
   return (
-    <div className="hero-particle-container" ref={containerRef}>
-      <canvas 
-        ref={canvasRef} 
-        className="hero-particle-canvas"
-      />
-      
-      <h1 className={`hero-particle-text ${phase}`}>
-        {phase === 'finished' ? (
-          finalDom
-        ) : (
-          chars.map((c, i) => {
-            if (c.isBr) return <br key={i} />;
-            
-            let className = "particle-char";
-            if (c.isHighlight) className += " highlight-char-assembling";
-
-            return (
-              <span 
-                key={i} 
-                ref={el => spansRef.current[i] = el}
-                className={className}
-              >
-                {c.char === ' ' ? '\u00A0' : c.char}
-              </span>
-            );
-          })
-        )}
+    <div className="hpc-root">
+      <canvas ref={canvasRef} className="hpc-canvas" />
+      <h1 ref={h1Ref} className="hpc-heading">
+        {renderedLines}
       </h1>
     </div>
   );
