@@ -717,6 +717,25 @@ async function initDashboard(client) {
         }
     });
 
+    app.patch('/api/reviews/:reviewId/pin', ensureAuthenticated, async (req, res) => {
+        try {
+            if (!(await isBotOwner(req.session.user.id))) {
+                return res.status(403).json({ error: 'Only the Bot Owner can pin reviews.' });
+            }
+
+            const { pinned } = req.body;
+            if (typeof pinned !== 'boolean') {
+                return res.status(400).json({ error: 'Pinned boolean is required.' });
+            }
+
+            const result = await db.toggleReviewPin(req.params.reviewId, pinned);
+            res.json(result);
+        } catch (error) {
+            console.error('[REVIEWS] Failed to pin review:', error);
+            res.status(500).json({ error: 'Failed to pin review.' });
+        }
+    });
+
     app.get('/api/guilds/:guildId/bootstrap', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
         try {
             const snapshot = await createDashboardSnapshot(client, req.params.guildId);

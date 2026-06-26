@@ -409,6 +409,7 @@ function getReviewModel() {
             }],
             default: []
         },
+        pinned: { type: Boolean, default: false },
         createdAt: { type: Number, default: Date.now }
     });
 
@@ -426,7 +427,7 @@ async function createReview(data) {
 
 async function listReviews(limit = 100) {
     const Review = getReviewModel();
-    return await Review.find({}).sort({ createdAt: -1 }).limit(limit);
+    return await Review.find({}).sort({ pinned: -1, createdAt: -1 }).limit(limit);
 }
 
 async function addReviewReply(reviewId, replyData) {
@@ -464,6 +465,16 @@ async function deleteReviewReply(reviewId, replyId) {
         { new: true }
     );
     if (!result) throw new Error('Review not found');
+    return result;
+}
+
+async function toggleReviewPin(reviewId, pinnedState) {
+    const Review = getReviewModel();
+    const result = await Review.findByIdAndUpdate(
+        reviewId,
+        { $set: { pinned: pinnedState } },
+        { new: true }
+    );
     return result;
 }
 

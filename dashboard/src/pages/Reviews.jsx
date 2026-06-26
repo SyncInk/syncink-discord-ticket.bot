@@ -83,6 +83,26 @@ export default function Reviews({ user }) {
     }
   };
 
+  const handlePinReview = async (reviewId, currentState) => {
+    try {
+      const newState = !currentState;
+      await axios.patch(`/api/reviews/${reviewId}/pin`, { pinned: newState });
+      setReviews(reviews.map(r => {
+        if (r._id === reviewId) {
+          return { ...r, pinned: newState };
+        }
+        return r;
+      }).sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      }));
+    } catch (error) {
+      console.error('Failed to toggle pin:', error);
+      alert('Failed to pin/unpin review.');
+    }
+  };
+
   const getTierIcon = (tier) => {
     switch (tier?.toLowerCase()) {
       case 'owner':
@@ -185,6 +205,11 @@ export default function Reviews({ user }) {
                 <div className="review-user-info">
                   <span className="review-username">{review.globalName || review.username}</span>
                 </div>
+                {review.pinned && (
+                  <div className="pinned-badge" title="Pinned Review">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+                  </div>
+                )}
               </div>
               <div className="review-stars">
                 {renderStars(review.rating)}
@@ -265,9 +290,14 @@ export default function Reviews({ user }) {
                       </div>
                     </div>
                   ) : (
-                    <button className="owner-reply-btn" onClick={() => setReplyingTo(review._id)}>
-                      Reply as Owner
-                    </button>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <button className="owner-reply-btn" onClick={() => setReplyingTo(review._id)}>
+                        Reply as Owner
+                      </button>
+                      <button className="owner-pin-btn" onClick={() => handlePinReview(review._id, review.pinned)}>
+                        {review.pinned ? 'Unpin' : 'Pin'}
+                      </button>
+                    </div>
                   )}
                 </div>
               )}
