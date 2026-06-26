@@ -503,6 +503,7 @@ module.exports = {
     listTicketsByGuild,
     normalizeGuildConfig,
     toPlainDocument,
+    toggleReviewPin,
     updateGuildConfig,
     updateTicket
 };

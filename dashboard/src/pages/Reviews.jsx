@@ -189,7 +189,7 @@ export default function Reviews({ user }) {
           <p style={{ textAlign: 'center', color: '#94A3B8', gridColumn: '1 / -1' }}>No reviews yet. Be the first!</p>
         ) : (
           reviews.map((review) => (
-            <div key={review._id} className="review-card">
+            <div key={review._id} className={`review-card ${review.pinned ? 'pinned-review-card' : ''}`}>
               <div className="review-card-header">
                 {review.avatar ? (
                   <img
@@ -219,11 +219,20 @@ export default function Reviews({ user }) {
               </div>
               <div className="review-footer">
                 <div className="review-meta">
-                  {review.highestTier && review.highestTierGuildName && (
+                  {review.username === 'syncky_wink' ? (
+                    <>
+                      <span className="review-tier tier-developer">
+                        <span className="tier-icon">{getTierIcon('developer')}</span>
+                        DEVELOPER
+                      </span>
+                      <span className="meta-dot">•</span>
+                      <span className="meta-server-name">SYNCINK TICKET BOT</span>
+                    </>
+                  ) : review.highestTier && review.highestTierGuildName && (
                     <>
                       <span className={`review-tier tier-${review.highestTier.toLowerCase()}`}>
                         <span className="tier-icon">{getTierIcon(review.highestTier)}</span>
-                        {review.highestTier}
+                        {review.highestTier.toUpperCase()}
                       </span>
                       <span className="meta-dot">•</span>
                       <span className="meta-server-name">{review.highestTierGuildName}</span>
@@ -294,8 +303,12 @@ export default function Reviews({ user }) {
                       <button className="owner-reply-btn" onClick={() => setReplyingTo(review._id)}>
                         Reply as Owner
                       </button>
-                      <button className="owner-pin-btn" onClick={() => handlePinReview(review._id, review.pinned)}>
-                        {review.pinned ? 'Unpin' : 'Pin'}
+                      <button className="owner-pin-btn" onClick={() => handlePinReview(review._id, review.pinned)} title={review.pinned ? 'Unpin' : 'Pin'}>
+                        {review.pinned ? (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+                        ) : (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+                        )}
                       </button>
                     </div>
                   )}
