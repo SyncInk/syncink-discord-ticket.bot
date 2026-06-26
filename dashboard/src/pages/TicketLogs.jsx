@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, Link } from 'react-router-dom';
 import {
   ActionButton,
   DataTable,
@@ -94,8 +94,8 @@ export default function TicketLogs() {
             {
               key: 'transcript',
               label: 'Transcript',
-              render: (row) => row.transcriptAvailable
-                ? <a href={row.transcriptMessageUrl} target="_blank" rel="noreferrer">Online Transcript</a>
+              render: (row) => row.transcriptAvailable || row.status === 'closed'
+                ? <Link to={`/dashboard/${snapshot.settings.guildId}/transcripts/${row.ticketId}`} className="text-blue-500 hover:underline">Online Transcript</Link>
                 : 'Pending'
             }
           ]}

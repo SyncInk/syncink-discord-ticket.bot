@@ -884,6 +884,47 @@ async function initDashboard(client) {
             if (!ticket || ticket.guildId !== req.params.guildId) {
                 return res.status(404).json({ error: 'Ticket not found' });
             }
+
+            if ((!ticket.messages || ticket.messages.length === 0) && ticket.transcriptMessageUrl) {
+                const parts = ticket.transcriptMessageUrl.split('/');
+                const messageId = parts.pop();
+                const channelId = parts.pop();
+                
+                try {
+                    const channel = client.channels.cache.get(channelId);
+                    if (channel) {
+                        const msg = await channel.messages.fetch(messageId);
+                        const attachment = msg.attachments.first();
+                        if (attachment && attachment.url.endsWith('.txt')) {
+                            const response = await axios.get(attachment.url);
+                            const text = response.data;
+                            
+                            const parsedMessages = [];
+                            const lines = text.split('\n');
+                            for (const line of lines) {
+                                const match = line.match(/^\[(.*?)\] (.*?): ([\s\S]*)$/);
+                                if (match) {
+                                    parsedMessages.push({
+                                        authorTag: match[2],
+                                        content: match[3],
+                                        timestamp: new Date(match[1]).getTime() || Date.now(),
+                                        attachments: []
+                                    });
+                                } else if (parsedMessages.length > 0) {
+                                    parsedMessages[parsedMessages.length - 1].content += '\n' + line;
+                                }
+                            }
+                            
+                            const ticketObj = typeof ticket.toObject === 'function' ? ticket.toObject() : JSON.parse(JSON.stringify(ticket));
+                            ticketObj.messages = parsedMessages;
+                            return res.json(ticketObj);
+                        }
+                    }
+                } catch (err) {
+                    console.error('[DASHBOARD] Failed to parse legacy transcript:', err.message);
+                }
+            }
+
             res.json(ticket);
         } catch (error) {
             console.error('[DASHBOARD] Failed to fetch transcript:', error);

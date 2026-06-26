@@ -58,11 +58,9 @@ export default function Transcripts() {
             {
               key: 'link',
               label: 'Transcript',
-              render: (row) => row.messages && row.messages.length > 0
+              render: (row) => row.status === 'closed'
                 ? <Link to={`/dashboard/${snapshot.settings.guildId}/transcripts/${row.ticketId}`} className="text-blue-500 hover:underline">View Online Transcript</Link>
-                : row.transcriptMessageUrl
-                  ? <a href={row.transcriptMessageUrl} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">Download Legacy (.txt)</a>
-                  : 'Not available'
+                : 'Not available'
             }
           ]}
           rows={transcriptRows}
