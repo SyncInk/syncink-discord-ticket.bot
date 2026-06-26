@@ -406,7 +406,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                 </button>
               );
             })}
-            <button type="button" className="nav-item" onClick={() => refreshSnapshot(true)}>
+            <button type="button" className="nav-item" onClick={() => window.location.reload()}>
               <RefreshCw size={18} />
               <span>Refresh Data</span>
             </button>
