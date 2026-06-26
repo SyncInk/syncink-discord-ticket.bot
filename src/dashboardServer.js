@@ -880,8 +880,9 @@ async function initDashboard(client) {
 
     app.get('/api/guilds/:guildId/tickets/:ticketId/transcript', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
         try {
-            const ticket = await db.getTicket(req.params.ticketId);
-            if (!ticket || ticket.guildId !== req.params.guildId) {
+            const Ticket = db.getMongoModel();
+            const ticket = await Ticket.findOne({ ticketId: req.params.ticketId, guildId: req.params.guildId });
+            if (!ticket) {
                 return res.status(404).json({ error: 'Ticket not found' });
             }
 
