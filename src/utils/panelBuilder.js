@@ -89,13 +89,17 @@ function buildTicketPanelPayload(guildConfig) {
     };
 
     let descriptionLines = Array.isArray(panelConfig.description)
-        ? panelConfig.description
+        ? panelConfig.description.filter(Boolean)
         : String(panelConfig.description || '')
             .split('\n')
             .map((line) => line.trim())
             .filter(Boolean);
 
     descriptionLines = descriptionLines.filter(line => !line.includes('__**Support Requests**__') && !line.includes('__Support Requests__'));
+
+    if (panelConfig.thumbnailUrl === 'https://cdn.discordapp.com/emojis/1513315354439581746.webp?size=1024') {
+        panelConfig.thumbnailUrl = 'https://cdn3.emoji.gg/emojis/70776-admin.png';
+    }
 
     const embed = new EmbedBuilder()
         .setDescription(
