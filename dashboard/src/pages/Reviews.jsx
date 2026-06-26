@@ -180,12 +180,6 @@ export default function Reviews({ user }) {
                 )}
                 <div className="review-user-info">
                   <span className="review-username">{review.globalName || review.username}</span>
-                  {review.highestTier && review.highestTierGuildName && (
-                    <span className={`review-tier tier-${review.highestTier.toLowerCase()}`}>
-                      <span className="tier-icon">{getTierIcon(review.highestTier)}</span>
-                      {review.highestTier} OF {review.highestTierGuildName}
-                    </span>
-                  )}
                 </div>
               </div>
               <div className="review-stars">
@@ -194,8 +188,22 @@ export default function Reviews({ user }) {
               <div className="review-content">
                 {review.content}
               </div>
-              <div className="review-date">
-                {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+              <div className="review-footer">
+                <div className="review-meta">
+                  {review.highestTier && review.highestTierGuildName && (
+                    <>
+                      <span className={`review-tier tier-${review.highestTier.toLowerCase()}`}>
+                        <span className="tier-icon">{getTierIcon(review.highestTier)}</span>
+                        {review.highestTier}
+                      </span>
+                      <span className="meta-dot">•</span>
+                      <span className="meta-server-name">{review.highestTierGuildName}</span>
+                    </>
+                  )}
+                </div>
+                <div className="review-date">
+                  {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                </div>
               </div>
 
               {(review.replies || []).length > 0 && (
