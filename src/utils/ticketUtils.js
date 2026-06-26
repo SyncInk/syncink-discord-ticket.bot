@@ -422,9 +422,17 @@ async function handleButton(interaction, client) {
         await interaction.reply({ embeds: [closeEmbed], ephemeral: true });
 
         const messages = await thread.messages.fetch({ limit: 100 });
-        const transcriptData = messages
-            .reverse()
-            .map((message) => `[${new Date(message.createdTimestamp).toLocaleString()}] ${message.author.tag}: ${message.content}`)
+        const dbMessages = messages.map((m) => ({
+            authorId: m.author.id,
+            authorTag: m.author.tag,
+            authorAvatar: m.author.displayAvatarURL(),
+            content: m.content,
+            timestamp: m.createdTimestamp,
+            attachments: m.attachments.map(a => a.url)
+        })).reverse();
+
+        const transcriptData = dbMessages
+            .map((message) => `[${new Date(message.timestamp).toLocaleString()}] ${message.authorTag}: ${message.content}`)
             .join('\n');
 
         const transcript = new AttachmentBuilder(Buffer.from(transcriptData, 'utf-8'), {
@@ -436,6 +444,7 @@ async function handleButton(interaction, client) {
             closedAt: Date.now(),
             closedById: user.id,
             lastActivityAt: Date.now(),
+            messages: dbMessages,
             activityCount: (ticket.activityCount || 0) + 1
         });
 
@@ -445,7 +454,8 @@ async function handleButton(interaction, client) {
             'Ticket Closed',
             `Thread: ${thread.name}\nClosed By: <@${user.id}>\nCreator: <@${ticket.creatorId}>`,
             config.colors.error,
-            transcript
+            transcript,
+            ticket.ticketId
         );
 
         await db.updateTicket(thread.id, {
@@ -509,7 +519,7 @@ async function handleButton(interaction, client) {
     }
 }
 
-async function logTicketAction(client, guild, title, description, color, attachment = null) {
+async function logTicketAction(client, guild, title, description, color, attachment = null, dashboardTicketId = null) {
     const guildConfig = await db.getGuildConfig(guild.id);
     const logChannel = guildConfig.logChannelId ? guild.channels.cache.get(guildConfig.logChannelId) : null;
     const transcriptChannel = guildConfig.transcriptChannelId
@@ -545,7 +555,15 @@ async function logTicketAction(client, guild, title, description, color, attachm
     if (transcriptMessage) {
         embed.addFields({
             name: 'Transcript',
-            value: `[Open transcript](${transcriptMessage.url})`
+            value: `[Download txt](${transcriptMessage.url})`
+        });
+    }
+
+    if (dashboardTicketId) {
+        const dashboardUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        embed.addFields({
+            name: 'Online Transcript',
+            value: `[View on Dashboard](${dashboardUrl}/dashboard/${guild.id}/transcripts/${dashboardTicketId})`
         });
     }
 

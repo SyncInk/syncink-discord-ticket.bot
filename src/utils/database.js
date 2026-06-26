@@ -279,6 +279,17 @@ function getMongoModel() {
         panelChannelId: { type: String, default: null },
         transcriptChannelId: { type: String, default: null },
         transcriptMessageUrl: { type: String, default: null },
+        messages: {
+            type: [{
+                authorId: String,
+                authorTag: String,
+                authorAvatar: String,
+                content: String,
+                timestamp: Number,
+                attachments: [String]
+            }],
+            default: []
+        },
         activityCount: { type: Number, default: 0 },
         transferHistory: [{
             fromChannelId: String,

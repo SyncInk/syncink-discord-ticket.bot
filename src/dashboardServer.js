@@ -878,6 +878,19 @@ async function initDashboard(client) {
         }
     });
 
+    app.get('/api/guilds/:guildId/tickets/:ticketId/transcript', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
+        try {
+            const ticket = await db.getTicket(req.params.ticketId);
+            if (!ticket || ticket.guildId !== req.params.guildId) {
+                return res.status(404).json({ error: 'Ticket not found' });
+            }
+            res.json(ticket);
+        } catch (error) {
+            console.error('[DASHBOARD] Failed to fetch transcript:', error);
+            res.status(500).json({ error: 'Failed to fetch transcript.' });
+        }
+    });
+
     app.post('/api/guilds/:guildId/nickname', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
         try {
             const userTier = req.allowedGuild.dashboardTier;

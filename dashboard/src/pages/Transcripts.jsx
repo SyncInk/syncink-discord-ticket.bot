@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, Link } from 'react-router-dom';
 import {
   ActionButton,
   DataTable,
@@ -58,9 +58,11 @@ export default function Transcripts() {
             {
               key: 'link',
               label: 'Transcript',
-              render: (row) => row.transcriptMessageUrl
-                ? <a href={row.transcriptMessageUrl} target="_blank" rel="noreferrer">Online Transcript</a>
-                : 'Not uploaded yet'
+              render: (row) => row.messages && row.messages.length > 0
+                ? <Link to={`/dashboard/${snapshot.settings.guildId}/transcripts/${row.ticketId}`} className="text-blue-500 hover:underline">View Online Transcript</Link>
+                : row.transcriptMessageUrl
+                  ? <a href={row.transcriptMessageUrl} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">Download Legacy (.txt)</a>
+                  : 'Not available'
             }
           ]}
           rows={transcriptRows}

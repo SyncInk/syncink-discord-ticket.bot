@@ -20,6 +20,8 @@ import Invite from './pages/Invite';
 import Guide from './pages/Guide';
 import Reviews from './pages/Reviews';
 
+import TranscriptView from './pages/Transcript';
+
 export default function App() {
   const [user, setUser] = useState(null);
   const [guilds, setGuilds] = useState([]);
@@ -50,7 +52,7 @@ export default function App() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [selectedGuildId]);
 
   const handleSelectGuild = (guildId) => {
     setSelectedGuildId(guildId);
@@ -73,6 +75,7 @@ export default function App() {
       <Route path="/invite" element={<Invite />} />
       <Route path="/guide" element={user ? <Guide /> : <Navigate to="/login" />} />
       <Route path="/reviews" element={<Reviews user={user} />} />
+      <Route path="/dashboard/:guildId/transcripts/:ticketId" element={user ? <TranscriptView /> : <Navigate to="/login" />} />
       <Route
         path="/servers"
         element={user ? (
