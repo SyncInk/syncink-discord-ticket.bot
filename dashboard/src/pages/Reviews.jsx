@@ -141,12 +141,16 @@ export default function Reviews({ user }) {
             </div>
             <textarea
               className="review-textarea"
-              placeholder="Tell us what you think about SyncInk Ticket..."
+              placeholder="Tell us what you think about SyncInk Ticket... (minimum 60 characters)"
               value={content}
               onChange={(e) => setContent(e.target.value)}
+              minLength={60}
               required
             />
-            <button type="submit" className="submit-review-btn" disabled={submitting || !content.trim()}>
+            <div className="char-counter" style={{ color: content.trim().length < 60 ? '#EF4444' : '#2ECC71', fontSize: '0.8rem', textAlign: 'right', marginBottom: '16px' }}>
+              {content.trim().length} / 60 minimum characters
+            </div>
+            <button type="submit" className="submit-review-btn" disabled={submitting || content.trim().length < 60}>
               {submitting ? 'Submitting...' : 'Post Review'}
             </button>
           </form>

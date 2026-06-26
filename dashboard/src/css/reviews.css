@@ -19,12 +19,22 @@
 }
 
 .reviews-header h1 {
-  font-size: 3rem;
+  font-size: 3.5rem;
+  font-weight: 900;
+  letter-spacing: -1.5px;
   margin: 0;
-  background: linear-gradient(135deg, #A78BFA, #60A5FA);
+  background: linear-gradient(270deg, #C084FC, #3B82F6, #8B5CF6, #60A5FA);
+  background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 30px rgba(167, 139, 250, 0.3);
+  text-shadow: 0 10px 40px rgba(167, 139, 250, 0.4);
+  animation: title-gradient-shift 6s ease infinite;
+}
+
+@keyframes title-gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .reviews-header p {
