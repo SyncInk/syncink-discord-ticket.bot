@@ -114,11 +114,12 @@ async function handleSelectMenu(interaction, client) {
                 ping
             );
 
+            const ticketConfig = getCategoryConfig(guildConfig, ticket.type);
             const claimersEmbed = new EmbedBuilder()
                 .setTitle('Claimers')
                 .setDescription('• No one has claimed this ticket yet.')
                 .setColor(config.colors.primary)
-                .setThumbnail('https://cdn.discordapp.com/emojis/1513348396851794080.webp?size=1024');
+                .setThumbnail(ticketConfig && ticketConfig.emoji ? `https://cdn.discordapp.com/emojis/${ticketConfig.emoji}.webp?size=1024` : null);
 
             const reasonEmbed = new EmbedBuilder()
                 .setTitle('Reason')
@@ -280,7 +281,7 @@ async function handleModalSubmit(interaction, client) {
             .setTitle('Claimers')
             .setDescription('• No one has claimed this ticket yet.')
             .setColor(config.colors.primary)
-            .setThumbnail('https://cdn.discordapp.com/emojis/1513348396851794080.webp?size=1024');
+            .setThumbnail(optionData.emoji ? `https://cdn.discordapp.com/emojis/${optionData.emoji}.webp?size=1024` : null);
 
         const reasonEmbed = new EmbedBuilder()
             .setTitle('Reason')
@@ -385,7 +386,7 @@ async function handleButton(interaction, client) {
         });
 
         const claimersEmbed = EmbedBuilder.from(interaction.message.embeds[0]);
-        claimersEmbed.setDescription(`• <@${user.id}>`);
+        claimersEmbed.setDescription(`<:claimers:1513345698689581087> <@${user.id}>`);
 
         await interaction.update({ embeds: [claimersEmbed, interaction.message.embeds[1]] });
         await thread.send({ content: `<:claimers:1513345698689581087> <@${user.id}> is a claimer now!` });
@@ -417,7 +418,7 @@ async function handleButton(interaction, client) {
         }
 
         const closeEmbed = new EmbedBuilder()
-            .setDescription('🔒 **| Closing ticket, please wait...**')
+            .setDescription('<:lock:1519090351766507603> **| Closing ticket, please wait...**')
             .setColor(config.colors.error);
         await interaction.reply({ embeds: [closeEmbed], ephemeral: true });
 
@@ -560,7 +561,7 @@ async function logTicketAction(client, guild, title, description, color, attachm
     }
 
     if (dashboardTicketId) {
-        const dashboardUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        const dashboardUrl = process.env.FRONTEND_URL || 'https://syncink-discord-ticketbot.up.railway.app';
         embed.addFields({
             name: 'Online Transcript',
             value: `[View on Dashboard](${dashboardUrl}/dashboard/${guild.id}/transcripts/${dashboardTicketId})`
