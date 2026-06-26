@@ -39,6 +39,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
+  align-items: start;
   z-index: 2;
   margin-bottom: 40px;
 }
