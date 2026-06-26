@@ -9,16 +9,14 @@ const config = require('../../config');
 
 function getDefaultPanelConfig() {
     return {
-        title: '',
+        title: 'Support Requests',
         description: [
-            '<:staff:1513328514529624185> __**Support Requests**__',
-            '',
             '<:looking:1513319472172367992> Choose the appropriate `Option` from the select `Menu` below',
             '',
             '<:rules:1513319398688034997> Any form of `Trolling/Spam` to abuse the system will result in a severe punishment'
         ],
         color: '#2b2d31',
-        thumbnailUrl: 'https://cdn.discordapp.com/emojis/1513315354439581746.webp?size=1024',
+        thumbnailUrl: 'https://cdn3.emoji.gg/emojis/70776-admin.png',
         placeholder: 'Select a ticket type'
     };
 }
@@ -90,16 +88,18 @@ function buildTicketPanelPayload(guildConfig) {
         ...(guildConfig?.panelConfig || {})
     };
 
-    const descriptionLines = Array.isArray(panelConfig.description)
+    let descriptionLines = Array.isArray(panelConfig.description)
         ? panelConfig.description
         : String(panelConfig.description || '')
             .split('\n')
             .map((line) => line.trim())
             .filter(Boolean);
 
+    descriptionLines = descriptionLines.filter(line => !line.includes('__**Support Requests**__') && !line.includes('__Support Requests__'));
+
     const embed = new EmbedBuilder()
         .setDescription(
-            `# <:staff:1513328514529624185> __${panelConfig.title}__\n\n` +
+            `# <:staff:1513328514529624185> __${panelConfig.title || 'Support Requests'}__\n\n` +
             descriptionLines.map((line) => `• ${line}`).join('\n\n')
         )
         .setColor(panelConfig.color || '#2b2d31');
