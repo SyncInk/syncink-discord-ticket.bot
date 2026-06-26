@@ -369,24 +369,25 @@ async function handleButton(interaction, client) {
         if (!isStaff) {
             return interaction.reply({ content: 'Only staff members can claim tickets.', ephemeral: true });
         }
-        if (ticket.claimerId) {
+        if (ticket.claimerIds && ticket.claimerIds.includes(user.id)) {
             return interaction.reply({
-                content: `This ticket is already claimed by <@${ticket.claimerId}>.`,
+                content: `You have already claimed this ticket.`,
                 ephemeral: true
             });
         }
 
         const claimerIds = Array.isArray(ticket.claimerIds) ? Array.from(new Set([...ticket.claimerIds, user.id])) : [user.id];
         await db.updateTicket(thread.id, {
-            claimerId: user.id,
+            claimerId: ticket.claimerId || user.id, // keep first claimer as primary
             claimerIds,
-            claimedAt: Date.now(),
+            claimedAt: ticket.claimedAt || Date.now(),
             lastActivityAt: Date.now(),
             activityCount: (ticket.activityCount || 0) + 1
         });
 
         const claimersEmbed = EmbedBuilder.from(interaction.message.embeds[0]);
-        claimersEmbed.setDescription(`<:claimers:1513345698689581087> <@${user.id}>`);
+        const formattedClaimers = claimerIds.map(id => `• <:claimers:1513345698689581087> <@${id}>`).join('\n\n');
+        claimersEmbed.setDescription(formattedClaimers);
 
         await interaction.update({ embeds: [claimersEmbed, interaction.message.embeds[1]] });
         await thread.send({ content: `<:claimers:1513345698689581087> <@${user.id}> is a claimer now!` });
@@ -492,6 +493,7 @@ async function handleButton(interaction, client) {
             console.error('[CLOSE] Error adding log embed:', error);
         }
 
+        await thread.send('<a:sync_approved_check_box:1519090351766507603> Ticket is closed successfully.');
         await thread.members.remove(ticket.creatorId).catch(() => {});
         await thread.setLocked(true).catch(() => {});
         await thread.setArchived(true).catch(() => {});

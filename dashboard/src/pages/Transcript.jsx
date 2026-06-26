@@ -27,7 +27,7 @@ export default function Transcript() {
   if (!ticket || !ticket.messages || ticket.messages.length === 0) {
     return (
       <div className="transcript-empty">
-        <Link to={`/dashboard/${guildId}/tickets`} className="back-link">← Back to Tickets</Link>
+        <a href="https://syncink-discord-ticketbot.up.railway.app" className="back-link">← Back to Dashboard</a>
         <h2>No messages found for this ticket.</h2>
         <p>If this is an older ticket, the transcript might not have been saved in the new format.</p>
         {ticket && ticket.transcriptMessageUrl && (
@@ -42,7 +42,7 @@ export default function Transcript() {
   return (
     <div className="transcript-page">
       <div className="transcript-header">
-        <Link to={`/dashboard/${guildId}/tickets`} className="back-link">← Back to Tickets</Link>
+        <a href="https://syncink-discord-ticketbot.up.railway.app" className="back-link">← Back to Dashboard</a>
         <h1>Transcript: {ticket.ticketId}</h1>
         <p>Ticket closed on {new Date(ticket.closedAt).toLocaleString()}</p>
       </div>
