@@ -10,6 +10,9 @@ export default function Reviews({ user }) {
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replyContent, setReplyContent] = useState('');
+  const [submittingReply, setSubmittingReply] = useState(false);
 
   useEffect(() => {
     axios.get('/api/reviews')
@@ -39,6 +42,44 @@ export default function Reviews({ user }) {
       alert('Failed to submit your review. Please try again later.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleReplySubmit = async (reviewId) => {
+    if (!replyContent.trim()) return;
+    setSubmittingReply(true);
+    try {
+      const res = await axios.post(`/api/reviews/${reviewId}/reply`, { content: replyContent });
+      setReviews(reviews.map(r => {
+        if (r._id === reviewId) {
+          const newReplies = [...(r.replies || []), res.data];
+          return { ...r, replies: newReplies };
+        }
+        return r;
+      }));
+      setReplyContent('');
+      setReplyingTo(null);
+    } catch (error) {
+      console.error('Failed to submit reply:', error);
+      alert('Failed to submit your reply.');
+    } finally {
+      setSubmittingReply(false);
+    }
+  };
+
+  const handleDeleteReply = async (reviewId, replyId) => {
+    if (!window.confirm("Are you sure you want to delete this reply?")) return;
+    try {
+      await axios.delete(`/api/reviews/${reviewId}/reply/${replyId}`);
+      setReviews(reviews.map(r => {
+        if (r._id === reviewId) {
+          return { ...r, replies: r.replies.filter(rep => rep.replyId !== replyId) };
+        }
+        return r;
+      }));
+    } catch (error) {
+      console.error('Failed to delete reply:', error);
+      alert('Failed to delete reply.');
     }
   };
 
@@ -156,6 +197,68 @@ export default function Reviews({ user }) {
               <div className="review-date">
                 {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
               </div>
+
+              {(review.replies || []).length > 0 && (
+                <div className="review-replies-section">
+                  <div className="replies-divider" />
+                  {review.replies.map(reply => (
+                    <div key={reply.replyId} className="review-reply-card">
+                      <div className="reply-header">
+                        {reply.avatar ? (
+                          <img className="reply-avatar" src={`https://cdn.discordapp.com/avatars/${reply.userId}/${reply.avatar}.png`} alt={reply.username} />
+                        ) : (
+                          <div className="reply-avatar-fallback">{reply.globalName ? reply.globalName.charAt(0) : reply.username.charAt(0)}</div>
+                        )}
+                        <div className="reply-user-info">
+                          <span className="reply-username">{reply.globalName || reply.username}</span>
+                          <span className="reply-subtitle">Creator of SyncInk</span>
+                          <span className="review-tier tier-owner" style={{marginTop: '4px'}}>
+                            <span className="tier-icon">{getTierIcon('owner')}</span>
+                            OWNER
+                          </span>
+                        </div>
+                        {user?.isBotOwner && (
+                          <button className="delete-reply-btn" onClick={() => handleDeleteReply(review._id, reply.replyId)}>Delete</button>
+                        )}
+                      </div>
+                      <div className="reply-content">
+                        {reply.content}
+                      </div>
+                      <div className="reply-date">
+                        {new Date(reply.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {user?.isBotOwner && (
+                <div className="owner-reply-actions">
+                  {replyingTo === review._id ? (
+                    <div className="reply-form">
+                      <textarea
+                        className="review-textarea"
+                        placeholder="Write your official response..."
+                        value={replyContent}
+                        onChange={(e) => setReplyContent(e.target.value)}
+                        autoFocus
+                      />
+                      <div className="reply-form-buttons">
+                        <button className="submit-review-btn" onClick={() => handleReplySubmit(review._id)} disabled={submittingReply || !replyContent.trim()}>
+                          {submittingReply ? 'Posting...' : 'Post Reply'}
+                        </button>
+                        <button className="cancel-reply-btn" onClick={() => { setReplyingTo(null); setReplyContent(''); }}>
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button className="owner-reply-btn" onClick={() => setReplyingTo(review._id)}>
+                      Reply as Owner
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           ))
         )}

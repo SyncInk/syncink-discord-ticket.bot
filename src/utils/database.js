@@ -397,6 +397,18 @@ function getReviewModel() {
         highestTierGuildName: { type: String, default: null },
         rating: { type: Number, required: true, min: 1, max: 5 },
         content: { type: String, required: true },
+        replies: {
+            type: [{
+                replyId: { type: String, default: () => new mongoose.Types.ObjectId().toString() },
+                userId: String,
+                username: String,
+                globalName: String,
+                avatar: String,
+                content: String,
+                createdAt: { type: Number, default: Date.now }
+            }],
+            default: []
+        },
         createdAt: { type: Number, default: Date.now }
     });
 
@@ -417,13 +429,54 @@ async function listReviews(limit = 100) {
     return await Review.find({}).sort({ createdAt: -1 }).limit(limit);
 }
 
+async function addReviewReply(reviewId, replyData) {
+    const Review = getReviewModel();
+    const review = await Review.findById(reviewId);
+    if (!review) throw new Error('Review not found');
+
+    const reply = {
+        replyId: new mongoose.Types.ObjectId().toString(),
+        createdAt: Date.now(),
+        ...replyData
+    };
+
+    review.replies.push(reply);
+    await review.save();
+    return reply;
+}
+
+async function editReviewReply(reviewId, replyId, content) {
+    const Review = getReviewModel();
+    const result = await Review.findOneAndUpdate(
+        { _id: reviewId, "replies.replyId": replyId },
+        { $set: { "replies.$.content": content } },
+        { new: true }
+    );
+    if (!result) throw new Error('Review or reply not found');
+    return result;
+}
+
+async function deleteReviewReply(reviewId, replyId) {
+    const Review = getReviewModel();
+    const result = await Review.findByIdAndUpdate(
+        reviewId,
+        { $pull: { replies: { replyId } } },
+        { new: true }
+    );
+    if (!result) throw new Error('Review not found');
+    return result;
+}
+
 module.exports = {
+    addReviewReply,
     backfillTicketGuildIds,
     buildDefaultGuildSettings,
     createActivityLog,
     createAuditLog,
     createReview,
     createTicket,
+    deleteReviewReply,
+    editReviewReply,
     getAllOpenTickets,
     getAuditLogModel,
     getActivityLogModel,

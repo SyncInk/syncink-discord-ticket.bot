@@ -537,9 +537,13 @@ async function initDashboard(client) {
                 }
             }
         }
+        const isOwner = await isBotOwner(req.session.user.id);
         
         res.json({
-            user: req.session.user,
+            user: {
+                ...req.session.user,
+                isBotOwner: isOwner
+            },
             guilds
         });
     });
@@ -641,6 +645,75 @@ async function initDashboard(client) {
             res.send('Fixed successfully! You can go back to the dashboard now.');
         } catch (error) {
             res.status(500).send(error.message);
+        }
+    });
+
+    const isBotOwner = async (userId) => {
+        if (process.env.OWNER_ID && process.env.OWNER_ID === userId) return true;
+        try {
+            await client.application.fetch().catch(() => {});
+            const owner = client.application?.owner;
+            if (owner) {
+                if (owner.members) return owner.members.has(userId);
+                return owner.id === userId;
+            }
+        } catch (e) {}
+        return false;
+    };
+
+    app.post('/api/reviews/:reviewId/reply', ensureAuthenticated, async (req, res) => {
+        try {
+            if (!(await isBotOwner(req.session.user.id))) {
+                return res.status(403).json({ error: 'Only the Bot Owner can reply to reviews.' });
+            }
+
+            const { content } = req.body;
+            if (!content) return res.status(400).json({ error: 'Content is required.' });
+
+            const replyData = {
+                userId: req.session.user.id,
+                username: req.session.user.username,
+                globalName: req.session.user.global_name,
+                avatar: req.session.user.avatar,
+                content
+            };
+
+            const reply = await db.addReviewReply(req.params.reviewId, replyData);
+            res.json(reply);
+        } catch (error) {
+            console.error('[REVIEWS] Failed to post reply:', error);
+            res.status(500).json({ error: 'Failed to submit reply.' });
+        }
+    });
+
+    app.patch('/api/reviews/:reviewId/reply/:replyId', ensureAuthenticated, async (req, res) => {
+        try {
+            if (!(await isBotOwner(req.session.user.id))) {
+                return res.status(403).json({ error: 'Only the Bot Owner can reply to reviews.' });
+            }
+
+            const { content } = req.body;
+            if (!content) return res.status(400).json({ error: 'Content is required.' });
+
+            const result = await db.editReviewReply(req.params.reviewId, req.params.replyId, content);
+            res.json(result);
+        } catch (error) {
+            console.error('[REVIEWS] Failed to edit reply:', error);
+            res.status(500).json({ error: 'Failed to edit reply.' });
+        }
+    });
+
+    app.delete('/api/reviews/:reviewId/reply/:replyId', ensureAuthenticated, async (req, res) => {
+        try {
+            if (!(await isBotOwner(req.session.user.id))) {
+                return res.status(403).json({ error: 'Only the Bot Owner can reply to reviews.' });
+            }
+
+            const result = await db.deleteReviewReply(req.params.reviewId, req.params.replyId);
+            res.json(result);
+        } catch (error) {
+            console.error('[REVIEWS] Failed to delete reply:', error);
+            res.status(500).json({ error: 'Failed to delete reply.' });
         }
     });
 

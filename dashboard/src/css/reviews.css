@@ -159,9 +159,162 @@
 }
 
 .review-date {
+  font-size: 0.8rem;
+  color: #64748B;
+  text-align: right;
+  margin-top: 16px;
+}
+
+/* Replies Section */
+.review-replies-section {
+  margin-top: 24px;
+  padding-left: 16px;
+  border-left: 2px solid rgba(251, 191, 36, 0.3); /* Owner yellow accent */
+}
+
+.replies-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 20px;
+  margin-top: 8px;
+}
+
+.review-reply-card {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), inset 0 0 15px rgba(251, 191, 36, 0.05);
+}
+
+.reply-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.reply-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(251, 191, 36, 0.5);
+}
+
+.reply-avatar-fallback {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: 1.1rem;
+}
+
+.reply-user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.reply-username {
+  font-weight: 700;
+  color: #F8FAFC;
+  font-size: 1rem;
+}
+
+.reply-subtitle {
+  font-size: 0.75rem;
+  color: #FCD34D;
+  margin-bottom: 2px;
+}
+
+.reply-content {
+  color: #CBD5E1;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.reply-date {
   font-size: 0.75rem;
   color: #64748B;
-  align-self: flex-end;
+  text-align: right;
+}
+
+/* Owner Reply Actions */
+.owner-reply-actions {
+  margin-top: 16px;
+}
+
+.owner-reply-btn {
+  background: rgba(251, 191, 36, 0.1);
+  color: #FCD34D;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.owner-reply-btn:hover {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+}
+
+.reply-form {
+  background: rgba(15, 23, 42, 0.5);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.reply-form-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.cancel-reply-btn {
+  background: transparent;
+  color: #94A3B8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-reply-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #F8FAFC;
+}
+
+.delete-reply-btn {
+  margin-left: auto;
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-reply-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
 }
 
 /* Write Review Section */
