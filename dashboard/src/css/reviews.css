@@ -92,9 +92,49 @@
   grid-column: 1 / -1;
   justify-self: center;
   width: 100%;
-  border: 1px solid rgba(167, 139, 250, 0.6);
-  box-shadow: 0 0 24px rgba(167, 139, 250, 0.15);
-  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(167, 139, 250, 0.8);
+  box-shadow: 0 0 30px rgba(167, 139, 250, 0.2), inset 0 0 20px rgba(167, 139, 250, 0.05);
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(30, 27, 75, 0.8));
+  position: relative;
+  overflow: hidden;
+}
+
+.pinned-review-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #A855F7, #3B82F6, #A855F7);
+  background-size: 200% 100%;
+  animation: gradientMove 3s linear infinite;
+}
+
+.developer-review-card {
+  border: 1px solid rgba(250, 204, 21, 0.6) !important;
+  box-shadow: 0 0 40px rgba(250, 204, 21, 0.15), inset 0 0 20px rgba(250, 204, 21, 0.05) !important;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(66, 32, 6, 0.4)) !important;
+}
+
+.developer-review-card::before {
+  background: linear-gradient(90deg, #FACC15, #F59E0B, #FACC15) !important;
+}
+
+.developer-review-card .review-username {
+  color: #FACC15;
+  text-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+}
+
+.developer-review-card .review-tier.tier-developer {
+  background: rgba(250, 204, 21, 0.2);
+  color: #FACC15;
+  border-color: rgba(250, 204, 21, 0.4);
+}
+
+.developer-review-card .pinned-badge {
+  background: rgba(250, 204, 21, 0.2);
+  color: #FACC15;
+  border-color: rgba(250, 204, 21, 0.4);
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.2);
 }
 
 .review-card-header {

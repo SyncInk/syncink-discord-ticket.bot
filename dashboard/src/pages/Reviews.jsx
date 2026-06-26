@@ -189,7 +189,7 @@ export default function Reviews({ user }) {
           <p style={{ textAlign: 'center', color: '#94A3B8', gridColumn: '1 / -1' }}>No reviews yet. Be the first!</p>
         ) : (
           reviews.map((review) => (
-            <div key={review._id} className={`review-card ${review.pinned ? 'pinned-review-card' : ''}`}>
+            <div key={review._id} className={`review-card ${review.pinned ? 'pinned-review-card' : ''} ${review.username === 'syncky_wink' ? 'developer-review-card' : ''}`}>
               <div className="review-card-header">
                 {review.avatar ? (
                   <img
