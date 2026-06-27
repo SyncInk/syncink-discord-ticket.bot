@@ -421,6 +421,9 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
             <button type="button" onClick={() => navigate('/reviews')}>Reviews</button>
             <button type="button" onClick={() => navigate('/invite')}>Invite Bot</button>
             <button type="button" onClick={() => navigate('/guide')}>Guide</button>
+            <button type="button" onClick={() => navigate('/faq')}>FAQ</button>
+            <button type="button" onClick={() => navigate('/privacy')}>Privacy</button>
+            <button type="button" onClick={() => navigate('/terms')}>Terms</button>
             <strong className="topbar-active">Dashboard</strong>
           </div>
 

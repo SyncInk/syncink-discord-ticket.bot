@@ -21,6 +21,9 @@ import Guide from './pages/Guide';
 import Reviews from './pages/Reviews';
 
 import TranscriptView from './pages/Transcript';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import FAQ from './pages/FAQ';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -29,30 +32,24 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/auth/me')
-      .then((response) => {
-        setUser(response.data.user);
-        setGuilds(response.data.guilds);
+    checkAuth();
+  }, []);
 
-        const storedGuildStillExists = response.data.guilds.some((guild) => guild.id === selectedGuildId);
-        if (!storedGuildStillExists) {
-          const firstGuildId = response.data.guilds[0]?.id || null;
-          setSelectedGuildId(firstGuildId);
-          if (firstGuildId) {
-            localStorage.setItem('selectedGuildId', firstGuildId);
-          } else {
-            localStorage.removeItem('selectedGuildId');
-          }
-        }
-      })
-      .catch(() => {
-        setUser(null);
-        setGuilds([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [selectedGuildId]);
+  const checkAuth = async () => {
+    try {
+      const res = await axios.get('/api/auth/me');
+      setUser(res.data.user);
+      setGuilds(res.data.guilds);
+      
+      if (res.data.guilds.length > 0 && !selectedGuildId) {
+        setSelectedGuildId(res.data.guilds[0].id);
+      }
+    } catch (err) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSelectGuild = (guildId) => {
     setSelectedGuildId(guildId);
@@ -75,6 +72,9 @@ export default function App() {
       <Route path="/invite" element={<Invite />} />
       <Route path="/guide" element={user ? <Guide /> : <Navigate to="/login" />} />
       <Route path="/reviews" element={<Reviews user={user} />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/faq" element={<FAQ />} />
       <Route path="/dashboard/:guildId/transcripts/:ticketId" element={user ? <TranscriptView /> : <Navigate to="/login" />} />
       <Route
         path="/servers"
