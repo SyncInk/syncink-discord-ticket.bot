@@ -60,12 +60,9 @@ module.exports = {
             const claimerIds = Array.isArray(ticket.claimerIds) ? [...ticket.claimerIds] : [];
 
             for (const claimerId of newClaimers) {
-                if (desc.includes('No one has claimed')) {
-                    desc = `• <@${claimerId}>`;
+                if (desc.includes('No one has claimed') && !claimerIds.includes(claimerId)) {
                     await message.channel.send(`<:claimers:1513345698689581087> <@${claimerId}> is a claimer now!`);
-                    if (!claimerIds.includes(claimerId)) {
-                        claimerIds.push(claimerId);
-                    }
+                    claimerIds.push(claimerId);
                     await db.updateTicket(message.channel.id, {
                         claimerId,
                         claimerIds,
@@ -84,12 +81,9 @@ module.exports = {
                         ticketChannelId: message.channel.id,
                         relatedTicketId: ticket.ticketId
                     });
-                } else if (!desc.includes(claimerId)) {
-                    desc += `\n• <@${claimerId}>`;
+                } else if (!claimerIds.includes(claimerId)) {
                     await message.channel.send(`<:claimers:1513345698689581087> <@${claimerId}> is also a claimer now!`);
-                    if (!claimerIds.includes(claimerId)) {
-                        claimerIds.push(claimerId);
-                    }
+                    claimerIds.push(claimerId);
                     await db.updateTicket(message.channel.id, {
                         claimerIds,
                         lastActivityAt: Date.now()
@@ -99,7 +93,8 @@ module.exports = {
             }
 
             if (updated) {
-                claimersEmbed.setDescription(desc);
+                const formattedClaimers = claimerIds.map(id => `• <:claimers:1513345698689581087> <@${id}>`).join('\n\n');
+                claimersEmbed.setDescription(formattedClaimers);
                 await welcomeMsg.edit({ embeds: [claimersEmbed, welcomeMsg.embeds[1]] });
             }
         } catch (error) {
