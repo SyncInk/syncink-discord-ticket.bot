@@ -493,7 +493,10 @@ async function handleButton(interaction, client) {
             console.error('[CLOSE] Error adding log embed:', error);
         }
 
-        await thread.send('<a:sync_approved_check_box:1519090351766507603> Ticket is closed successfully.');
+        const successEmbed = new EmbedBuilder()
+            .setDescription('<a:sync_approved_check_box:1519090351766507603> **| Ticket is closed successfully.**')
+            .setColor(config.colors.success);
+        await thread.send({ embeds: [successEmbed] });
         await thread.members.remove(ticket.creatorId).catch(() => {});
         await thread.setLocked(true).catch(() => {});
         await thread.setArchived(true).catch(() => {});
