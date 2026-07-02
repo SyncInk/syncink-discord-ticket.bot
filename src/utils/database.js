@@ -462,7 +462,7 @@ async function editReviewReply(reviewId, replyId, content) {
     const result = await Review.findOneAndUpdate(
         { _id: reviewId, "replies.replyId": replyId },
         { $set: { "replies.$.content": content } },
-        { new: true }
+        { returnDocument: 'after' }
     );
     if (!result) throw new Error('Review or reply not found');
     return result;
@@ -473,7 +473,7 @@ async function deleteReviewReply(reviewId, replyId) {
     const result = await Review.findByIdAndUpdate(
         reviewId,
         { $pull: { replies: { replyId } } },
-        { new: true }
+        { returnDocument: 'after' }
     );
     if (!result) throw new Error('Review not found');
     return result;
@@ -484,7 +484,7 @@ async function toggleReviewPin(reviewId, pinnedState) {
     const result = await Review.findByIdAndUpdate(
         reviewId,
         { $set: { pinned: pinnedState } },
-        { new: true }
+        { returnDocument: 'after' }
     );
     return result;
 }

@@ -389,7 +389,8 @@ async function handleButton(interaction, client) {
         const formattedClaimers = claimerIds.map(id => `• <:claimers:1513345698689581087> <@${id}>`).join('\n\n');
         claimersEmbed.setDescription(formattedClaimers);
 
-        await interaction.update({ embeds: [claimersEmbed, interaction.message.embeds[1]] });
+        const embedsToKeep = interaction.message.embeds.slice(1);
+        await interaction.update({ embeds: [claimersEmbed, ...embedsToKeep] });
         await thread.send({ content: `<:claimers:1513345698689581087> <@${user.id}> is a claimer now!` });
 
         await db.createActivityLog({

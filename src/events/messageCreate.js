@@ -95,7 +95,8 @@ module.exports = {
             if (updated) {
                 const formattedClaimers = claimerIds.map(id => `• <:claimers:1513345698689581087> <@${id}>`).join('\n\n');
                 claimersEmbed.setDescription(formattedClaimers);
-                await welcomeMsg.edit({ embeds: [claimersEmbed, welcomeMsg.embeds[1]] });
+                const embedsToKeep = welcomeMsg.embeds.slice(1);
+                await welcomeMsg.edit({ embeds: [claimersEmbed, ...embedsToKeep] });
             }
         } catch (error) {
             console.error('[AUTO CLAIM] Could not update welcome message on auto-claim:', error);
