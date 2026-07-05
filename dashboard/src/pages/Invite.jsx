@@ -8,7 +8,7 @@ export default function Invite() {
   const rootRef  = useRef(null);
 
   const INVITE_URL =
-    'https://discord.com/oauth2/authorize?client_id=1513075101992747158&permissions=8&integration_type=0&scope=bot+applications.commands';
+    'https://discord.com/oauth2/authorize?client_id=1513075101992747158&permissions=292326591504&integration_type=0&scope=bot+applications.commands';
 
   // ── Subtle mouse parallax ───────────────────────────────────────────────
   useEffect(() => {
