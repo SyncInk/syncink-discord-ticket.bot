@@ -2676,3 +2676,121 @@ canvas {
   }
 }
 
+.legal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), color var(--transition);
+  margin-left: auto;
+}
+.legal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.topbar-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.topbar-dropdown-btn {
+  display: flex;
+  align-items: center;
+}
+.topbar-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-panel-strong);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px;
+  box-shadow: var(--shadow-md);
+  min-width: 150px;
+  z-index: 100;
+  flex-direction: column;
+  gap: 4px;
+}
+.topbar-dropdown:hover .topbar-dropdown-menu,
+.topbar-dropdown:focus-within .topbar-dropdown-menu {
+  display: flex;
+}
+.topbar-dropdown-menu button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-soft);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background var(--transition), color var(--transition);
+}
+.topbar-dropdown-menu button:hover {
+  background: var(--bg-hover);
+  color: #fff;
+}
+
+.legal-document {
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+.legal-document h2 {
+  color: #fff;
+  margin-top: 24px;
+  font-family: 'Sora', sans-serif;
+}
+.legal-document h2:first-child {
+  margin-top: 0;
+}
+.legal-document ul {
+  padding-left: 20px;
+}
+.legal-document li {
+  margin-bottom: 8px;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.faq-item {
+  background: var(--bg-panel-strong);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+.faq-item:hover {
+  border-color: var(--border-strong);
+}
+.faq-question {
+  width: 100%;
+  padding: 20px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Sora', sans-serif;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.faq-answer {
+  padding: 0 20px 20px 20px;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+

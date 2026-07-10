@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { PageHeader, SectionCard } from '../components/Common';
+import { ChevronDown } from 'lucide-react';
 
 const FAQS = [
   {
@@ -33,48 +35,42 @@ export default function FAQ() {
   };
 
   return (
-    <div className="transcript-page" style={{ padding: '40px', color: '#dcddde', background: '#36393f', minHeight: '100vh', boxSizing: 'border-box' }}>
-      <div className="transcript-header">
-        <button className="back-link" onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', color: '#00aff4', cursor: 'pointer', padding: 0, fontSize: '14px' }}>
-          ← Back
-        </button>
-        <h1 style={{ marginTop: '20px' }}>Frequently Asked Questions</h1>
-        <p>Find answers to common questions about using our bot.</p>
-      </div>
+    <div className="dashboard-shell" style={{ display: 'block', height: '100vh', overflowY: 'auto' }}>
+      <main className="main-shell" style={{ margin: '0 auto', maxWidth: '900px', padding: '40px 20px' }}>
+        <div className="content-shell page-stack">
+          <button type="button" className="action-button tone-secondary" onClick={() => navigate(-1)} style={{ width: 'fit-content' }}>
+            ← Go Back
+          </button>
+          
+          <PageHeader 
+            title="Frequently Asked Questions" 
+            description="Find answers to common questions about using our bot." 
+          />
 
-      <div style={{ maxWidth: '800px' }}>
-        {FAQS.map((faq, index) => (
-          <div key={index} style={{ background: '#2f3136', marginBottom: '16px', borderRadius: '8px', overflow: 'hidden' }}>
-            <button
-              onClick={() => toggleAccordion(index)}
-              style={{
-                width: '100%',
-                padding: '20px',
-                background: 'transparent',
-                border: 'none',
-                color: '#fff',
-                textAlign: 'left',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
-              {faq.question}
-              <span style={{ fontSize: '20px', transition: 'transform 0.3s', transform: openIndex === index ? 'rotate(45deg)' : 'rotate(0)' }}>
-                +
-              </span>
-            </button>
-            {openIndex === index && (
-              <div style={{ padding: '0 20px 20px 20px', color: '#dcddde', lineHeight: '1.6' }}>
-                {faq.answer}
+          <div className="faq-list">
+            {FAQS.map((faq, index) => (
+              <div key={index} className="faq-item">
+                <button
+                  type="button"
+                  className="faq-question"
+                  onClick={() => toggleAccordion(index)}
+                >
+                  {faq.question}
+                  <ChevronDown size={20} style={{ 
+                    transition: 'transform 0.3s', 
+                    transform: openIndex === index ? 'rotate(180deg)' : 'rotate(0)' 
+                  }} />
+                </button>
+                {openIndex === index && (
+                  <div className="faq-answer">
+                    {faq.answer}
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

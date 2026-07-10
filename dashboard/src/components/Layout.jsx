@@ -422,8 +422,13 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
             <button type="button" onClick={() => navigate('/invite')}>Invite Bot</button>
             <button type="button" onClick={() => navigate('/guide')}>Guide</button>
             <button type="button" onClick={() => navigate('/faq')}>FAQ</button>
-            <button type="button" onClick={() => navigate('/privacy')}>Privacy</button>
-            <button type="button" onClick={() => navigate('/terms')}>Terms</button>
+            <div className="topbar-dropdown">
+              <button type="button" className="topbar-dropdown-btn">Legal <ChevronDown size={14} style={{marginLeft: 4}} /></button>
+              <div className="topbar-dropdown-menu">
+                <button type="button" onClick={() => navigate('/privacy')}>Privacy Policy</button>
+                <button type="button" onClick={() => navigate('/terms')}>Terms of Service</button>
+              </div>
+            </div>
             <strong className="topbar-active">Dashboard</strong>
           </div>
 

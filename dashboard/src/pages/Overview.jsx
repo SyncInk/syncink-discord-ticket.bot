@@ -1,7 +1,7 @@
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { MetricCard, PageHeader, SectionCard, Pill } from '../components/Common';
-import { Ticket, Activity, FolderClosed, ArrowRightLeft, BadgeCheck, Shield, FileText, HelpCircle } from 'lucide-react';
+import { Ticket, Activity, FolderClosed, ArrowRightLeft, BadgeCheck, Shield, FileText, HelpCircle, X } from 'lucide-react';
 
 function ActivityChart({ data }) {
   if (!data || data.length === 0) return <div className="chart-empty">No activity data available.</div>;
@@ -45,6 +45,12 @@ function ActivityChart({ data }) {
 export default function Overview() {
   const { snapshot } = useOutletContext();
   const { stats, analytics } = snapshot;
+  const [showLegal, setShowLegal] = React.useState(localStorage.getItem('hideLegalBanner') !== 'true');
+
+  const hideLegal = () => {
+    localStorage.setItem('hideLegalBanner', 'true');
+    setShowLegal(false);
+  };
 
   return (
     <div className="page-stack">
@@ -53,20 +59,23 @@ export default function Overview() {
         description="High-level metrics and activity for your ticket system."
       />
 
-      <div className="legal-banner">
-        <div className="legal-banner-content">
-          <Shield className="legal-icon" size={28} />
-          <div className="legal-text">
-            <h3>Legal & Support Hub</h3>
-            <p>Please review our official policies and frequently asked questions for guidance.</p>
+      {showLegal && (
+        <div className="legal-banner">
+          <div className="legal-banner-content">
+            <Shield className="legal-icon" size={28} />
+            <div className="legal-text">
+              <h3>Legal & Support Hub</h3>
+              <p>Please review our official policies and frequently asked questions for guidance.</p>
+            </div>
+          </div>
+          <div className="legal-links">
+            <a href="/privacy" className="action-button"><Shield size={16} /> Privacy Policy</a>
+            <a href="/terms" className="action-button"><FileText size={16} /> Terms of Service</a>
+            <a href="/faq" className="action-button"><HelpCircle size={16} /> FAQ</a>
+            <button type="button" className="legal-close" onClick={hideLegal} title="Dismiss"><X size={16} /></button>
           </div>
         </div>
-        <div className="legal-links">
-          <a href="/privacy" className="action-button"><Shield size={16} /> Privacy Policy</a>
-          <a href="/terms" className="action-button"><FileText size={16} /> Terms of Service</a>
-          <a href="/faq" className="action-button"><HelpCircle size={16} /> FAQ</a>
-        </div>
-      </div>
+      )}
 
       <div className="metric-grid">
         <MetricCard label="Total Tickets" value={stats.totalTickets} />
