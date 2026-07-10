@@ -2705,38 +2705,57 @@ canvas {
 .topbar-dropdown-menu {
   display: none;
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: var(--bg-panel-strong);
-  border: 1px solid var(--border);
+  background: rgba(18, 24, 43, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   padding: 8px;
-  box-shadow: var(--shadow-md);
-  min-width: 150px;
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(165, 136, 255, 0.15);
+  min-width: 180px;
   z-index: 100;
   flex-direction: column;
   gap: 4px;
+  animation: dropdownFade 0.2s ease forwards;
 }
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
 .topbar-dropdown:hover .topbar-dropdown-menu,
 .topbar-dropdown:focus-within .topbar-dropdown-menu {
   display: flex;
 }
+
 .topbar-dropdown-menu button {
   width: 100%;
   text-align: left;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background: transparent;
   border: none;
   color: var(--text-soft);
   border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 14px;
-  transition: background var(--transition), color var(--transition);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
+
 .topbar-dropdown-menu button:hover {
-  background: var(--bg-hover);
+  background: rgba(165, 136, 255, 0.12);
   color: #fff;
+  transform: translateX(4px);
+}
+
+.topbar-dropdown-menu button svg {
+  color: var(--accent);
 }
 
 .legal-document {
