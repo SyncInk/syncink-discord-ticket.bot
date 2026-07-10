@@ -9,12 +9,15 @@ import {
   X
 } from 'lucide-react';
 
-export function PageHeader({ eyebrow, title, description, action }) {
+export function PageHeader({ eyebrow, title, description, action, icon: Icon }) {
   return (
     <div className="page-header">
       <div>
         {eyebrow ? <div className="page-eyebrow">{eyebrow}</div> : null}
-        <h1>{title}</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {Icon && <Icon size={26} color="var(--accent)" />}
+          {title}
+        </h1>
         {description ? <p>{description}</p> : null}
       </div>
       {action ? <div className="page-header-action">{action}</div> : null}

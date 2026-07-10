@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader, SectionCard } from '../components/Common';
+import { Shield } from 'lucide-react';
 
 export default function PrivacyPolicy() {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function PrivacyPolicy() {
           <PageHeader 
             title="Privacy Policy" 
             description="Last updated: June 2026" 
+            icon={Shield}
           />
 
           <SectionCard>

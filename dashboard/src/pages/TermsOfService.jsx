@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader, SectionCard } from '../components/Common';
+import { FileText } from 'lucide-react';
 
 export default function TermsOfService() {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export default function TermsOfService() {
           <PageHeader 
             title="Terms of Service" 
             description="Last updated: June 2026" 
+            icon={FileText}
           />
 
           <SectionCard>

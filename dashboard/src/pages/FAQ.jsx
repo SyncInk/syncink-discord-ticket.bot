@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader, SectionCard } from '../components/Common';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, HelpCircle } from 'lucide-react';
 
 const FAQS = [
   {
@@ -45,6 +45,7 @@ export default function FAQ() {
           <PageHeader 
             title="Frequently Asked Questions" 
             description="Find answers to common questions about using our bot." 
+            icon={HelpCircle}
           />
 
           <div className="faq-list">
