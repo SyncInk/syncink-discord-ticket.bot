@@ -2838,3 +2838,13 @@ canvas {
   font-size: 14px;
 }
 
+.faq-answer code {
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.9em;
+  color: #e2e2e2;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+

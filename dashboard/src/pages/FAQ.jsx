@@ -6,27 +6,27 @@ import { ChevronDown, HelpCircle } from 'lucide-react';
 const FAQS = [
   {
     question: "How do I setup the bot for the first time?",
-    answer: "Go to your Dashboard, navigate to the 'Ticket Panels' page, configure your categories, and click 'Deploy Panel' to send the interactive ticket menu to your Discord server."
+    answer: <>Go to your Dashboard, navigate to the 'Ticket Panels' page, configure your categories, and click 'Deploy Panel' to send the interactive ticket menu to your Discord server.</>
   },
   {
     question: "What permissions does the bot actually need?",
-    answer: "The bot does NOT require the `Administrator` permission. For maximum security, it only requests the specific permissions it needs to operate: `Manage Channels` (to create/close tickets), `Send Messages`, `Read Message History`, and `View Channels`."
+    answer: <>The bot does NOT require the <code>Administrator</code> permission. For maximum security, it only requests the specific permissions it needs to operate: <code>Manage Channels</code> (to create/close tickets), <code>Send Messages</code>, <code>Read Message History</code>, and <code>View Channels</code>.</>
   },
   {
     question: "Why aren't my ticket transcripts generating?",
-    answer: "Ensure the bot has the `Read Message History` and `View Channels` permissions in your ticket categories, and verify that you have configured a valid Log Channel in the Dashboard settings."
+    answer: <>Ensure the bot has the <code>Read Message History</code> and <code>View Channels</code> permissions in your ticket categories, and verify that you have configured a valid Log Channel in the Dashboard settings.</>
   },
   {
     question: "How are transcripts generated and stored?",
-    answer: "When a ticket is closed, the bot automatically compiles all messages, attachments, and metadata into a permanent HTML file. This file is sent directly to your designated Discord Log Channel, ensuring you always have a secure backup of the conversation."
+    answer: <>When a ticket is closed, the bot automatically compiles all messages, attachments, and metadata into a permanent HTML file. This file is sent directly to your designated Discord Log Channel, ensuring you always have a secure backup of the conversation.</>
   },
   {
     question: "Can I customize the ticket categories?",
-    answer: "Yes! Navigate to the 'Ticket Categories' tab on your dashboard. You can add custom emojis, titles, descriptions, and assign specific staff roles to each category to route users to the right team."
+    answer: <>Yes! Navigate to the 'Ticket Categories' tab on your dashboard. You can add custom emojis, titles, descriptions, and assign specific staff roles to each category to route users to the right team.</>
   },
   {
     question: "How do I add staff members?",
-    answer: "You can assign staff roles directly from the Dashboard under 'Dashboard Access' and 'Ticket Categories'. Anyone with those roles will automatically be granted `View Channel` and `Send Messages` access in new tickets."
+    answer: <>You can assign staff roles directly from the Dashboard under 'Dashboard Access' and 'Ticket Categories'. Anyone with those roles will automatically be granted <code>View Channel</code> and <code>Send Messages</code> access in new tickets.</>
   }
 ];
 
