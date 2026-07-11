@@ -46,6 +46,14 @@ export default function PrivacyPolicy() {
 
               <h2>5. Contact Us</h2>
               <p>If you have any questions about this Privacy Policy, please contact us via our Support Server.</p>
+              
+              <div className="support-embed">
+                <h3>SyncInk Support Hub</h3>
+                <p>Join our official Discord server for fast support, updates, and community.</p>
+                <a href="https://discord.gg/FnsJYbmW4A" target="_blank" rel="noopener noreferrer" className="action-button tone-primary">
+                  Join Support Server
+                </a>
+              </div>
 
               <h2>6. Intellectual Property & Copyright</h2>
               <p>The design, name, branding, and source code of SyncInk are strictly protected by international copyright law. Any unauthorized copying, cloning, reproduction, or distribution of our layout, assets, or identity is strictly prohibited and will be met with immediate legal action.</p>
