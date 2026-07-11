@@ -11,6 +11,7 @@ import {
 } from '../components/Common';
 import usePermissions from '../hooks/usePermissions';
 import LockedOverlay from '../components/LockedOverlay';
+import { Trash2, Plus } from 'lucide-react';
 
 export default function TicketCategories() {
   const { busy, saveSettings, snapshot } = useOutletContext();
@@ -41,6 +42,25 @@ export default function TicketCategories() {
     }));
   };
 
+  const addCategory = () => {
+    if (!canEditSettings) return;
+    setCategories((current) => [
+      ...current,
+      {
+        value: `custom_${Date.now()}`,
+        label: 'New Custom Category',
+        description: 'Provide a description for your new category',
+        emoji: '',
+        roleIds: []
+      }
+    ]);
+  };
+
+  const removeCategory = (value) => {
+    if (!canEditSettings) return;
+    setCategories((current) => current.filter((category) => category.value !== value));
+  };
+
   const renderEmoji = (emoji) => {
     if (!emoji) return null;
     if (/^\d+$/.test(emoji)) {
@@ -52,9 +72,9 @@ export default function TicketCategories() {
   return (
     <div className="page-stack">
       <PageHeader
-        eyebrow="Safe Category Editing"
+        eyebrow="Dynamic Category Editing"
         title="Customize ticket categories"
-        description="Rename labels, rewrite descriptions, swap emojis, and assign destination staff roles while keeping the existing bot logic intact."
+        description="Add new custom categories, rewrite existing labels, swap emojis, assign staff roles, and remove unused categories."
         action={canEditSettings && (
           <ActionButton tone="primary" busy={busy} onClick={() => saveSettings({ categoryOverrides: categories }, 'Categories saved')}>
             Save category settings
@@ -69,10 +89,23 @@ export default function TicketCategories() {
             <SectionCard
               title={<>{renderEmoji(category.emoji)} {category.label}</>}
               description={`Internal value: ${category.value}`}
+              action={
+                canEditSettings && (
+                  <button 
+                    type="button" 
+                    className="action-button" 
+                    onClick={() => removeCategory(category.value)}
+                    style={{ padding: '8px', color: 'var(--error)', borderColor: 'var(--border)' }}
+                    title="Remove Category"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )
+              }
             >
               <div className="form-grid">
                 <Field label="Emoji">
-                  <TextInput value={category.emoji} onChange={(event) => updateCategory(category.value, 'emoji', event.target.value)} disabled={!canEditSettings} />
+                  <TextInput value={category.emoji || ''} onChange={(event) => updateCategory(category.value, 'emoji', event.target.value)} disabled={!canEditSettings} />
                 </Field>
 
                 <Field label="Label">
@@ -95,6 +128,25 @@ export default function TicketCategories() {
             </SectionCard>
           </div>
         ))}
+        
+        {canEditSettings && (
+          <button 
+            type="button" 
+            className="action-button tone-secondary" 
+            onClick={addCategory} 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              gap: 8, 
+              padding: '24px', 
+              borderStyle: 'dashed',
+              background: 'transparent'
+            }}
+          >
+            <Plus size={20} /> Add New Category
+          </button>
+        )}
       </div>
     </div>
   );

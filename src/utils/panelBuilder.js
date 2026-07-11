@@ -34,23 +34,19 @@ function defaultRoleGroupForCategory(ticketType) {
 }
 
 function normalizeTicketOptions(guildConfig) {
-    const overrides = Array.isArray(guildConfig?.categoryOverrides) ? guildConfig.categoryOverrides : [];
-    const overrideMap = new Map(overrides.map((option) => [option.value, option]));
-
-    return config.ticketOptions.map((baseOption) => {
-        const override = overrideMap.get(baseOption.value) || {};
-
-        return {
-            ...baseOption,
+    if (Array.isArray(guildConfig?.categoryOverrides) && guildConfig.categoryOverrides.length > 0) {
+        return guildConfig.categoryOverrides.map((override) => ({
             ...override,
-            value: baseOption.value,
-            label: override.label || baseOption.label,
-            description: override.description || baseOption.description,
-            emoji: override.emoji || baseOption.emoji,
             roleIds: Array.isArray(override.roleIds) ? override.roleIds : [],
-            roleGroup: override.roleGroup || defaultRoleGroupForCategory(baseOption.value)
-        };
-    });
+            roleGroup: override.roleGroup || defaultRoleGroupForCategory(override.value)
+        }));
+    }
+
+    return config.ticketOptions.map((baseOption) => ({
+        ...baseOption,
+        roleIds: [],
+        roleGroup: defaultRoleGroupForCategory(baseOption.value)
+    }));
 }
 
 function getCategoryConfig(guildConfig, ticketType) {
