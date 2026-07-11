@@ -11,7 +11,7 @@ import {
 } from '../components/Common';
 import usePermissions from '../hooks/usePermissions';
 import LockedOverlay from '../components/LockedOverlay';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, ArrowUp, ArrowDown } from 'lucide-react';
 
 export default function TicketCategories() {
   const { busy, saveSettings, snapshot } = useOutletContext();
@@ -61,6 +61,28 @@ export default function TicketCategories() {
     setCategories((current) => current.filter((category) => category.value !== value));
   };
 
+  const moveUp = (index) => {
+    if (!canEditSettings || index === 0) return;
+    setCategories((current) => {
+      const newCats = [...current];
+      const temp = newCats[index - 1];
+      newCats[index - 1] = newCats[index];
+      newCats[index] = temp;
+      return newCats;
+    });
+  };
+
+  const moveDown = (index) => {
+    if (!canEditSettings || index === categories.length - 1) return;
+    setCategories((current) => {
+      const newCats = [...current];
+      const temp = newCats[index + 1];
+      newCats[index + 1] = newCats[index];
+      newCats[index] = temp;
+      return newCats;
+    });
+  };
+
   const renderEmoji = (emoji) => {
     if (!emoji) return null;
     if (/^\d+$/.test(emoji)) {
@@ -83,7 +105,7 @@ export default function TicketCategories() {
       />
 
       <div className="card-grid">
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <div key={category.value} style={{ position: 'relative' }}>
             {!canEditSettings && <LockedOverlay tooltip={getLockTooltip('admin')} />}
             <SectionCard
@@ -91,15 +113,37 @@ export default function TicketCategories() {
               description={`Internal value: ${category.value}`}
               action={
                 canEditSettings && (
-                  <button 
-                    type="button" 
-                    className="action-button" 
-                    onClick={() => removeCategory(category.value)}
-                    style={{ padding: '8px', color: 'var(--error)', borderColor: 'var(--border)' }}
-                    title="Remove Category"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button 
+                      type="button" 
+                      className="action-button" 
+                      onClick={() => moveUp(index)}
+                      disabled={index === 0}
+                      style={{ padding: '8px', opacity: index === 0 ? 0.5 : 1 }}
+                      title="Move Up"
+                    >
+                      <ArrowUp size={16} />
+                    </button>
+                    <button 
+                      type="button" 
+                      className="action-button" 
+                      onClick={() => moveDown(index)}
+                      disabled={index === categories.length - 1}
+                      style={{ padding: '8px', opacity: index === categories.length - 1 ? 0.5 : 1 }}
+                      title="Move Down"
+                    >
+                      <ArrowDown size={16} />
+                    </button>
+                    <button 
+                      type="button" 
+                      className="action-button" 
+                      onClick={() => removeCategory(category.value)}
+                      style={{ padding: '8px', color: 'var(--error)', borderColor: 'var(--border)' }}
+                      title="Remove Category"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 )
               }
             >
