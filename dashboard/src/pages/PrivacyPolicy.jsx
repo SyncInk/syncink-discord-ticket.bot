@@ -25,7 +25,7 @@ export default function PrivacyPolicy() {
               <h2>1. Information We Collect</h2>
               <p>We collect information you provide directly to us when you use our bot and dashboard. This includes:</p>
               <ul>
-                <li><strong>Discord Profile Information:</strong> Your Discord User ID, username, and avatar URL to authenticate your session.</li>
+                <li><strong>Discord Profile Information:</strong> Your Discord User ID and username to authenticate your session.</li>
                 <li><strong>Server Information:</strong> Your Discord Server ID, roles, and channel layouts to provide ticketing features.</li>
                 <li><strong>Ticket Data & Transcripts:</strong> Messages sent within ticket threads, including text and attachment URLs, to generate ticket transcripts for your server logs.</li>
               </ul>
@@ -46,6 +46,9 @@ export default function PrivacyPolicy() {
 
               <h2>5. Contact Us</h2>
               <p>If you have any questions about this Privacy Policy, please contact us via our Support Server.</p>
+
+              <h2>6. Intellectual Property & Copyright</h2>
+              <p>The design, name, branding, and source code of SyncInk are strictly protected by international copyright law. Any unauthorized copying, cloning, reproduction, or distribution of our layout, assets, or identity is strictly prohibited and will be met with immediate legal action.</p>
             </div>
           </SectionCard>
         </div>

@@ -41,6 +41,20 @@ export default function TermsOfService() {
 
               <h2>5. Changes to Terms</h2>
               <p>We reserve the right to modify or replace these Terms at any time. We will notify users of any significant changes via our Support Server or Dashboard announcements.</p>
+
+              <h2>6. Intellectual Property & Copyright</h2>
+              <p>The design, name, branding, and source code of SyncInk are strictly protected by international copyright law. Any unauthorized copying, cloning, reproduction, or distribution of our layout, assets, or identity is strictly prohibited and will be met with immediate legal action.</p>
+
+              <h2>7. Support & Contact</h2>
+              <p>If you have any questions or concerns regarding these terms, please contact us on our official support server.</p>
+              
+              <div className="support-embed">
+                <h3>SyncInk Support Hub</h3>
+                <p>Join our official Discord server for fast support, updates, and community.</p>
+                <a href="https://discord.gg/FnsJYbmW4A" target="_blank" rel="noopener noreferrer" className="action-button tone-primary">
+                  Join Support Server
+                </a>
+              </div>
             </div>
           </SectionCard>
         </div>
