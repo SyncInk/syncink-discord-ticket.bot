@@ -35,7 +35,7 @@ async function handleSelectMenu(interaction, client) {
         const optionData = getCategoryConfig(guildConfig, selectedValue);
 
         if (!optionData) {
-            return interaction.reply({ content: 'Invalid ticket type.', ephemeral: true });
+            return interaction.reply({ content: '<a:refused:1520914088568295564> Invalid ticket type.', ephemeral: true });
         }
 
         const modal = new ModalBuilder()
@@ -63,7 +63,7 @@ async function handleSelectMenu(interaction, client) {
         const roleGroup = interaction.values[0];
         const ticket = await db.getTicket(interaction.channel.id);
         if (!ticket) {
-            return interaction.reply({ content: 'Ticket not found.', ephemeral: true });
+            return interaction.reply({ content: '<a:refused:1520914088568295564> Ticket not found.', ephemeral: true });
         }
 
         await interaction.update({ content: 'Transferring ticket...', components: [] });
@@ -233,7 +233,7 @@ async function handleModalSubmit(interaction, client) {
     const reason = interaction.fields.getTextInputValue('ticket_reason');
 
     if (!optionData) {
-        return interaction.editReply('This ticket category is no longer available.');
+        return interaction.editReply('<a:refused:1520914088568295564> This ticket category is no longer available.');
     }
 
     let prefix = 'ticket';
@@ -365,12 +365,12 @@ async function handleModalSubmit(interaction, client) {
         );
 
         const successEmbed = new EmbedBuilder()
-            .setDescription(`🎟️ <#${thread.id}> **| Ticket created successfully!**`)
+            .setDescription(`<a:approved:1520913982678896670> <#${thread.id}> **| Ticket created successfully!**`)
             .setColor(config.colors.success);
         await interaction.editReply({ content: '', embeds: [successEmbed] });
     } catch (error) {
         console.error('[TICKET CREATE ERROR]', error);
-        await interaction.editReply(`Failed to create ticket: \`${error.message}\`. Please check my permissions in this channel (I must have \`Manage Channels\`, \`Manage Roles\`, \`Embed Links\`, and \`Create Private Threads\`).`);
+        await interaction.editReply(`<a:refused:1520914088568295564> Failed to create ticket: \`${error.message}\`. Please check my permissions in this channel (I must have \`Manage Channels\`, \`Manage Roles\`, \`Embed Links\`, and \`Create Private Threads\`).`);
     }
 }
 
@@ -381,7 +381,7 @@ async function handleButton(interaction, client) {
     if (!ticket) {
         if (customId.startsWith('ticket_btn_')) {
             return interaction.reply({
-                content: 'This thread is not registered as a ticket in the database.',
+                content: '<a:refused:1520914088568295564> This thread is not registered as a ticket in the database.',
                 ephemeral: true
             });
         }
@@ -400,11 +400,11 @@ async function handleButton(interaction, client) {
 
     if (customId === 'ticket_btn_claim') {
         if (!isStaff) {
-            return interaction.reply({ content: 'Only staff members can claim tickets.', ephemeral: true });
+            return interaction.reply({ content: '<a:refused:1520914088568295564> Only staff members can claim tickets.', ephemeral: true });
         }
         if (ticket.claimerIds && ticket.claimerIds.includes(user.id)) {
             return interaction.reply({
-                content: `You have already claimed this ticket.`,
+                content: `<a:refused:1520914088568295564> You have already claimed this ticket.`,
                 ephemeral: true
             });
         }
@@ -447,13 +447,13 @@ async function handleButton(interaction, client) {
     } else if (customId === 'ticket_btn_close') {
         if (!isStaff && user.id !== ticket.creatorId) {
             return interaction.reply({
-                content: 'You do not have permission to close this ticket.',
+                content: '<a:refused:1520914088568295564> You do not have permission to close this ticket.',
                 ephemeral: true
             });
         }
 
         const closeEmbed = new EmbedBuilder()
-            .setDescription('<:lock:1519090351766507603> **| Closing ticket, please wait...**')
+            .setDescription('🔒 **| Closing ticket, please wait...**')
             .setColor(config.colors.error);
         await interaction.reply({ embeds: [closeEmbed], ephemeral: true });
 
@@ -528,7 +528,7 @@ async function handleButton(interaction, client) {
         }
 
         const successEmbed = new EmbedBuilder()
-            .setDescription('✅ **| Ticket is closed successfully.**')
+            .setDescription('<a:approved:1520913982678896670> **| Ticket is closed successfully.**')
             .setColor(config.colors.success);
         await thread.send({ embeds: [successEmbed] });
         await thread.members.remove(ticket.creatorId).catch(() => {});
@@ -536,7 +536,7 @@ async function handleButton(interaction, client) {
         await thread.setArchived(true).catch(() => {});
     } else if (customId === 'ticket_btn_transfer') {
         if (!isStaff) {
-            return interaction.reply({ content: 'Only staff can transfer tickets.', ephemeral: true });
+            return interaction.reply({ content: '<a:refused:1520914088568295564> Only staff can transfer tickets.', ephemeral: true });
         }
 
         const { StringSelectMenuBuilder } = require('discord.js');
