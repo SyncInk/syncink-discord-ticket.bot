@@ -519,7 +519,7 @@ async function handleButton(interaction, client) {
             if (welcomeMsg) {
                 const logEmbed = new EmbedBuilder()
                     .setTitle('Log')
-                    .setDescription(`🔒 [Ticket Log](${logResult?.logMessage ? logResult.logMessage.url : '#'})`)
+                    .setDescription(logResult?.logMessage ? `🔒 [Ticket Log](${logResult.logMessage.url})` : '⚠️ *Log channel not set. Transcript not archived.*')
                     .setColor('#2b2d31');
                 await welcomeMsg.edit({ embeds: [...welcomeMsg.embeds, logEmbed], components: [] });
             }
@@ -528,7 +528,7 @@ async function handleButton(interaction, client) {
         }
 
         const successEmbed = new EmbedBuilder()
-            .setDescription('<a:sync_approved_check_box:1519090351766507603> **| Ticket is closed successfully.**')
+            .setDescription('✅ **| Ticket is closed successfully.**')
             .setColor(config.colors.success);
         await thread.send({ embeds: [successEmbed] });
         await thread.members.remove(ticket.creatorId).catch(() => {});
