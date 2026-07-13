@@ -131,17 +131,17 @@ async function handleSelectMenu(interaction, client) {
                 .setCustomId('ticket_btn_close')
                 .setLabel('Close')
                 .setStyle(ButtonStyle.Danger)
-                .setEmoji('1513900649249505433');
+                .setEmoji('🔒');
             const transferBtn = new ButtonBuilder()
                 .setCustomId('ticket_btn_transfer')
                 .setLabel('Transfer')
                 .setStyle(ButtonStyle.Secondary)
-                .setEmoji('1513904436785971211');
+                .setEmoji('🔄');
             const claimBtn = new ButtonBuilder()
                 .setCustomId('ticket_btn_claim')
                 .setLabel('Claim')
                 .setStyle(ButtonStyle.Success)
-                .setEmoji('1513902469028249680');
+                .setEmoji('🙋');
 
             const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
 
@@ -198,7 +198,7 @@ async function handleSelectMenu(interaction, client) {
             }
 
             const embed = new EmbedBuilder()
-                .setDescription(`<:sync_ticket_transfer:1513904436785971211> **This ticket has been transferred to** <#${newThread.id}>`)
+                .setDescription(`🔄 **This ticket has been transferred to** <#${newThread.id}>`)
                 .setColor(config.colors.success);
 
             if (welcomeMsgId) {
@@ -325,17 +325,17 @@ async function handleModalSubmit(interaction, client) {
             .setCustomId('ticket_btn_close')
             .setLabel('Close')
             .setStyle(ButtonStyle.Danger)
-            .setEmoji('1513900649249505433');
+            .setEmoji('🔒');
         const transferBtn = new ButtonBuilder()
             .setCustomId('ticket_btn_transfer')
             .setLabel('Transfer')
             .setStyle(ButtonStyle.Secondary)
-            .setEmoji('1513904436785971211');
+            .setEmoji('🔄');
         const claimBtn = new ButtonBuilder()
             .setCustomId('ticket_btn_claim')
             .setLabel('Claim')
             .setStyle(ButtonStyle.Success)
-            .setEmoji('1513902469028249680');
+            .setEmoji('🙋');
 
         const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
 
