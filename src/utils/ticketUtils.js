@@ -370,7 +370,7 @@ async function handleModalSubmit(interaction, client) {
         await interaction.editReply({ content: '', embeds: [successEmbed] });
     } catch (error) {
         console.error('[TICKET CREATE ERROR]', error);
-        await interaction.editReply('Failed to create ticket. Please check my permissions. I need `Manage Channels` and `Create Private Threads` to function properly.');
+        await interaction.editReply('Failed to create ticket. Please check my permissions. I must have `Manage Channels`, `Manage Roles`, and `Create Private Threads` to function properly.');
     }
 }
 

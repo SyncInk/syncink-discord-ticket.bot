@@ -10,7 +10,7 @@ const FAQS = [
   },
   {
     question: "What permissions does the bot actually need?",
-    answer: <>The bot does NOT require the <code>Administrator</code> permission. For maximum security, it only requests the specific permissions it needs to operate: <code>Manage Channels</code> (to create/close tickets), <code>Create Private Threads</code>, <code>Send Messages</code>, <code>Send Messages in Threads</code>, <code>Read Message History</code>, and <code>View Channels</code>.</>
+    answer: <>The bot does NOT require the <code>Administrator</code> permission. For maximum security, it only requests the specific permissions it needs to operate: <code>Manage Channels</code> (to create/close tickets), <code>Manage Roles</code> (to secure private ticket channels), <code>Create Private Threads</code>, <code>Send Messages</code>, <code>Send Messages in Threads</code>, <code>Read Message History</code>, and <code>View Channels</code>.</>
   },
   {
     question: "Why aren't my ticket transcripts generating?",
