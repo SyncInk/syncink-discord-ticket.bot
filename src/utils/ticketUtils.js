@@ -273,7 +273,7 @@ async function handleModalSubmit(interaction, client) {
                     },
                     {
                         id: client.user.id,
-                        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageMessages, PermissionFlagsBits.ReadMessageHistory]
+                        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks, PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageMessages, PermissionFlagsBits.ReadMessageHistory]
                     },
                     {
                         id: interaction.user.id,
@@ -314,7 +314,7 @@ async function handleModalSubmit(interaction, client) {
             .setTitle('Claimers')
             .setDescription('• No one has claimed this ticket yet.')
             .setColor(config.colors.primary)
-            .setThumbnail(optionData.emoji ? `https://cdn.discordapp.com/emojis/${optionData.emoji}.webp?size=1024` : null);
+            .setThumbnail((optionData.emoji && /^\d+$/.test(optionData.emoji)) ? `https://cdn.discordapp.com/emojis/${optionData.emoji}.webp?size=1024` : null);
 
         const reasonEmbed = new EmbedBuilder()
             .setTitle('Reason')
@@ -370,7 +370,7 @@ async function handleModalSubmit(interaction, client) {
         await interaction.editReply({ content: '', embeds: [successEmbed] });
     } catch (error) {
         console.error('[TICKET CREATE ERROR]', error);
-        await interaction.editReply('Failed to create ticket. Please check my permissions. I must have `Manage Channels`, `Manage Roles`, and `Create Private Threads` to function properly.');
+        await interaction.editReply(`Failed to create ticket: \`${error.message}\`. Please check my permissions in this channel (I must have \`Manage Channels\`, \`Manage Roles\`, \`Embed Links\`, and \`Create Private Threads\`).`);
     }
 }
 
