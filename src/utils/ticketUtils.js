@@ -17,7 +17,8 @@ const {
     buildRoleMention,
     buildTicketPanelPayload,
     getCategoryConfig,
-    normalizeTicketOptions
+    normalizeTicketOptions,
+    resolveRoleIdsForCategory
 } = require('./panelBuilder');
 
 function renderTicketOpeningMessage(template, guildName, targetUserId, staffPing) {
@@ -243,14 +244,46 @@ async function handleModalSubmit(interaction, client) {
     const threadName = `${prefix}-${interaction.user.username}`;
 
     try {
-        const thread = await interaction.channel.threads.create({
-            name: threadName,
-            autoArchiveDuration: 1440,
-            type: ChannelType.PrivateThread,
-            reason: 'Ticket thread'
-        });
+        let thread;
+        try {
+            thread = await interaction.channel.threads.create({
+                name: threadName,
+                autoArchiveDuration: 1440,
+                type: ChannelType.PrivateThread,
+                reason: 'Ticket thread'
+            });
+            await thread.members.add(interaction.user.id);
+        } catch (threadError) {
+            console.error('[TICKET THREAD ERROR] Thread creation failed, falling back to text channel...', threadError.message);
+            
+            const staffRoleIds = resolveRoleIdsForCategory(guildConfig, typeValue);
+            const staffOverwrites = staffRoleIds.map(roleId => ({
+                id: roleId,
+                allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory]
+            }));
 
-        await thread.members.add(interaction.user.id);
+            thread = await interaction.guild.channels.create({
+                name: threadName,
+                type: ChannelType.GuildText,
+                parent: interaction.channel.parentId,
+                permissionOverwrites: [
+                    {
+                        id: interaction.guild.id,
+                        deny: [PermissionFlagsBits.ViewChannel]
+                    },
+                    {
+                        id: client.user.id,
+                        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageMessages, PermissionFlagsBits.ReadMessageHistory]
+                    },
+                    {
+                        id: interaction.user.id,
+                        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory]
+                    },
+                    ...staffOverwrites
+                ],
+                reason: 'Ticket fallback channel'
+            });
+        }
 
         const ticketId = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
         const staffPing = buildRoleMention(guildConfig, typeValue);
@@ -337,7 +370,7 @@ async function handleModalSubmit(interaction, client) {
         await interaction.editReply({ content: '', embeds: [successEmbed] });
     } catch (error) {
         console.error('[TICKET CREATE ERROR]', error);
-        await interaction.editReply('Failed to create ticket thread. Please check permissions and ensure the server has Private Threads enabled.');
+        await interaction.editReply('Failed to create ticket. Please check my permissions. I need `Manage Channels` and `Create Private Threads` to function properly.');
     }
 }
 
