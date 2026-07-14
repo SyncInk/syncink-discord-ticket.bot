@@ -571,12 +571,17 @@ async function handleButton(interaction, client) {
                 ? { id: opt.emoji.match(/\d+/)[0] }
                 : (opt.emoji ? { name: opt.emoji } : undefined);
             
-            return {
+            const optionData = {
                 label: (opt.label || 'Unknown Role').substring(0, 100),
-                description: (opt.description || '').substring(0, 100),
                 value: opt.value,
                 emoji: emojiObj
             };
+
+            if (opt.description && opt.description.trim() !== '') {
+                optionData.description = opt.description.substring(0, 100);
+            }
+
+            return optionData;
         });
 
         if (options.length === 0) {
