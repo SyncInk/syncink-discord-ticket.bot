@@ -29,7 +29,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-function SortableTransferItem({ option, canEditSettings, snapshot, updateOption, toggleRole, removeOption, getLockTooltip }) {
+function SortableTransferItem({ option, canEditSettings, snapshot, updateOption, toggleRole, removeOption, getLockTooltip, openConfirm }) {
   const {
     attributes,
     listeners,
@@ -75,8 +75,15 @@ function SortableTransferItem({ option, canEditSettings, snapshot, updateOption,
             <button 
               type="button" 
               className="action-button" 
-              onClick={() => removeOption(option.value)}
-              style={{ padding: '8px', color: 'var(--error)', borderColor: 'var(--border)' }}
+              onClick={() => {
+                openConfirm({
+                  title: 'Delete Transfer Option',
+                  message: `Are you sure you want to delete the "${option.label || 'Unknown'}" transfer option? This cannot be undone.`,
+                  confirmText: 'Delete Option',
+                  danger: true
+                }, () => removeOption(option.value));
+              }}
+              style={{ padding: '8px', color: 'var(--error)', borderColor: 'var(--border)', height: 'fit-content', minHeight: 'unset' }}
               title="Remove Transfer Option"
             >
               <Trash2 size={16} />
@@ -108,7 +115,7 @@ function SortableTransferItem({ option, canEditSettings, snapshot, updateOption,
 }
 
 export default function TransferOptions() {
-  const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
+  const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction, openConfirm } = useOutletContext();
   const { canEditSettings, getLockTooltip } = usePermissions();
   const [options, setOptions] = useState(snapshot.settings.transferOptions || []);
 
@@ -228,6 +235,7 @@ export default function TransferOptions() {
                 toggleRole={toggleRole}
                 removeOption={removeOption}
                 getLockTooltip={getLockTooltip}
+                openConfirm={openConfirm}
               />
             ))}
           </SortableContext>

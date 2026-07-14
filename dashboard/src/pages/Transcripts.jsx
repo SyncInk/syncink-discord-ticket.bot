@@ -11,12 +11,30 @@ import {
 import { formatDateTime } from '../format';
 
 export default function Transcripts() {
-  const { busy, saveSettings, snapshot } = useOutletContext();
+  const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
   const [transcriptChannelId, setTranscriptChannelId] = useState(snapshot.settings.transcriptChannelId || '');
 
   useEffect(() => {
     setTranscriptChannelId(snapshot.settings.transcriptChannelId || '');
   }, [snapshot]);
+
+  useEffect(() => {
+    const isDirty = transcriptChannelId !== (snapshot.settings.transcriptChannelId || '');
+    setUnsavedChanges(isDirty);
+    
+    if (isDirty) {
+      setSaveAction(() => async () => {
+        await saveSettings({ transcriptChannelId }, 'Transcript destination saved');
+      });
+    } else {
+      setSaveAction(null);
+    }
+    
+    return () => {
+      setUnsavedChanges(false);
+      setSaveAction(null);
+    };
+  }, [transcriptChannelId, snapshot.settings.transcriptChannelId, setUnsavedChanges, setSaveAction]);
 
   const transcriptRows = snapshot.tickets
     .filter((ticket) => ticket.status === 'closed')

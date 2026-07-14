@@ -12,12 +12,30 @@ import {
 import { formatDateTime, statusTone } from '../format';
 
 export default function TicketLogs() {
-  const { busy, saveSettings, snapshot } = useOutletContext();
+  const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
   const [logChannelId, setLogChannelId] = useState(snapshot.settings.logChannelId || '');
 
   useEffect(() => {
     setLogChannelId(snapshot.settings.logChannelId || '');
   }, [snapshot]);
+
+  useEffect(() => {
+    const isDirty = logChannelId !== (snapshot.settings.logChannelId || '');
+    setUnsavedChanges(isDirty);
+    
+    if (isDirty) {
+      setSaveAction(() => async () => {
+        await saveSettings({ logChannelId }, 'Ticket log destination saved');
+      });
+    } else {
+      setSaveAction(null);
+    }
+    
+    return () => {
+      setUnsavedChanges(false);
+      setSaveAction(null);
+    };
+  }, [logChannelId, snapshot.settings.logChannelId, setUnsavedChanges, setSaveAction]);
 
   const rows = snapshot.tickets.map((ticket) => ({
     key: ticket.ticketId,

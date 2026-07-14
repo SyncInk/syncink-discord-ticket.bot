@@ -29,7 +29,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-function SortableCategoryItem({ category, canEditSettings, snapshot, updateCategory, toggleRole, removeCategory, getLockTooltip }) {
+function SortableCategoryItem({ category, canEditSettings, snapshot, updateCategory, toggleRole, removeCategory, getLockTooltip, openConfirm }) {
   const {
     attributes,
     listeners,
@@ -75,8 +75,15 @@ function SortableCategoryItem({ category, canEditSettings, snapshot, updateCateg
             <button 
               type="button" 
               className="action-button" 
-              onClick={() => removeCategory(category.value)}
-              style={{ padding: '8px', color: 'var(--error)', borderColor: 'var(--border)' }}
+              onClick={() => {
+                openConfirm({
+                  title: 'Delete Category',
+                  message: `Are you sure you want to delete the "${category.label || 'Unknown'}" category? This cannot be undone.`,
+                  confirmText: 'Delete Category',
+                  danger: true
+                }, () => removeCategory(category.value));
+              }}
+              style={{ padding: '8px', color: 'var(--error)', borderColor: 'var(--border)', height: 'fit-content', minHeight: 'unset' }}
               title="Remove Category"
             >
               <Trash2 size={16} />
@@ -112,7 +119,7 @@ function SortableCategoryItem({ category, canEditSettings, snapshot, updateCateg
 }
 
 export default function TicketCategories() {
-  const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
+  const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction, openConfirm } = useOutletContext();
   const { canEditSettings, getLockTooltip } = usePermissions();
   const [categories, setCategories] = useState(snapshot.settings.categoryOverrides);
 
@@ -233,6 +240,7 @@ export default function TicketCategories() {
                 toggleRole={toggleRole}
                 removeCategory={removeCategory}
                 getLockTooltip={getLockTooltip}
+                openConfirm={openConfirm}
               />
             ))}
           </SortableContext>

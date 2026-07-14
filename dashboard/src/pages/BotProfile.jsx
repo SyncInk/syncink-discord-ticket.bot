@@ -7,7 +7,7 @@ import usePermissions from '../hooks/usePermissions';
 import LockedOverlay from '../components/LockedOverlay';
 
 export default function BotProfile() {
-  const { snapshot, selectedGuild, refreshSnapshot } = useOutletContext();
+  const { snapshot, selectedGuild, refreshSnapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
   const { isDeveloper, getLockTooltip } = usePermissions();
   const [nickname, setNickname] = useState(snapshot.bot?.nickname || '');
   const [busy, setBusy] = useState(false);
@@ -24,10 +24,29 @@ export default function BotProfile() {
       await refreshSnapshot(true);
     } catch (error) {
       console.error('Failed to change nickname:', error);
+      throw error;
     } finally {
       setBusy(false);
     }
   };
+
+  useEffect(() => {
+    const isDirty = nickname !== (snapshot.bot?.nickname || '');
+    setUnsavedChanges(isDirty);
+    
+    if (isDirty) {
+      setSaveAction(() => handleSaveNickname);
+    } else {
+      setSaveAction(null);
+    }
+    
+    return () => {
+      setUnsavedChanges(false);
+      setSaveAction(null);
+    };
+  }, [nickname, snapshot.bot?.nickname, setUnsavedChanges, setSaveAction]);
+
+
 
   return (
     <div className="page-stack">

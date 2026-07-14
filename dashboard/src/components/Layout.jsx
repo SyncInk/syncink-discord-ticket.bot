@@ -109,7 +109,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
   const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [saveAction, setSaveAction] = useState(null);
-  const [pendingNavigation, setPendingNavigation] = useState(null);
+  const [pendingAction, setPendingAction] = useState(null);
   const refreshTimer = useRef(null);
   const socketRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -128,7 +128,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
 
   const handleNavigate = (path) => {
     if (unsavedChanges) {
-      setPendingNavigation(path);
+      setPendingAction(() => () => navigate(path));
     } else {
       navigate(path);
     }
@@ -269,9 +269,17 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
   };
 
   const handleServerSwitch = (guild) => {
-    onSelectGuild(guild.id);
-    setServerDropdownOpen(false);
-    setServerSearch('');
+    if (unsavedChanges) {
+      setPendingAction(() => () => {
+        onSelectGuild(guild.id);
+        setServerDropdownOpen(false);
+        setServerSearch('');
+      });
+    } else {
+      onSelectGuild(guild.id);
+      setServerDropdownOpen(false);
+      setServerSearch('');
+    }
   };
 
   const filteredGuilds = guilds.filter((guild) =>
@@ -530,7 +538,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
       />
 
       {/* Unsaved Changes Premium Modal */}
-      {pendingNavigation && (
+      {pendingAction && (
         <div className="unsaved-modal-overlay">
           <div className="unsaved-modal-content glass-effect slide-up">
             <div className="unsaved-modal-header">
@@ -545,7 +553,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
             <div className="unsaved-modal-actions">
               <button 
                 className="unsaved-btn cancel-btn" 
-                onClick={() => setPendingNavigation(null)}
+                onClick={() => setPendingAction(null)}
                 disabled={busy}
               >
                 Cancel
@@ -556,8 +564,8 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                   onClick={() => {
                     setUnsavedChanges(false);
                     setSaveAction(null);
-                    navigate(pendingNavigation);
-                    setPendingNavigation(null);
+                    pendingAction();
+                    setPendingAction(null);
                   }}
                   disabled={busy}
                 >
@@ -577,8 +585,8 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                     }
                     setUnsavedChanges(false);
                     setSaveAction(null);
-                    navigate(pendingNavigation);
-                    setPendingNavigation(null);
+                    pendingAction();
+                    setPendingAction(null);
                   }}
                 >
                   <Save size={16} /> Save & Continue
