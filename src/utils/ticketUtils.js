@@ -340,19 +340,19 @@ async function handleModalSubmit(interaction, client) {
 
         const closeBtn = new ButtonBuilder()
             .setCustomId('ticket_btn_close')
-            .setLabel('Close')
-            .setStyle(ButtonStyle.Danger)
-            .setEmoji('🔒');
+                .setLabel('Close')
+                .setStyle(ButtonStyle.Danger)
+                .setEmoji('🔒');
         const transferBtn = new ButtonBuilder()
             .setCustomId('ticket_btn_transfer')
-            .setLabel('Transfer')
-            .setStyle(ButtonStyle.Secondary)
-            .setEmoji('🔄');
+                .setLabel('Transfer')
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji('🔄');
         const claimBtn = new ButtonBuilder()
             .setCustomId('ticket_btn_claim')
-            .setLabel('Claim')
-            .setStyle(ButtonStyle.Success)
-            .setEmoji('🙋');
+                .setLabel('Claim')
+                .setStyle(ButtonStyle.Success)
+                .setEmoji('🙋');
 
         const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
 
