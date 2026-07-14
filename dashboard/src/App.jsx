@@ -7,6 +7,7 @@ import ServerSelect from './pages/ServerSelect';
 import Overview from './pages/Overview';
 import TicketPanels from './pages/TicketPanels';
 import TicketCategories from './pages/TicketCategories';
+import TransferOptions from './pages/TransferOptions';
 import TicketLogs from './pages/TicketLogs';
 import Transcripts from './pages/Transcripts';
 import Analytics from './pages/Analytics';
@@ -106,6 +107,7 @@ export default function App() {
         <Route index element={<Overview />} />
         <Route path="panels" element={<TicketPanels />} />
         <Route path="categories" element={<TicketCategories />} />
+        <Route path="transfer-options" element={<TransferOptions />} />
         <Route path="ticket-logs" element={<TicketLogs />} />
         <Route path="transcripts" element={<Transcripts />} />
         <Route path="analytics" element={<Analytics />} />

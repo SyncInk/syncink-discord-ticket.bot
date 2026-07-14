@@ -777,7 +777,8 @@ async function initDashboard(client) {
                 'panelConfig',
                 'defaultTicketMessages',
                 'dashboardPreferences',
-                'categoryOverrides'
+                'categoryOverrides',
+                'transferOptions'
             ];
 
             // Only owners and developers can modify role mappings

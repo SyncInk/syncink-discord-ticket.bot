@@ -4,6 +4,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import {
   Activity,
+  ArrowRightLeft,
   BookOpen,
   Bot,
   BrushCleaning,
@@ -52,6 +53,7 @@ const ALL_NAV_ITEMS = [
   { path: '/', label: 'Dashboard Overview', icon: LayoutDashboard, minTier: 'member' },
   { path: '/panels', label: 'Ticket Panels', icon: PanelsTopLeft, minTier: 'moderator' },
   { path: '/categories', label: 'Ticket Categories', icon: MessageSquareMore, minTier: 'moderator' },
+  { path: '/transfer-options', label: 'Transfer Options', icon: ArrowRightLeft, minTier: 'moderator' },
   { path: '/ticket-logs', label: 'Ticket Logs', icon: ClipboardList, minTier: 'staff' },
   { path: '/transcripts', label: 'Transcripts', icon: FileText, minTier: 'moderator' },
   { path: '/analytics', label: 'Analytics', icon: ChartColumnBig, minTier: 'moderator' },

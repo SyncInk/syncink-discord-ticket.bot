@@ -50,7 +50,13 @@ function buildDefaultGuildSettings(guildId) {
             emoji: option.emoji,
             roleIds: [],
             roleGroup: defaultRoleGroupForCategory(option.value)
-        }))
+        })),
+        transferOptions: [
+            { label: 'Staff', value: 'staffRoleIds', emoji: '1513352362121625661', roleIds: [] },
+            { label: 'Admins', value: 'adminRoleIds', emoji: '1513805305492799508', roleIds: [] },
+            { label: 'Developers', value: 'developerRoleIds', emoji: '754668951232839772', roleIds: [] },
+            { label: 'Owner', value: 'ownerRoleIds', emoji: '1513803214674464788', roleIds: [] }
+        ]
     };
 }
 
@@ -91,7 +97,10 @@ function normalizeGuildConfig(doc) {
             roleIds: Array.isArray(option.roleIds) ? option.roleIds : [],
             roleGroup: option.roleGroup || defaultRoleGroupForCategory(option.value)
         })),
-        ticketOptions
+        ticketOptions,
+        transferOptions: Array.isArray(plain.transferOptions) && plain.transferOptions.length > 0
+            ? plain.transferOptions
+            : defaults.transferOptions
     };
 }
 
@@ -345,6 +354,12 @@ function getGuildSettingsModel() {
             emoji: String,
             roleIds: { type: [String], default: [] },
             roleGroup: String
+        }],
+        transferOptions: [{
+            value: String,
+            label: String,
+            emoji: String,
+            roleIds: { type: [String], default: [] }
         }]
     });
 

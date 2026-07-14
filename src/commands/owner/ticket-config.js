@@ -59,6 +59,13 @@ module.exports = {
                 options.push({ name: `Category: ${cat.label}`, value: `category_${cat.value}` });
             });
 
+            const transferOptions = Array.isArray(guildConfig.transferOptions) ? guildConfig.transferOptions : [];
+            transferOptions.forEach(opt => {
+                if (opt.value && opt.label) {
+                    options.push({ name: `Transfer: ${opt.label}`, value: `transfer_${opt.value}` });
+                }
+            });
+
             const filtered = options.filter(opt => opt.name.toLowerCase().includes(focusedOption.value.toLowerCase())).slice(0, 25);
             await interaction.respond(filtered);
         }
@@ -98,13 +105,19 @@ module.exports = {
             const role = interaction.options.getRole('role');
             
             let isCategory = type.startsWith('category_');
+            let isTransfer = type.startsWith('transfer_');
             let targetCategoryValue = isCategory ? type.replace('category_', '') : null;
+            let targetTransferValue = isTransfer ? type.replace('transfer_', '') : null;
             let currentArray = [];
             
             if (isCategory) {
                 const categoryOverrides = Array.isArray(guildConfig.categoryOverrides) ? guildConfig.categoryOverrides : [];
                 const catOverride = categoryOverrides.find(c => c.value === targetCategoryValue);
                 currentArray = catOverride && Array.isArray(catOverride.roleIds) ? [...catOverride.roleIds] : [];
+            } else if (isTransfer) {
+                const transferOptions = Array.isArray(guildConfig.transferOptions) ? guildConfig.transferOptions : [];
+                const transOverride = transferOptions.find(t => t.value === targetTransferValue);
+                currentArray = transOverride && Array.isArray(transOverride.roleIds) ? [...transOverride.roleIds] : [];
             } else {
                 currentArray = Array.isArray(guildConfig[type]) ? [...guildConfig[type]] : [];
             }
@@ -140,6 +153,19 @@ module.exports = {
                     });
                 }
                 await db.updateGuildConfig(interaction.guild.id, { categoryOverrides });
+            } else if (isTransfer) {
+                const transferOptions = Array.isArray(guildConfig.transferOptions) ? [...guildConfig.transferOptions] : [];
+                const transIndex = transferOptions.findIndex(t => t.value === targetTransferValue);
+                if (transIndex > -1) {
+                    transferOptions[transIndex].roleIds = currentArray;
+                } else {
+                    transferOptions.push({
+                        value: targetTransferValue,
+                        label: targetTransferValue,
+                        roleIds: currentArray
+                    });
+                }
+                await db.updateGuildConfig(interaction.guild.id, { transferOptions });
             } else {
                 await db.updateGuildConfig(interaction.guild.id, { [type]: currentArray });
             }

@@ -60,7 +60,7 @@ async function handleSelectMenu(interaction, client) {
             await interaction.message.edit({ components: payload.components }).catch(() => {});
         }
     } else if (interaction.customId === 'ticket_transfer_select') {
-        const categoryValue = interaction.values[0];
+        const transferValue = interaction.values[0];
         const ticket = await db.getTicket(interaction.channel.id);
         if (!ticket) {
             return interaction.reply({ content: '<a:refused:1520914088568295564> Ticket not found.', ephemeral: true });
@@ -69,14 +69,36 @@ async function handleSelectMenu(interaction, client) {
         await interaction.update({ content: 'Transferring ticket...', components: [] });
 
         const guildConfig = await db.getGuildConfig(interaction.guild.id);
-        const targetCategoryConfig = getCategoryConfig(guildConfig, categoryValue);
-        if (!targetCategoryConfig) {
-            return interaction.followUp({ content: '<a:refused:1520914088568295564> Category not found.', ephemeral: true });
+        const transferOptions = Array.isArray(guildConfig.transferOptions) && guildConfig.transferOptions.length > 0
+            ? guildConfig.transferOptions
+            : [
+                { label: 'Staff', value: 'staffRoleIds', emoji: '1513352362121625661', roleIds: [] },
+                { label: 'Admins', value: 'adminRoleIds', emoji: '1513805305492799508', roleIds: [] },
+                { label: 'Developers', value: 'developerRoleIds', emoji: '754668951232839772', roleIds: [] },
+                { label: 'Owner', value: 'ownerRoleIds', emoji: '1513803214674464788', roleIds: [] }
+            ];
+
+        const targetOption = transferOptions.find(opt => opt.value === transferValue);
+        if (!targetOption) {
+            return interaction.followUp({ content: '<a:refused:1520914088568295564> Transfer option not found.', ephemeral: true });
         }
 
-        const targetRoleIds = resolveRoleIdsForCategory(guildConfig, categoryValue);
-        const ping = buildRoleMention(guildConfig, categoryValue);
-        const roleGroup = targetCategoryConfig.label || categoryValue;
+        let targetRoleIds = [];
+        if (targetOption.roleIds && targetOption.roleIds.length > 0) {
+            targetRoleIds = targetOption.roleIds;
+        } else {
+            const fallbackKey = targetOption.value;
+            targetRoleIds = Array.isArray(guildConfig[fallbackKey]) ? guildConfig[fallbackKey] : [];
+        }
+
+        const validRoleIds = targetRoleIds.filter(id => /^\d+$/.test(String(id)));
+        const ping = validRoleIds.length > 0
+            ? validRoleIds.map((roleId) => `<@&${roleId}>`).join(' ')
+            : targetOption.value === 'adminRoleIds' ? '@Admins' :
+                targetOption.value === 'developerRoleIds' ? '@Developers' :
+                    targetOption.value === 'ownerRoleIds' ? '@Owner' : '@Staff';
+
+        const roleGroup = targetOption.label || targetOption.value;
 
         let reason = 'Transferred ticket';
         let welcomeMsgId = null;
@@ -115,7 +137,7 @@ async function handleSelectMenu(interaction, client) {
                 .setTitle('Claimers')
                 .setDescription('• No one has claimed this ticket yet.')
                 .setColor(config.colors.primary)
-                .setThumbnail(targetCategoryConfig && targetCategoryConfig.emoji ? `https://cdn.discordapp.com/emojis/${targetCategoryConfig.emoji.match(/\d+/) ? targetCategoryConfig.emoji.match(/\d+/)[0] : ''}.webp?size=1024` : null);
+                .setThumbnail(targetOption && targetOption.emoji ? `https://cdn.discordapp.com/emojis/${targetOption.emoji.match(/\d+/) ? targetOption.emoji.match(/\d+/)[0] : ''}.webp?size=1024` : null);
 
             const reasonEmbed = new EmbedBuilder()
                 .setTitle('Reason')
@@ -158,7 +180,6 @@ async function handleSelectMenu(interaction, client) {
 
             await db.updateTicket(interaction.channel.id, {
                 channelId: newThread.id,
-                type: categoryValue,
                 lastActivityAt: Date.now(),
                 transferHistory
             });
@@ -536,13 +557,22 @@ async function handleButton(interaction, client) {
         }
 
         const guildConfig = await db.getGuildConfig(interaction.guild.id);
-        const options = normalizeTicketOptions(guildConfig).map(opt => {
+        const transferOptions = Array.isArray(guildConfig.transferOptions) && guildConfig.transferOptions.length > 0
+            ? guildConfig.transferOptions
+            : [
+                { label: 'Staff', value: 'staffRoleIds', emoji: '1513352362121625661' },
+                { label: 'Admins', value: 'adminRoleIds', emoji: '1513805305492799508' },
+                { label: 'Developers', value: 'developerRoleIds', emoji: '754668951232839772' },
+                { label: 'Owner', value: 'ownerRoleIds', emoji: '1513803214674464788' }
+            ];
+
+        const options = transferOptions.map(opt => {
             const emojiObj = opt.emoji && typeof opt.emoji === 'string' && opt.emoji.match(/\d+/)
                 ? { id: opt.emoji.match(/\d+/)[0] }
                 : (opt.emoji ? { name: opt.emoji } : undefined);
             
             return {
-                label: opt.label.substring(0, 100),
+                label: (opt.label || 'Unknown Role').substring(0, 100),
                 description: (opt.description || '').substring(0, 100),
                 value: opt.value,
                 emoji: emojiObj
@@ -550,18 +580,18 @@ async function handleButton(interaction, client) {
         });
 
         if (options.length === 0) {
-            return interaction.reply({ content: '<a:refused:1520914088568295564> No ticket categories available for transfer.', ephemeral: true });
+            return interaction.reply({ content: '<a:refused:1520914088568295564> No transfer roles available.', ephemeral: true });
         }
 
         const { StringSelectMenuBuilder } = require('discord.js');
         const selectMenu = new StringSelectMenuBuilder()
             .setCustomId('ticket_transfer_select')
-            .setPlaceholder('Select a category to transfer to')
+            .setPlaceholder('Select a role to transfer to')
             .addOptions(options.slice(0, 25));
 
         const row = new ActionRowBuilder().addComponents(selectMenu);
         await interaction.reply({
-            content: 'Which category would you like to transfer this ticket to?',
+            content: 'Who would you like to transfer this ticket to?',
             components: [row],
             ephemeral: true
         });
