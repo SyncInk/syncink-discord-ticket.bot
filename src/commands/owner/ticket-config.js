@@ -30,14 +30,9 @@ module.exports = {
             )
             .addStringOption((option) => option
                 .setName('type')
-                .setDescription('What level of access')
+                .setDescription('What level of access or custom category')
                 .setRequired(true)
-                .addChoices(
-                    { name: 'Staff', value: 'staffRoleIds' },
-                    { name: 'Admin', value: 'adminRoleIds' },
-                    { name: 'Owner', value: 'ownerRoleIds' },
-                    { name: 'Developer', value: 'developerRoleIds' }
-                )
+                .setAutocomplete(true)
             )
             .addRoleOption((option) => option
                 .setName('role')
@@ -45,6 +40,29 @@ module.exports = {
                 .setRequired(true)
             )
         ),
+
+    async autocomplete(interaction) {
+        const focusedOption = interaction.options.getFocused(true);
+        if (focusedOption.name === 'type') {
+            const guildConfig = await db.getGuildConfig(interaction.guild.id);
+            const { normalizeTicketOptions } = require('../../utils/panelBuilder');
+            
+            const options = [
+                { name: 'Global: Staff', value: 'staffRoleIds' },
+                { name: 'Global: Admin', value: 'adminRoleIds' },
+                { name: 'Global: Owner', value: 'ownerRoleIds' },
+                { name: 'Global: Developer', value: 'developerRoleIds' }
+            ];
+
+            const categories = normalizeTicketOptions(guildConfig);
+            categories.forEach(cat => {
+                options.push({ name: `Category: ${cat.label}`, value: `category_${cat.value}` });
+            });
+
+            const filtered = options.filter(opt => opt.name.toLowerCase().includes(focusedOption.value.toLowerCase())).slice(0, 25);
+            await interaction.respond(filtered);
+        }
+    },
 
     async execute(interaction) {
         const guildConfig = await db.getGuildConfig(interaction.guild.id);
@@ -78,12 +96,23 @@ module.exports = {
             const action = interaction.options.getString('action');
             const type = interaction.options.getString('type');
             const role = interaction.options.getRole('role');
-            const currentArray = Array.isArray(guildConfig[type]) ? [...guildConfig[type]] : [];
+            
+            let isCategory = type.startsWith('category_');
+            let targetCategoryValue = isCategory ? type.replace('category_', '') : null;
+            let currentArray = [];
+            
+            if (isCategory) {
+                const categoryOverrides = Array.isArray(guildConfig.categoryOverrides) ? guildConfig.categoryOverrides : [];
+                const catOverride = categoryOverrides.find(c => c.value === targetCategoryValue);
+                currentArray = catOverride && Array.isArray(catOverride.roleIds) ? [...catOverride.roleIds] : [];
+            } else {
+                currentArray = Array.isArray(guildConfig[type]) ? [...guildConfig[type]] : [];
+            }
 
             if (action === 'add') {
                 if (currentArray.includes(role.id)) {
                     return interaction.reply({
-                        content: `That role is already in the ${type} list.`,
+                        content: `<a:refused:1520914088568295564> That role is already in the list.`,
                         ephemeral: true
                     });
                 }
@@ -92,29 +121,44 @@ module.exports = {
                 const index = currentArray.indexOf(role.id);
                 if (index === -1) {
                     return interaction.reply({
-                        content: `That role is not in the ${type} list.`,
+                        content: `<a:refused:1520914088568295564> That role is not in the list.`,
                         ephemeral: true
                     });
                 }
                 currentArray.splice(index, 1);
             }
 
-            await db.updateGuildConfig(interaction.guild.id, { [type]: currentArray });
+            if (isCategory) {
+                const categoryOverrides = Array.isArray(guildConfig.categoryOverrides) ? [...guildConfig.categoryOverrides] : [];
+                const catIndex = categoryOverrides.findIndex(c => c.value === targetCategoryValue);
+                if (catIndex > -1) {
+                    categoryOverrides[catIndex].roleIds = currentArray;
+                } else {
+                    categoryOverrides.push({
+                        value: targetCategoryValue,
+                        roleIds: currentArray
+                    });
+                }
+                await db.updateGuildConfig(interaction.guild.id, { categoryOverrides });
+            } else {
+                await db.updateGuildConfig(interaction.guild.id, { [type]: currentArray });
+            }
+
             await db.createAuditLog({
                 guildId: interaction.guild.id,
                 actorId: interaction.user.id,
                 actorTag: interaction.user.tag,
                 source: 'discord',
-                action: 'Updated ticket role access',
+                action: `Updated ticket role access (${type})`,
                 changes: [{
                     field: type,
-                    before: guildConfig[type],
+                    before: 'previous',
                     after: currentArray
                 }]
             });
 
             return interaction.reply({
-                content: `Successfully ${action === 'add' ? 'added' : 'removed'} ${role.name} ${action === 'add' ? 'to' : 'from'} ${type}.`,
+                content: `<a:approved:1520913982678896670> Successfully ${action === 'add' ? 'added' : 'removed'} ${role.name}.`,
                 ephemeral: true
             });
         }

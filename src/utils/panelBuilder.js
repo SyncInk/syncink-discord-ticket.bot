@@ -67,8 +67,9 @@ function resolveRoleIdsForCategory(guildConfig, ticketType) {
 
 function buildRoleMention(guildConfig, ticketType) {
     const roleIds = resolveRoleIdsForCategory(guildConfig, ticketType);
-    if (roleIds.length > 0) {
-        return roleIds.map((roleId) => `<@&${roleId}>`).join(' ');
+    const validRoleIds = roleIds.filter(id => /^\d+$/.test(String(id)));
+    if (validRoleIds.length > 0) {
+        return validRoleIds.map((roleId) => `<@&${roleId}>`).join(' ');
     }
 
     const fallbackKey = defaultRoleGroupForCategory(ticketType);

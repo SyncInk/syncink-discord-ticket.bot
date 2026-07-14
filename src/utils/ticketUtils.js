@@ -60,7 +60,7 @@ async function handleSelectMenu(interaction, client) {
             await interaction.message.edit({ components: payload.components }).catch(() => {});
         }
     } else if (interaction.customId === 'ticket_transfer_select') {
-        const roleGroup = interaction.values[0];
+        const categoryValue = interaction.values[0];
         const ticket = await db.getTicket(interaction.channel.id);
         if (!ticket) {
             return interaction.reply({ content: '<a:refused:1520914088568295564> Ticket not found.', ephemeral: true });
@@ -69,18 +69,14 @@ async function handleSelectMenu(interaction, client) {
         await interaction.update({ content: 'Transferring ticket...', components: [] });
 
         const guildConfig = await db.getGuildConfig(interaction.guild.id);
-        const targetRoleIds = roleGroup === 'admin'
-            ? guildConfig.adminRoleIds
-            : roleGroup === 'dev'
-                ? guildConfig.developerRoleIds
-                : roleGroup === 'owner'
-                    ? guildConfig.ownerRoleIds
-                    : guildConfig.staffRoleIds;
-        const ping = targetRoleIds.length > 0
-            ? targetRoleIds.map((roleId) => `<@&${roleId}>`).join(' ')
-            : roleGroup === 'admin' ? '@Admins' :
-                roleGroup === 'dev' ? '@Developers' :
-                    roleGroup === 'owner' ? '@Owner' : '@Staff';
+        const targetCategoryConfig = getCategoryConfig(guildConfig, categoryValue);
+        if (!targetCategoryConfig) {
+            return interaction.followUp({ content: '<a:refused:1520914088568295564> Category not found.', ephemeral: true });
+        }
+
+        const targetRoleIds = resolveRoleIdsForCategory(guildConfig, categoryValue);
+        const ping = buildRoleMention(guildConfig, categoryValue);
+        const roleGroup = targetCategoryConfig.label || categoryValue;
 
         let reason = 'Transferred ticket';
         let welcomeMsgId = null;
@@ -115,12 +111,11 @@ async function handleSelectMenu(interaction, client) {
                 ping
             );
 
-            const ticketConfig = getCategoryConfig(guildConfig, ticket.type);
             const claimersEmbed = new EmbedBuilder()
                 .setTitle('Claimers')
                 .setDescription('• No one has claimed this ticket yet.')
                 .setColor(config.colors.primary)
-                .setThumbnail(ticketConfig && ticketConfig.emoji ? `https://cdn.discordapp.com/emojis/${ticketConfig.emoji}.webp?size=1024` : null);
+                .setThumbnail(targetCategoryConfig && targetCategoryConfig.emoji ? `https://cdn.discordapp.com/emojis/${targetCategoryConfig.emoji.match(/\d+/) ? targetCategoryConfig.emoji.match(/\d+/)[0] : ''}.webp?size=1024` : null);
 
             const reasonEmbed = new EmbedBuilder()
                 .setTitle('Reason')
@@ -163,6 +158,7 @@ async function handleSelectMenu(interaction, client) {
 
             await db.updateTicket(interaction.channel.id, {
                 channelId: newThread.id,
+                type: categoryValue,
                 lastActivityAt: Date.now(),
                 transferHistory
             });
@@ -539,20 +535,33 @@ async function handleButton(interaction, client) {
             return interaction.reply({ content: '<a:refused:1520914088568295564> Only staff can transfer tickets.', ephemeral: true });
         }
 
+        const guildConfig = await db.getGuildConfig(interaction.guild.id);
+        const options = normalizeTicketOptions(guildConfig).map(opt => {
+            const emojiObj = opt.emoji && typeof opt.emoji === 'string' && opt.emoji.match(/\d+/)
+                ? { id: opt.emoji.match(/\d+/)[0] }
+                : (opt.emoji ? { name: opt.emoji } : undefined);
+            
+            return {
+                label: opt.label.substring(0, 100),
+                description: (opt.description || '').substring(0, 100),
+                value: opt.value,
+                emoji: emojiObj
+            };
+        });
+
+        if (options.length === 0) {
+            return interaction.reply({ content: '<a:refused:1520914088568295564> No ticket categories available for transfer.', ephemeral: true });
+        }
+
         const { StringSelectMenuBuilder } = require('discord.js');
         const selectMenu = new StringSelectMenuBuilder()
             .setCustomId('ticket_transfer_select')
-            .setPlaceholder('Select a role to transfer to')
-            .addOptions([
-                { label: 'Staff', value: 'staff', emoji: '1513352362121625661' },
-                { label: 'Admins', value: 'admin', emoji: '1513805305492799508' },
-                { label: 'Developers', value: 'dev', emoji: '754668951232839772' },
-                { label: 'Owner', value: 'owner', emoji: '1513803214674464788' }
-            ]);
+            .setPlaceholder('Select a category to transfer to')
+            .addOptions(options.slice(0, 25));
 
         const row = new ActionRowBuilder().addComponents(selectMenu);
         await interaction.reply({
-            content: 'Who would you like to transfer this ticket to?',
+            content: 'Which category would you like to transfer this ticket to?',
             components: [row],
             ephemeral: true
         });
