@@ -77,7 +77,7 @@ function renderDiscordTokens(text, keyPrefix) {
 }
 
 export default function TicketPanels() {
-  const { busy, deployPanel, openConfirm, saveSettings, snapshot } = useOutletContext();
+  const { busy, deployPanel, openConfirm, saveSettings, snapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
   const { canEditSettings, getLockTooltip } = usePermissions();
   const [form, setForm] = useState(snapshot.settings.panelConfig);
   const [panelChannelId, setPanelChannelId] = useState(snapshot.settings.panelChannelId || '');
@@ -86,6 +86,33 @@ export default function TicketPanels() {
     setForm(snapshot.settings.panelConfig);
     setPanelChannelId(snapshot.settings.panelChannelId || '');
   }, [snapshot]);
+
+  useEffect(() => {
+    const isDirty = JSON.stringify(form) !== JSON.stringify(snapshot.settings.panelConfig) || 
+                    panelChannelId !== (snapshot.settings.panelChannelId || '');
+    setUnsavedChanges(isDirty);
+    
+    if (isDirty) {
+      setSaveAction(() => async () => {
+        // Save both settings that could be dirty
+        const payload = {};
+        if (JSON.stringify(form) !== JSON.stringify(snapshot.settings.panelConfig)) {
+            payload.panelConfig = form;
+        }
+        if (panelChannelId !== (snapshot.settings.panelChannelId || '')) {
+            payload.panelChannelId = panelChannelId;
+        }
+        await saveSettings(payload, 'Settings saved');
+      });
+    } else {
+      setSaveAction(null);
+    }
+    
+    return () => {
+      setUnsavedChanges(false);
+      setSaveAction(null);
+    };
+  }, [form, panelChannelId, snapshot.settings.panelConfig, snapshot.settings.panelChannelId, setUnsavedChanges, setSaveAction]);
 
   const updateField = (key, value) => {
     setForm((current) => ({ ...current, [key]: value }));

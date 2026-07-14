@@ -1,4 +1,4 @@
-import React, { startTransition, useEffect, useEffectEvent, useRef, useState } from 'react';
+import React, { startTransition, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
@@ -28,7 +28,10 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   User,
-  X
+  X,
+  AlertTriangle,
+  Save,
+  Trash2
 } from 'lucide-react';
 import {
   ActionButton,
@@ -104,9 +107,32 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
   const [serverDropdownOpen, setServerDropdownOpen] = useState(false);
   const [serverSearch, setServerSearch] = useState('');
   const [showAnnouncement, setShowAnnouncement] = useState(true);
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [saveAction, setSaveAction] = useState(null);
+  const [pendingNavigation, setPendingNavigation] = useState(null);
   const refreshTimer = useRef(null);
   const socketRef = useRef(null);
   const dropdownRef = useRef(null);
+
+  // Warn on browser close/refresh
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (unsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [unsavedChanges]);
+
+  const handleNavigate = (path) => {
+    if (unsavedChanges) {
+      setPendingNavigation(path);
+    } else {
+      navigate(path);
+    }
+  };
 
   const dismissToast = (id) => {
     setToasts((current) => current.filter((toast) => toast.id !== id));
@@ -383,7 +409,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                     key={item.path}
                     type="button"
                     className={`nav-item ${active ? 'active' : ''}`}
-                    onClick={() => navigate(item.path)}
+                    onClick={() => handleNavigate(item.path)}
                   >
                     <Icon size={18} />
                     <span>{item.label}</span>
@@ -402,7 +428,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                   key={item.path}
                   type="button"
                   className="nav-item"
-                  onClick={() => navigate(item.path)}
+                  onClick={() => handleNavigate(item.path)}
                 >
                   <Icon size={18} />
                   <span>{item.label}</span>
@@ -421,15 +447,15 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
         <header className="topbar">
           <div className="topbar-nav">
             <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">Support</a>
-            <button type="button" onClick={() => navigate('/reviews')}>Reviews</button>
-            <button type="button" onClick={() => navigate('/invite')}>Invite Bot</button>
-            <button type="button" onClick={() => navigate('/guide')}>Guide</button>
-            <button type="button" onClick={() => navigate('/faq')}>FAQ</button>
+            <button type="button" onClick={() => handleNavigate('/reviews')}>Reviews</button>
+            <button type="button" onClick={() => handleNavigate('/invite')}>Invite Bot</button>
+            <button type="button" onClick={() => handleNavigate('/guide')}>Guide</button>
+            <button type="button" onClick={() => handleNavigate('/faq')}>FAQ</button>
             <div className="topbar-dropdown">
               <button type="button" className="topbar-dropdown-btn">Legal <ChevronDown size={14} style={{marginLeft: 4}} /></button>
               <div className="topbar-dropdown-menu">
-                <button type="button" onClick={() => navigate('/privacy')}><Shield size={16} /> Privacy Policy</button>
-                <button type="button" onClick={() => navigate('/terms')}><FileText size={16} /> Terms of Service</button>
+                <button type="button" onClick={() => handleNavigate('/privacy')}><Shield size={16} /> Privacy Policy</button>
+                <button type="button" onClick={() => handleNavigate('/terms')}><FileText size={16} /> Terms of Service</button>
               </div>
             </div>
             <strong className="topbar-active">Dashboard</strong>
@@ -471,7 +497,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
             <div className="layout-error" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '16px', color: 'var(--text)' }}>
               <h2>Failed to load server data</h2>
               <p style={{ color: 'var(--text-muted)' }}>We could not retrieve the configuration for this server. You may not have the required access, or the bot might be offline.</p>
-              <button className="action-button tone-primary" onClick={() => navigate('/servers')}>Return to Server List</button>
+              <button className="action-button tone-primary" onClick={() => handleNavigate('/servers')}>Return to Server List</button>
             </div>
           ) : (
             <Outlet
@@ -486,7 +512,9 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                 saveSettings,
                 selectedGuild,
                 snapshot,
-                user
+                user,
+                setUnsavedChanges,
+                setSaveAction
               }}
             />
           )}
@@ -500,6 +528,66 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
         onCancel={() => !confirmBusy && setConfirmState(null)}
         onConfirm={handleConfirm}
       />
+
+      {/* Unsaved Changes Premium Modal */}
+      {pendingNavigation && (
+        <div className="unsaved-modal-overlay">
+          <div className="unsaved-modal-content glass-effect slide-up">
+            <div className="unsaved-modal-header">
+              <div className="unsaved-modal-icon-bg">
+                <AlertTriangle size={28} className="unsaved-modal-icon" />
+              </div>
+              <div className="unsaved-modal-title">
+                <h2>Unsaved Changes</h2>
+                <p>You have modified settings on this page. Would you like to save your changes before leaving?</p>
+              </div>
+            </div>
+            <div className="unsaved-modal-actions">
+              <button 
+                className="unsaved-btn cancel-btn" 
+                onClick={() => setPendingNavigation(null)}
+                disabled={busy}
+              >
+                Cancel
+              </button>
+              <div className="unsaved-btn-group">
+                <button 
+                  className="unsaved-btn discard-btn" 
+                  onClick={() => {
+                    setUnsavedChanges(false);
+                    setSaveAction(null);
+                    navigate(pendingNavigation);
+                    setPendingNavigation(null);
+                  }}
+                  disabled={busy}
+                >
+                  <Trash2 size={16} /> Discard Changes
+                </button>
+                <ActionButton 
+                  tone="primary" 
+                  busy={busy}
+                  className="unsaved-btn save-btn"
+                  onClick={async () => {
+                    if (saveAction) {
+                      try {
+                        await saveAction();
+                      } catch (e) {
+                        return; // Save failed, stay on page
+                      }
+                    }
+                    setUnsavedChanges(false);
+                    setSaveAction(null);
+                    navigate(pendingNavigation);
+                    setPendingNavigation(null);
+                  }}
+                >
+                  <Save size={16} /> Save & Continue
+                </ActionButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

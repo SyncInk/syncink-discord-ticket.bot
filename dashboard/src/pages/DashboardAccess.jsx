@@ -14,7 +14,7 @@ const TIERS = [
 ];
 
 export default function DashboardAccess() {
-  const { busy, saveSettings, snapshot } = useOutletContext();
+  const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
   const { canEditAccess, getLockTooltip } = usePermissions();
   const [roleMap, setRoleMap] = useState([]);
   const [selectedNewRole, setSelectedNewRole] = useState('');
@@ -45,6 +45,38 @@ export default function DashboardAccess() {
 
     setRoleMap(nextRoleMap);
   }, [snapshot]);
+
+  useEffect(() => {
+    const payload = {
+      ownerRoleIds: roleMap.filter((role) => role.tier === 'owner').map((role) => role.id),
+      developerRoleIds: roleMap.filter((role) => role.tier === 'developer').map((role) => role.id),
+      adminRoleIds: roleMap.filter((role) => role.tier === 'admin').map((role) => role.id),
+      moderatorRoleIds: roleMap.filter((role) => role.tier === 'moderator').map((role) => role.id),
+      staffRoleIds: roleMap.filter((role) => role.tier === 'staff').map((role) => role.id)
+    };
+
+    const isDirty = 
+      JSON.stringify(payload.ownerRoleIds) !== JSON.stringify(snapshot.settings.ownerRoleIds || []) ||
+      JSON.stringify(payload.developerRoleIds) !== JSON.stringify(snapshot.settings.developerRoleIds || []) ||
+      JSON.stringify(payload.adminRoleIds) !== JSON.stringify(snapshot.settings.adminRoleIds || []) ||
+      JSON.stringify(payload.moderatorRoleIds) !== JSON.stringify(snapshot.settings.moderatorRoleIds || []) ||
+      JSON.stringify(payload.staffRoleIds) !== JSON.stringify(snapshot.settings.staffRoleIds || []);
+
+    setUnsavedChanges(isDirty);
+    
+    if (isDirty) {
+      setSaveAction(() => async () => {
+        await saveSettings(payload, 'Access tiers saved');
+      });
+    } else {
+      setSaveAction(null);
+    }
+    
+    return () => {
+      setUnsavedChanges(false);
+      setSaveAction(null);
+    };
+  }, [roleMap, snapshot.settings, setUnsavedChanges, setSaveAction]);
 
   const handleUpdateRole = (roleId, newTier) => {
     if (!canEditAccess) return;

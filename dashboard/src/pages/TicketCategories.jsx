@@ -112,13 +112,31 @@ function SortableCategoryItem({ category, canEditSettings, snapshot, updateCateg
 }
 
 export default function TicketCategories() {
-  const { busy, saveSettings, snapshot } = useOutletContext();
+  const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
   const { canEditSettings, getLockTooltip } = usePermissions();
   const [categories, setCategories] = useState(snapshot.settings.categoryOverrides);
 
   useEffect(() => {
     setCategories(snapshot.settings.categoryOverrides);
   }, [snapshot]);
+
+  useEffect(() => {
+    const isDirty = JSON.stringify(categories) !== JSON.stringify(snapshot.settings.categoryOverrides);
+    setUnsavedChanges(isDirty);
+    
+    if (isDirty) {
+      setSaveAction(() => async () => {
+        await saveSettings({ categoryOverrides: categories }, 'Categories saved');
+      });
+    } else {
+      setSaveAction(null);
+    }
+    
+    return () => {
+      setUnsavedChanges(false);
+      setSaveAction(null);
+    };
+  }, [categories, snapshot.settings.categoryOverrides, setUnsavedChanges, setSaveAction]);
 
   const updateCategory = (value, key, nextValue) => {
     setCategories((current) => current.map((category) => (

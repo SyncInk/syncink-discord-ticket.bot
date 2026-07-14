@@ -108,13 +108,31 @@ function SortableTransferItem({ option, canEditSettings, snapshot, updateOption,
 }
 
 export default function TransferOptions() {
-  const { busy, saveSettings, snapshot } = useOutletContext();
+  const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
   const { canEditSettings, getLockTooltip } = usePermissions();
   const [options, setOptions] = useState(snapshot.settings.transferOptions || []);
 
   useEffect(() => {
     setOptions(snapshot.settings.transferOptions || []);
   }, [snapshot]);
+
+  useEffect(() => {
+    const isDirty = JSON.stringify(options) !== JSON.stringify(snapshot.settings.transferOptions || []);
+    setUnsavedChanges(isDirty);
+    
+    if (isDirty) {
+      setSaveAction(() => async () => {
+        await saveSettings({ transferOptions: options }, 'Transfer options saved');
+      });
+    } else {
+      setSaveAction(null);
+    }
+    
+    return () => {
+      setUnsavedChanges(false);
+      setSaveAction(null);
+    };
+  }, [options, snapshot.settings.transferOptions, setUnsavedChanges, setSaveAction]);
 
   const updateOption = (value, key, nextValue) => {
     setOptions((current) => current.map((opt) => (

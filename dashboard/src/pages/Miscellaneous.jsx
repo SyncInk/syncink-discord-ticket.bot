@@ -13,7 +13,7 @@ import usePermissions from '../hooks/usePermissions';
 import LockedOverlay from '../components/LockedOverlay';
 
 export default function Miscellaneous() {
-  const { busy, saveSettings, snapshot } = useOutletContext();
+  const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
   const { canEditSettings, getLockTooltip } = usePermissions();
   const [minutes, setMinutes] = useState(snapshot.settings.inactivityReminderMinutes || 1440);
   const [messages, setMessages] = useState(snapshot.settings.defaultTicketMessages || { openingLine: '', inactivityReminderText: '' });
@@ -24,6 +24,32 @@ export default function Miscellaneous() {
     setMessages(snapshot.settings.defaultTicketMessages || { openingLine: '', inactivityReminderText: '' });
     setLogChannelId(snapshot.settings.logChannelId || '');
   }, [snapshot]);
+
+  useEffect(() => {
+    const isDirty = 
+      Number(minutes) !== (snapshot.settings.inactivityReminderMinutes || 1440) ||
+      JSON.stringify(messages) !== JSON.stringify(snapshot.settings.defaultTicketMessages || { openingLine: '', inactivityReminderText: '' }) ||
+      logChannelId !== (snapshot.settings.logChannelId || '');
+      
+    setUnsavedChanges(isDirty);
+    
+    if (isDirty) {
+      setSaveAction(() => async () => {
+        await saveSettings({
+          inactivityReminderMinutes: Number(minutes),
+          defaultTicketMessages: messages,
+          logChannelId: logChannelId || null
+        }, 'Miscellaneous settings saved');
+      });
+    } else {
+      setSaveAction(null);
+    }
+    
+    return () => {
+      setUnsavedChanges(false);
+      setSaveAction(null);
+    };
+  }, [minutes, messages, logChannelId, snapshot.settings, setUnsavedChanges, setSaveAction]);
 
   return (
     <div className="page-stack">

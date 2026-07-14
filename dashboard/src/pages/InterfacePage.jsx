@@ -12,7 +12,7 @@ import usePermissions from '../hooks/usePermissions';
 import LockedOverlay from '../components/LockedOverlay';
 
 export default function InterfacePage() {
-  const { busy, saveSettings, snapshot } = useOutletContext();
+  const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
   const { canEditSettings, getLockTooltip } = usePermissions();
   const defaultPrefs = { accentColor: '#9d7cff', density: 'comfortable', motion: 'full', glass: true, theme: 'dark', sidebarBehavior: 'auto', toastDuration: 'medium' };
   const [prefs, setPrefs] = useState(snapshot.settings?.dashboardPreferences || defaultPrefs);
@@ -20,6 +20,24 @@ export default function InterfacePage() {
   useEffect(() => {
     setPrefs(snapshot.settings?.dashboardPreferences || defaultPrefs);
   }, [snapshot]);
+
+  useEffect(() => {
+    const isDirty = JSON.stringify(prefs) !== JSON.stringify(snapshot.settings?.dashboardPreferences || defaultPrefs);
+    setUnsavedChanges(isDirty);
+    
+    if (isDirty) {
+      setSaveAction(() => async () => {
+        await saveSettings({ dashboardPreferences: prefs }, 'Interface preferences saved');
+      });
+    } else {
+      setSaveAction(null);
+    }
+    
+    return () => {
+      setUnsavedChanges(false);
+      setSaveAction(null);
+    };
+  }, [prefs, snapshot.settings?.dashboardPreferences, setUnsavedChanges, setSaveAction]);
 
   const updateField = (key, value) => {
     setPrefs((current) => ({ ...current, [key]: value }));
