@@ -8,6 +8,10 @@ module.exports = {
                 const command = client.commands.get(interaction.commandName);
                 if (!command) return;
                 await command.execute(interaction, client);
+            } else if (interaction.isAutocomplete()) {
+                const command = client.commands.get(interaction.commandName);
+                if (!command) return;
+                await command.autocomplete(interaction, client);
             } else if (interaction.isStringSelectMenu()) {
                 await handleSelectMenu(interaction, client);
             } else if (interaction.isModalSubmit()) {
