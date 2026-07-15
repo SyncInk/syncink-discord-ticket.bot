@@ -59,7 +59,7 @@ module.exports = {
                 options.push({ name: `Category: ${cat.label}`, value: `category_${cat.value}` });
             });
 
-            const transferOptions = Array.isArray(guildConfig.transferOptions) ? guildConfig.transferOptions : [];
+            const transferOptions = Array.isArray(guildConfig?.transferOptions) ? guildConfig.transferOptions : [];
             transferOptions.forEach(opt => {
                 if (opt.value && opt.label) {
                     options.push({ name: `Transfer: ${opt.label}`, value: `transfer_${opt.value}` });

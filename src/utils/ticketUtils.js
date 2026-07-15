@@ -148,17 +148,17 @@ async function handleSelectMenu(interaction, client) {
                 .setCustomId('ticket_btn_close')
                 .setLabel('Close')
                 .setStyle(ButtonStyle.Danger)
-                .setEmoji('🔒');
+                .setEmoji('1513900649249505433');
             const transferBtn = new ButtonBuilder()
                 .setCustomId('ticket_btn_transfer')
                 .setLabel('Transfer')
                 .setStyle(ButtonStyle.Secondary)
-                .setEmoji('🔄');
+                .setEmoji('1513904436785971211');
             const claimBtn = new ButtonBuilder()
                 .setCustomId('ticket_btn_claim')
                 .setLabel('Claim')
                 .setStyle(ButtonStyle.Success)
-                .setEmoji('🙋');
+                .setEmoji('1513902469028249680');
 
             const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
 
@@ -342,17 +342,17 @@ async function handleModalSubmit(interaction, client) {
             .setCustomId('ticket_btn_close')
                 .setLabel('Close')
                 .setStyle(ButtonStyle.Danger)
-                .setEmoji('🔒');
+                .setEmoji('1513900649249505433');
         const transferBtn = new ButtonBuilder()
             .setCustomId('ticket_btn_transfer')
                 .setLabel('Transfer')
                 .setStyle(ButtonStyle.Secondary)
-                .setEmoji('🔄');
+                .setEmoji('1513904436785971211');
         const claimBtn = new ButtonBuilder()
             .setCustomId('ticket_btn_claim')
                 .setLabel('Claim')
                 .setStyle(ButtonStyle.Success)
-                .setEmoji('🙋');
+                .setEmoji('1513902469028249680');
 
         const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
 
