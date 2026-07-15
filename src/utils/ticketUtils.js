@@ -148,17 +148,17 @@ async function handleSelectMenu(interaction, client) {
                 .setCustomId('ticket_btn_close')
                 .setLabel('Close')
                 .setStyle(ButtonStyle.Danger)
-                .setEmoji('1513900649249505433');
+                .setEmoji('🔒');
             const transferBtn = new ButtonBuilder()
                 .setCustomId('ticket_btn_transfer')
                 .setLabel('Transfer')
                 .setStyle(ButtonStyle.Secondary)
-                .setEmoji('1513904436785971211');
+                .setEmoji('🔄');
             const claimBtn = new ButtonBuilder()
                 .setCustomId('ticket_btn_claim')
                 .setLabel('Claim')
                 .setStyle(ButtonStyle.Success)
-                .setEmoji('1513902469028249680');
+                .setEmoji('🙋');
 
             const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
 
@@ -340,19 +340,19 @@ async function handleModalSubmit(interaction, client) {
 
         const closeBtn = new ButtonBuilder()
             .setCustomId('ticket_btn_close')
-                .setLabel('Close')
-                .setStyle(ButtonStyle.Danger)
-                .setEmoji('1513900649249505433');
+            .setLabel('Close')
+            .setStyle(ButtonStyle.Danger)
+            .setEmoji('🔒');
         const transferBtn = new ButtonBuilder()
             .setCustomId('ticket_btn_transfer')
-                .setLabel('Transfer')
-                .setStyle(ButtonStyle.Secondary)
-                .setEmoji('1513904436785971211');
+            .setLabel('Transfer')
+            .setStyle(ButtonStyle.Secondary)
+            .setEmoji('🔄');
         const claimBtn = new ButtonBuilder()
             .setCustomId('ticket_btn_claim')
-                .setLabel('Claim')
-                .setStyle(ButtonStyle.Success)
-                .setEmoji('1513902469028249680');
+            .setLabel('Claim')
+            .setStyle(ButtonStyle.Success)
+            .setEmoji('🙋');
 
         const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
 

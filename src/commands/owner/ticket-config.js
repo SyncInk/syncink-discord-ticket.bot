@@ -39,61 +39,25 @@ module.exports = {
                 .setDescription('The role to modify')
                 .setRequired(true)
             )
-        )
-        .addSubcommand((subcommand) => subcommand
-            .setName('transfer')
-            .setDescription('Add or remove a role from transfer options')
-            .addStringOption((option) => option
-                .setName('action')
-                .setDescription('Add or Remove')
-                .setRequired(true)
-                .addChoices(
-                    { name: 'Add', value: 'add' },
-                    { name: 'Remove', value: 'remove' }
-                )
-            )
-            .addStringOption((option) => option
-                .setName('type')
-                .setDescription('Which transfer option to modify')
-                .setRequired(true)
-                .setAutocomplete(true)
-            )
-            .addRoleOption((option) => option
-                .setName('role')
-                .setDescription('The role to modify')
-                .setRequired(true)
-            )
         ),
 
     async autocomplete(interaction) {
         const focusedOption = interaction.options.getFocused(true);
         if (focusedOption.name === 'type') {
-            const subcommand = interaction.options.getSubcommand();
             const guildConfig = await db.getGuildConfig(interaction.guild.id);
             const { normalizeTicketOptions } = require('../../utils/panelBuilder');
             
-            const options = [];
+            const options = [
+                { name: 'Global: Staff', value: 'staffRoleIds' },
+                { name: 'Global: Admin', value: 'adminRoleIds' },
+                { name: 'Global: Owner', value: 'ownerRoleIds' },
+                { name: 'Global: Developer', value: 'developerRoleIds' }
+            ];
 
-            if (subcommand === 'role') {
-                options.push(
-                    { name: 'Global: Staff', value: 'staffRoleIds' },
-                    { name: 'Global: Admin', value: 'adminRoleIds' },
-                    { name: 'Global: Owner', value: 'ownerRoleIds' },
-                    { name: 'Global: Developer', value: 'developerRoleIds' }
-                );
-
-                const categories = normalizeTicketOptions(guildConfig);
-                categories.forEach(cat => {
-                    options.push({ name: `Category: ${cat.label}`, value: `category_${cat.value}` });
-                });
-            } else if (subcommand === 'transfer') {
-                const transferOptions = Array.isArray(guildConfig?.transferOptions) ? guildConfig.transferOptions : [];
-                transferOptions.forEach(opt => {
-                    if (opt.value && opt.label) {
-                        options.push({ name: `Transfer: ${opt.label}`, value: `transfer_${opt.value}` });
-                    }
-                });
-            }
+            const categories = normalizeTicketOptions(guildConfig);
+            categories.forEach(cat => {
+                options.push({ name: `Category: ${cat.label}`, value: `category_${cat.value}` });
+            });
 
             const filtered = options.filter(opt => opt.name.toLowerCase().includes(focusedOption.value.toLowerCase())).slice(0, 25);
             await interaction.respond(filtered);
@@ -128,25 +92,19 @@ module.exports = {
             });
         }
 
-        if (subcommand === 'role' || subcommand === 'transfer') {
+        if (subcommand === 'role') {
             const action = interaction.options.getString('action');
             const type = interaction.options.getString('type');
             const role = interaction.options.getRole('role');
             
             let isCategory = type.startsWith('category_');
-            let isTransfer = type.startsWith('transfer_');
             let targetCategoryValue = isCategory ? type.replace('category_', '') : null;
-            let targetTransferValue = isTransfer ? type.replace('transfer_', '') : null;
             let currentArray = [];
             
             if (isCategory) {
                 const categoryOverrides = Array.isArray(guildConfig.categoryOverrides) ? guildConfig.categoryOverrides : [];
                 const catOverride = categoryOverrides.find(c => c.value === targetCategoryValue);
                 currentArray = catOverride && Array.isArray(catOverride.roleIds) ? [...catOverride.roleIds] : [];
-            } else if (isTransfer) {
-                const transferOptions = Array.isArray(guildConfig.transferOptions) ? guildConfig.transferOptions : [];
-                const transOverride = transferOptions.find(t => t.value === targetTransferValue);
-                currentArray = transOverride && Array.isArray(transOverride.roleIds) ? [...transOverride.roleIds] : [];
             } else {
                 currentArray = Array.isArray(guildConfig[type]) ? [...guildConfig[type]] : [];
             }
@@ -182,19 +140,6 @@ module.exports = {
                     });
                 }
                 await db.updateGuildConfig(interaction.guild.id, { categoryOverrides });
-            } else if (isTransfer) {
-                const transferOptions = Array.isArray(guildConfig.transferOptions) ? [...guildConfig.transferOptions] : [];
-                const transIndex = transferOptions.findIndex(t => t.value === targetTransferValue);
-                if (transIndex > -1) {
-                    transferOptions[transIndex].roleIds = currentArray;
-                } else {
-                    transferOptions.push({
-                        value: targetTransferValue,
-                        label: targetTransferValue,
-                        roleIds: currentArray
-                    });
-                }
-                await db.updateGuildConfig(interaction.guild.id, { transferOptions });
             } else {
                 await db.updateGuildConfig(interaction.guild.id, { [type]: currentArray });
             }
