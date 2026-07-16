@@ -486,7 +486,8 @@ async function handleButton(interaction, client) {
             config.colors.primary
         );
     } else if (customId === 'ticket_btn_close_cancel') {
-        return interaction.update({ content: '<a:approved:1520913982678896670> Ticket closure cancelled.', embeds: [], components: [] });
+        const cancelEmbed = new EmbedBuilder().setDescription('<a:approved:1520913982678896670> **| Ticket closure cancelled.**').setColor(config.colors.success);
+        return interaction.update({ content: '', embeds: [cancelEmbed], components: [] });
     } else if (customId === 'ticket_btn_close' || customId === 'ticket_btn_close_confirm') {
         if (!isStaff && user.id !== ticket.creatorId) {
             const errorEmbed = new EmbedBuilder().setDescription('<a:refused:1520914088568295564> **| You do not have permission to close this ticket.**').setColor('#ff5555');
