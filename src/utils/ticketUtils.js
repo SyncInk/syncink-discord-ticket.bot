@@ -158,7 +158,7 @@ async function handleSelectMenu(interaction, client) {
                 .setCustomId('ticket_btn_claim')
                 .setLabel('Claim')
                 .setStyle(ButtonStyle.Success)
-                .setEmoji('🙋');
+                .setEmoji('📝');
 
             const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
 
@@ -352,7 +352,7 @@ async function handleModalSubmit(interaction, client) {
             .setCustomId('ticket_btn_claim')
             .setLabel('Claim')
             .setStyle(ButtonStyle.Success)
-            .setEmoji('🙋');
+            .setEmoji('📝');
 
         const row = new ActionRowBuilder().addComponents(closeBtn, transferBtn, claimBtn);
 
