@@ -38,6 +38,14 @@ async function handleSelectMenu(interaction, client) {
             return interaction.reply({ content: '<a:refused:1520914088568295564> Invalid ticket type.', ephemeral: true });
         }
 
+        const existingTicket = await db.getUserOpenTicket(interaction.guild.id, interaction.user.id);
+        if (existingTicket) {
+            return interaction.reply({ 
+                content: `<a:refused:1520914088568295564> You already have an open ticket in <#${existingTicket.channelId}>! Please resolve it before opening a new one.`, 
+                ephemeral: true 
+            });
+        }
+
         const modal = new ModalBuilder()
             .setCustomId(`ticket_modal_${selectedValue}`)
             .setTitle('What is your issue?');
@@ -251,6 +259,11 @@ async function handleModalSubmit(interaction, client) {
 
     if (!optionData) {
         return interaction.editReply('<a:refused:1520914088568295564> This ticket category is no longer available.');
+    }
+
+    const existingTicket = await db.getUserOpenTicket(guild.id, interaction.user.id);
+    if (existingTicket) {
+        return interaction.editReply(`<a:refused:1520914088568295564> You already have an open ticket in <#${existingTicket.channelId}>! Please resolve it before opening a new one.`);
     }
 
     let prefix = 'ticket';

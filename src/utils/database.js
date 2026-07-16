@@ -152,6 +152,11 @@ async function getAllOpenTickets() {
     return await Ticket.find({ status: 'open' });
 }
 
+async function getUserOpenTicket(guildId, creatorId) {
+    const Ticket = getMongoModel();
+    return await Ticket.findOne({ guildId, creatorId, status: 'open' });
+}
+
 async function listTicketsByGuild(guildId, limit = 250) {
     const Ticket = getMongoModel();
     return await Ticket.find({ guildId }).sort({ createdAt: -1 }).limit(limit);
@@ -522,6 +527,7 @@ module.exports = {
     getMongoModel,
     getReviewModel,
     getTicket,
+    getUserOpenTicket,
     initDatabase,
     listActivityLogs,
     listAuditLogs,
