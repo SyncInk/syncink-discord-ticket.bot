@@ -484,7 +484,7 @@ async function handleButton(interaction, client) {
             config.colors.primary
         );
     } else if (customId === 'ticket_btn_close_cancel') {
-        return interaction.update({ content: '✅ Ticket closure cancelled.', embeds: [], components: [] });
+        return interaction.update({ content: '<a:approved:1520913982678896670> Ticket closure cancelled.', embeds: [], components: [] });
     } else if (customId === 'ticket_btn_close' || customId === 'ticket_btn_close_confirm') {
         if (!isStaff && user.id !== ticket.creatorId) {
             return interaction.reply({
@@ -495,7 +495,7 @@ async function handleButton(interaction, client) {
 
         if (customId === 'ticket_btn_close' && !isStaff && user.id === ticket.creatorId) {
             const confirmEmbed = new EmbedBuilder()
-                .setDescription('⚠️ **| Are you sure you want to close this ticket?**\n\nClosing a ticket prematurely or creating useless tickets to troll our staff team will result in a **severe punishment**.\n\nPlease confirm your decision below.')
+                .setDescription('<a:sync_alert:1513822294831534220> **| Are you sure you want to close this ticket?**\n\nClosing a ticket prematurely or creating useless tickets to troll our staff team will result in a **severe punishment**.\n\nPlease confirm your decision below.')
                 .setColor('#ffaa00');
 
             const confirmBtn = new ButtonBuilder()
