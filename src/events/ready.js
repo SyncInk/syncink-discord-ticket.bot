@@ -2,6 +2,7 @@ const { EmbedBuilder, REST, Routes } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const db = require('../utils/database');
+const { resolveRoleIdsForCategory } = require('../utils/panelBuilder');
 
 require('dotenv').config();
 
@@ -91,6 +92,14 @@ module.exports = {
                             const embed = new EmbedBuilder()
                                 .setDescription(reminderText)
                                 .setColor('#F1C40F');
+
+                            const roleIds = resolveRoleIdsForCategory(guildConfig, ticket.type || 'support');
+                            const pings = [`<@${ticket.creatorId}>`];
+                            if (roleIds && roleIds.length > 0) {
+                                pings.push(...roleIds.map(id => `<@&${id}>`));
+                            }
+                            const pingMsg = await channel.send({ content: pings.join(' ') });
+                            await pingMsg.delete().catch(() => {});
 
                             await channel.send({ embeds: [embed] });
 
