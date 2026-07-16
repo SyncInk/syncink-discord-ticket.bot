@@ -50,7 +50,7 @@ async function handleSelectMenu(interaction, client) {
         if (existingTicket) {
             await resetMenu();
             const errorEmbed = new EmbedBuilder()
-                .setDescription(`<a:refused:1520914088568295564> <#${existingTicket.channelId}> **| You already have an open ticket!** Please resolve it before opening a new one.`)
+                .setDescription(`**<a:refused:1520914088568295564> <#${existingTicket.channelId}> | You already have an open ticket! Please resolve it before opening a new one.**`)
                 .setColor('#ff5555');
             return interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
@@ -270,7 +270,7 @@ async function handleModalSubmit(interaction, client) {
     const existingTicket = await db.getUserOpenTicket(guild.id, interaction.user.id);
     if (existingTicket) {
         const errorEmbed = new EmbedBuilder()
-            .setDescription(`<a:refused:1520914088568295564> <#${existingTicket.channelId}> **| You already have an open ticket!** Please resolve it before opening a new one.`)
+            .setDescription(`**<a:refused:1520914088568295564> <#${existingTicket.channelId}> | You already have an open ticket! Please resolve it before opening a new one.**`)
             .setColor('#ff5555');
         return interaction.editReply({ content: '', embeds: [errorEmbed] });
     }
@@ -483,7 +483,9 @@ async function handleButton(interaction, client) {
             `Thread: <#${thread.id}>\nClaimed By: <@${user.id}>`,
             config.colors.primary
         );
-    } else if (customId === 'ticket_btn_close') {
+    } else if (customId === 'ticket_btn_close_cancel') {
+        return interaction.update({ content: '✅ Ticket closure cancelled.', embeds: [], components: [] });
+    } else if (customId === 'ticket_btn_close' || customId === 'ticket_btn_close_confirm') {
         if (!isStaff && user.id !== ticket.creatorId) {
             return interaction.reply({
                 content: '<a:refused:1520914088568295564> You do not have permission to close this ticket.',
@@ -491,10 +493,33 @@ async function handleButton(interaction, client) {
             });
         }
 
+        if (customId === 'ticket_btn_close' && !isStaff && user.id === ticket.creatorId) {
+            const confirmEmbed = new EmbedBuilder()
+                .setDescription('⚠️ **| Are you sure you want to close this ticket?**\n\nClosing a ticket prematurely or creating useless tickets to troll our staff team will result in a **severe punishment**.\n\nPlease confirm your decision below.')
+                .setColor('#ffaa00');
+
+            const confirmBtn = new ButtonBuilder()
+                .setCustomId('ticket_btn_close_confirm')
+                .setLabel('Yes, close ticket')
+                .setStyle(ButtonStyle.Danger);
+            const cancelBtn = new ButtonBuilder()
+                .setCustomId('ticket_btn_close_cancel')
+                .setLabel('Cancel')
+                .setStyle(ButtonStyle.Secondary);
+
+            const row = new ActionRowBuilder().addComponents(confirmBtn, cancelBtn);
+            return interaction.reply({ embeds: [confirmEmbed], components: [row], ephemeral: true });
+        }
+
         const closeEmbed = new EmbedBuilder()
             .setDescription('🔒 **| Closing ticket, please wait...**')
             .setColor(config.colors.error);
-        await interaction.reply({ embeds: [closeEmbed], ephemeral: true });
+        
+        if (customId === 'ticket_btn_close_confirm') {
+            await interaction.update({ embeds: [closeEmbed], components: [] });
+        } else {
+            await interaction.reply({ embeds: [closeEmbed], ephemeral: true });
+        }
 
         const messages = await thread.messages.fetch({ limit: 100 });
         const dbMessages = messages.map((m) => ({
