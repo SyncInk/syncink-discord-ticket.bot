@@ -68,7 +68,7 @@ module.exports = {
                     }
 
                     const guildConfig = await db.getGuildConfig(channel.guild.id);
-                    const thresholdMs = Math.max(5, Number(guildConfig.inactivityReminderMinutes || 120)) * 60 * 1000;
+                    const thresholdMs = Math.max(0.5, Number(guildConfig.inactivityReminderMinutes || 120)) * 60 * 1000;
                     const lastMessageId = channel.lastMessageId;
                     if (!lastMessageId) {
                         continue;
@@ -118,6 +118,6 @@ module.exports = {
             } catch (error) {
                 console.error('[INACTIVITY CHECK ERROR]', error);
             }
-        }, 5 * 60 * 1000);
+        }, 30 * 1000); // Check every 30 seconds
     }
 };
