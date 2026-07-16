@@ -40,10 +40,10 @@ async function handleSelectMenu(interaction, client) {
 
         const existingTicket = await db.getUserOpenTicket(interaction.guild.id, interaction.user.id);
         if (existingTicket) {
-            return interaction.reply({ 
-                content: `<a:refused:1520914088568295564> You already have an open ticket in <#${existingTicket.channelId}>! Please resolve it before opening a new one.`, 
-                ephemeral: true 
-            });
+            const errorEmbed = new EmbedBuilder()
+                .setDescription(`<a:refused:1520914088568295564> <#${existingTicket.channelId}> **| You already have an open ticket!** Please resolve it before opening a new one.`)
+                .setColor('#ff5555');
+            return interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
 
         const modal = new ModalBuilder()
@@ -263,7 +263,10 @@ async function handleModalSubmit(interaction, client) {
 
     const existingTicket = await db.getUserOpenTicket(guild.id, interaction.user.id);
     if (existingTicket) {
-        return interaction.editReply(`<a:refused:1520914088568295564> You already have an open ticket in <#${existingTicket.channelId}>! Please resolve it before opening a new one.`);
+        const errorEmbed = new EmbedBuilder()
+            .setDescription(`<a:refused:1520914088568295564> <#${existingTicket.channelId}> **| You already have an open ticket!** Please resolve it before opening a new one.`)
+            .setColor('#ff5555');
+        return interaction.editReply({ content: '', embeds: [errorEmbed] });
     }
 
     let prefix = 'ticket';
