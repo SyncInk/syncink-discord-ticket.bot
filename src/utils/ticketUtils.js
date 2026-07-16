@@ -43,7 +43,8 @@ async function handleSelectMenu(interaction, client) {
 
         if (!optionData) {
             await resetMenu();
-            return interaction.reply({ content: '<a:refused:1520914088568295564> Invalid ticket type.', ephemeral: true });
+            const errorEmbed = new EmbedBuilder().setDescription('<a:refused:1520914088568295564> **| Invalid ticket type.**').setColor('#ff5555');
+            return interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
 
         const existingTicket = await db.getUserOpenTicket(interaction.guild.id, interaction.user.id);
@@ -264,7 +265,8 @@ async function handleModalSubmit(interaction, client) {
     const reason = interaction.fields.getTextInputValue('ticket_reason');
 
     if (!optionData) {
-        return interaction.editReply('<a:refused:1520914088568295564> This ticket category is no longer available.');
+        const errorEmbed = new EmbedBuilder().setDescription('<a:refused:1520914088568295564> **| This ticket category is no longer available.**').setColor('#ff5555');
+        return interaction.editReply({ content: '', embeds: [errorEmbed] });
     }
 
     const existingTicket = await db.getUserOpenTicket(guild.id, interaction.user.id);
@@ -419,10 +421,8 @@ async function handleButton(interaction, client) {
 
     if (!ticket) {
         if (customId.startsWith('ticket_btn_')) {
-            return interaction.reply({
-                content: '<a:refused:1520914088568295564> This thread is not registered as a ticket in the database.',
-                ephemeral: true
-            });
+            const errorEmbed = new EmbedBuilder().setDescription('<a:refused:1520914088568295564> **| This thread is not registered as a ticket in the database.**').setColor('#ff5555');
+            return interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
         return;
     }
@@ -439,13 +439,12 @@ async function handleButton(interaction, client) {
 
     if (customId === 'ticket_btn_claim') {
         if (!isStaff) {
-            return interaction.reply({ content: '<a:refused:1520914088568295564> Only staff members can claim tickets.', ephemeral: true });
+            const errorEmbed = new EmbedBuilder().setDescription('<a:refused:1520914088568295564> **| Only staff members can claim tickets.**').setColor('#ff5555');
+            return interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
         if (ticket.claimerIds && ticket.claimerIds.includes(user.id)) {
-            return interaction.reply({
-                content: `<a:refused:1520914088568295564> You have already claimed this ticket.`,
-                ephemeral: true
-            });
+            const errorEmbed = new EmbedBuilder().setDescription('<a:refused:1520914088568295564> **| You have already claimed this ticket.**').setColor('#ff5555');
+            return interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
 
         const claimerIds = Array.isArray(ticket.claimerIds) ? Array.from(new Set([...ticket.claimerIds, user.id])) : [user.id];
@@ -463,7 +462,9 @@ async function handleButton(interaction, client) {
 
         const embedsToKeep = interaction.message.embeds.slice(1);
         await interaction.update({ embeds: [claimersEmbed, ...embedsToKeep] });
-        await thread.send({ content: `<:claimers:1513345698689581087> <@${user.id}> is a claimer now!` });
+        
+        const claimEmbed = new EmbedBuilder().setDescription(`<:claimers:1513345698689581087> <@${user.id}> **is a claimer now!**`).setColor(config.colors.primary);
+        await thread.send({ embeds: [claimEmbed] });
 
         await db.createActivityLog({
             guildId: guild.id,
@@ -487,10 +488,8 @@ async function handleButton(interaction, client) {
         return interaction.update({ content: '<a:approved:1520913982678896670> Ticket closure cancelled.', embeds: [], components: [] });
     } else if (customId === 'ticket_btn_close' || customId === 'ticket_btn_close_confirm') {
         if (!isStaff && user.id !== ticket.creatorId) {
-            return interaction.reply({
-                content: '<a:refused:1520914088568295564> You do not have permission to close this ticket.',
-                ephemeral: true
-            });
+            const errorEmbed = new EmbedBuilder().setDescription('<a:refused:1520914088568295564> **| You do not have permission to close this ticket.**').setColor('#ff5555');
+            return interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
 
         if (customId === 'ticket_btn_close' && !isStaff && user.id === ticket.creatorId) {
@@ -581,11 +580,15 @@ async function handleButton(interaction, client) {
             const firstMsgCollection = await thread.messages.fetch({ after: '1', limit: 10 });
             const welcomeMsg = firstMsgCollection.find((message) => message.author.id === client.user.id && message.embeds.length >= 2);
             if (welcomeMsg) {
+                await welcomeMsg.edit({ components: [] });
+            }
+
+            if (isStaff && interaction.followUp) {
                 const logEmbed = new EmbedBuilder()
                     .setTitle('Log')
-                    .setDescription(logResult?.logMessage ? `🔒 [Ticket Log](${logResult.logMessage.url})` : '⚠️ *Log channel not set. Transcript not archived.*')
+                    .setDescription(logResult?.logMessage ? `<a:approved:1520913982678896670> [Ticket Log](${logResult.logMessage.url})` : '<a:sync_alert:1513822294831534220> *Log channel not set. Transcript not archived.*')
                     .setColor('#2b2d31');
-                await welcomeMsg.edit({ embeds: [...welcomeMsg.embeds, logEmbed], components: [] });
+                await interaction.followUp({ embeds: [logEmbed], ephemeral: true }).catch(() => {});
             }
         } catch (error) {
             console.error('[CLOSE] Error adding log embed:', error);
