@@ -78,7 +78,8 @@ async function handleSelectMenu(interaction, client) {
         const transferValue = interaction.values[0];
         const ticket = await db.getTicket(interaction.channel.id);
         if (!ticket) {
-            return interaction.reply({ content: '<a:refused:1520914088568295564> Ticket not found.', ephemeral: true });
+            const errorEmbed = new EmbedBuilder().setDescription('<a:refused:1520914088568295564> **| Ticket not found.**').setColor('#ff5555');
+            return interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
 
         await interaction.update({ content: 'Transferring ticket...', components: [] });
@@ -411,7 +412,8 @@ async function handleModalSubmit(interaction, client) {
         await interaction.editReply({ content: '', embeds: [successEmbed] });
     } catch (error) {
         console.error('[TICKET CREATE ERROR]', error);
-        await interaction.editReply(`<a:refused:1520914088568295564> Failed to create ticket: \`${error.message}\`. Please check my permissions in this channel (I must have \`Manage Channels\`, \`Manage Roles\`, \`Embed Links\`, and \`Create Private Threads\`).`);
+        const errorEmbed = new EmbedBuilder().setDescription(`<a:refused:1520914088568295564> **| Failed to create ticket: \`${error.message}\`.**\nPlease check my permissions in this channel (I must have \`Manage Channels\`, \`Manage Roles\`, \`Embed Links\`, and \`Create Private Threads\`).`).setColor('#ff5555');
+        await interaction.editReply({ content: '', embeds: [errorEmbed] });
     }
 }
 
@@ -463,8 +465,7 @@ async function handleButton(interaction, client) {
         const embedsToKeep = interaction.message.embeds.slice(1);
         await interaction.update({ embeds: [claimersEmbed, ...embedsToKeep] });
         
-        const claimEmbed = new EmbedBuilder().setDescription(`<:claimers:1513345698689581087> <@${user.id}> **is a claimer now!**`).setColor(config.colors.primary);
-        await thread.send({ embeds: [claimEmbed] });
+        await thread.send({ content: `<:claimers:1513345698689581087> <@${user.id}> **is a claimer now!**` });
 
         await db.createActivityLog({
             guildId: guild.id,
@@ -580,15 +581,11 @@ async function handleButton(interaction, client) {
             const firstMsgCollection = await thread.messages.fetch({ after: '1', limit: 10 });
             const welcomeMsg = firstMsgCollection.find((message) => message.author.id === client.user.id && message.embeds.length >= 2);
             if (welcomeMsg) {
-                await welcomeMsg.edit({ components: [] });
-            }
-
-            if (isStaff && interaction.followUp) {
                 const logEmbed = new EmbedBuilder()
                     .setTitle('Log')
                     .setDescription(logResult?.logMessage ? `<a:approved:1520913982678896670> [Ticket Log](${logResult.logMessage.url})` : '<a:sync_alert:1513822294831534220> *Log channel not set. Transcript not archived.*')
                     .setColor('#2b2d31');
-                await interaction.followUp({ embeds: [logEmbed], ephemeral: true }).catch(() => {});
+                await welcomeMsg.edit({ embeds: [...welcomeMsg.embeds, logEmbed], components: [] });
             }
         } catch (error) {
             console.error('[CLOSE] Error adding log embed:', error);
@@ -603,7 +600,8 @@ async function handleButton(interaction, client) {
         await thread.setArchived(true).catch(() => {});
     } else if (customId === 'ticket_btn_transfer') {
         if (!isStaff) {
-            return interaction.reply({ content: '<a:refused:1520914088568295564> Only staff can transfer tickets.', ephemeral: true });
+            const errorEmbed = new EmbedBuilder().setDescription('<a:refused:1520914088568295564> **| Only staff can transfer tickets.**').setColor('#ff5555');
+            return interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
 
         const guildConfig = await db.getGuildConfig(interaction.guild.id);
@@ -635,7 +633,8 @@ async function handleButton(interaction, client) {
         });
 
         if (options.length === 0) {
-            return interaction.reply({ content: '<a:refused:1520914088568295564> No transfer roles available.', ephemeral: true });
+            const errorEmbed = new EmbedBuilder().setDescription('<a:refused:1520914088568295564> **| No transfer roles available.**').setColor('#ff5555');
+            return interaction.reply({ embeds: [errorEmbed], ephemeral: true });
         }
 
         const { StringSelectMenuBuilder } = require('discord.js');
@@ -645,8 +644,9 @@ async function handleButton(interaction, client) {
             .addOptions(options.slice(0, 25));
 
         const row = new ActionRowBuilder().addComponents(selectMenu);
+        const transferEmbed = new EmbedBuilder().setDescription('**Who would you like to transfer this ticket to?**').setColor(config.colors.primary);
         await interaction.reply({
-            content: 'Who would you like to transfer this ticket to?',
+            embeds: [transferEmbed],
             components: [row],
             ephemeral: true
         });
