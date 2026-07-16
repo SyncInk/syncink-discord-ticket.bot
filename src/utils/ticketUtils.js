@@ -34,12 +34,21 @@ async function handleSelectMenu(interaction, client) {
         const selectedValue = interaction.values[0];
         const optionData = getCategoryConfig(guildConfig, selectedValue);
 
+        const resetMenu = async () => {
+            if (interaction.message && interaction.message.components) {
+                const payload = buildTicketPanelPayload(guildConfig);
+                await interaction.message.edit({ components: payload.components }).catch(() => {});
+            }
+        };
+
         if (!optionData) {
+            await resetMenu();
             return interaction.reply({ content: '<a:refused:1520914088568295564> Invalid ticket type.', ephemeral: true });
         }
 
         const existingTicket = await db.getUserOpenTicket(interaction.guild.id, interaction.user.id);
         if (existingTicket) {
+            await resetMenu();
             const errorEmbed = new EmbedBuilder()
                 .setDescription(`<a:refused:1520914088568295564> <#${existingTicket.channelId}> **| You already have an open ticket!** Please resolve it before opening a new one.`)
                 .setColor('#ff5555');
@@ -63,10 +72,7 @@ async function handleSelectMenu(interaction, client) {
 
         await interaction.showModal(modal);
 
-        if (interaction.message && interaction.message.components) {
-            const payload = buildTicketPanelPayload(guildConfig);
-            await interaction.message.edit({ components: payload.components }).catch(() => {});
-        }
+        await resetMenu();
     } else if (interaction.customId === 'ticket_transfer_select') {
         const transferValue = interaction.values[0];
         const ticket = await db.getTicket(interaction.channel.id);
