@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, ShieldCheck, Ticket, Zap } from 'lucide-react';
+import { ShieldCheck, Ticket, Settings } from 'lucide-react';
 
 export default function Login() {
   const handleLogin = () => {
@@ -7,81 +7,100 @@ export default function Login() {
   };
 
   return (
-    <div className="login-wrapper">
+    <div className="login-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <div className="login-ambient-glow" />
 
-      <div className="login-card">
-        <div className="auth-column hero">
-          <div className="auth-badge">Professional control surface</div>
-          <h1 className="auth-title">Manage SyncInk Ticket from a dashboard that finally feels polished.</h1>
-          <p className="auth-subtitle">
-            A refined dark interface for category management, panel deployment, analytics, activity
-            tracking, transcripts, and operational visibility, all synchronized with your existing bot.
-          </p>
-
-          <div className="auth-insight-grid">
-            <div className="auth-insight">
-              <strong>Live Sync</strong>
-              <span>Discord actions, MongoDB updates, and dashboard changes stay aligned in real time.</span>
-            </div>
-            <div className="auth-insight">
-              <strong>Protected</strong>
-              <span>Only the server owner and Administrators can enter the management experience.</span>
-            </div>
-            <div className="auth-insight">
-              <strong>Premium Feel</strong>
-              <span>Purposeful spacing, glass surfaces, richer contrast, and cleaner page composition.</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="auth-column panel">
-          <div className="login-header">
-            <img src="/ticket-logo.png" alt="SyncInk Ticket Logo" className="login-logo" />
-            <h1>SyncInk Ticket</h1>
-            <p>
-              Sign in with Discord to access the dashboard and manage your support system with a professional workflow-focused interface.
+      <div 
+        className="login-card" 
+        style={{ 
+          width: 'min(480px, 100%)', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          background: 'rgba(11, 15, 27, 0.96)',
+          boxShadow: '0 24px 80px rgba(0, 0, 0, 0.4)'
+        }}
+      >
+        <div className="auth-column panel" style={{ padding: '48px 40px', background: 'transparent' }}>
+          <div className="login-header" style={{ alignItems: 'center', marginBottom: '32px', textAlign: 'center' }}>
+            <img 
+              src="/ticket-logo.png" 
+              alt="SyncInk Ticket Logo" 
+              className="login-logo" 
+              style={{ width: 84, height: 84, marginBottom: '20px', borderRadius: '50%', boxShadow: '0 0 40px rgba(165, 136, 255, 0.3)' }} 
+            />
+            <h1 style={{ fontSize: '28px', marginBottom: '12px', fontWeight: '700' }}>SyncInk Ticket</h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '15px', lineHeight: 1.6, padding: '0 10px' }}>
+              The premium ticket management system. Manage your support channels, customize your panels, and take full control.
             </p>
           </div>
 
-          <div className="login-features">
-            <div className="login-feature">
-              <div className="feature-icon"><Ticket size={16} /></div>
-              <div className="feature-text">
-                <strong>Panel and category control</strong>
-                <span>Fine-tune panel visuals, channel destinations, and ticket presentation safely.</span>
+          <div className="login-features" style={{ marginBottom: '36px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className="login-feature" style={{ border: 'none', padding: 0, gap: '16px' }}>
+              <div className="feature-icon" style={{ width: 42, height: 42, borderRadius: '14px', background: 'rgba(165, 136, 255, 0.08)', color: 'var(--accent)' }}><Ticket size={18} /></div>
+              <div className="feature-text" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+                <strong style={{ fontSize: '14px' }}>Premium Ticket Panels</strong>
+                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Auto-create and manage dynamic support categories</span>
               </div>
             </div>
 
-            <div className="login-feature">
-              <div className="feature-icon"><BarChart3 size={16} /></div>
-              <div className="feature-text">
-                <strong>Operational visibility</strong>
-                <span>Track activity, analytics, transcripts, and ticket history from one place.</span>
+            <div className="login-feature" style={{ border: 'none', padding: 0, gap: '16px' }}>
+              <div className="feature-icon" style={{ width: 42, height: 42, borderRadius: '14px', background: 'rgba(165, 136, 255, 0.08)', color: 'var(--accent)' }}><Settings size={18} /></div>
+              <div className="feature-text" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+                <strong style={{ fontSize: '14px' }}>Granular Permissions</strong>
+                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Full role and server-level toggle control</span>
               </div>
             </div>
 
-            <div className="login-feature">
-              <div className="feature-icon"><ShieldCheck size={16} /></div>
-              <div className="feature-text">
-                <strong>Secure access model</strong>
-                <span>OAuth2 authentication with live server permission checks before access is granted.</span>
+            <div className="login-feature" style={{ border: 'none', padding: 0, gap: '16px' }}>
+              <div className="feature-icon" style={{ width: 42, height: 42, borderRadius: '14px', background: 'rgba(165, 136, 255, 0.08)', color: 'var(--accent)' }}><ShieldCheck size={18} /></div>
+              <div className="feature-text" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+                <strong style={{ fontSize: '14px' }}>Secure & Private</strong>
+                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Discord OAuth2 protected dashboard</span>
               </div>
             </div>
           </div>
 
-          <button type="button" className="login-button" onClick={handleLogin}>
+          <button 
+            type="button" 
+            className="login-button" 
+            onClick={handleLogin} 
+            style={{ 
+              width: '100%', 
+              padding: '16px', 
+              borderRadius: '14px', 
+              background: '#5865F2', 
+              color: 'white', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              gap: '12px', 
+              fontSize: '15px', 
+              fontWeight: '600', 
+              border: 'none', 
+              cursor: 'pointer',
+              boxShadow: '0 8px 24px rgba(88, 101, 242, 0.25)',
+              transition: 'background 0.2s, transform 0.1s'
+            }}
+          >
             <img
               src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png"
               alt="Discord"
-              style={{ width: 18, filter: 'brightness(0) invert(1)' }}
+              style={{ width: 22, filter: 'brightness(0) invert(1)' }}
             />
-            Continue with Discord
+            Login with Discord
           </button>
 
-          <div className="login-footer">
-            <Zap size={14} style={{ verticalAlign: 'middle', marginRight: 6 }} />
-            Premium dashboard experience for SyncInk Ticket
+          <div 
+            className="login-footer" 
+            style={{ 
+              marginTop: '28px', 
+              fontSize: '12px', 
+              color: 'var(--text-muted)', 
+              textAlign: 'center',
+              opacity: 0.8
+            }}
+          >
+            SyncInk Ticket Dashboard &bull; Free for everyone &bull; Built with ♥
           </div>
         </div>
       </div>
