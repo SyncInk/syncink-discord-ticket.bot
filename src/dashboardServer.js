@@ -168,6 +168,7 @@ function computeDailySeries(tickets, days = 7) {
         const dateKey = current.toISOString().slice(0, 10);
         buckets.push({
             date: dateKey,
+            label: current.toLocaleDateString('en-US', { weekday: 'short' }),
             created: 0,
             closed: 0
         });

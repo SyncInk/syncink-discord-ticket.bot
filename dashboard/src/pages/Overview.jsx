@@ -97,7 +97,9 @@ export default function Overview() {
               <div key={item.actorId} className="staff-row">
                 <div>
                   <strong>{snapshot.activities.find((activity) => activity.actor?.id === item.actorId)?.actor?.displayName || item.actorId}</strong>
-                  <span>{item.total} actions recorded</span>
+                  <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                    ID: {item.actorId} &bull; {item.total} actions recorded
+                  </div>
                 </div>
                 <div className="staff-pills">
                   <Pill tone="success">{item.claimed} claimed</Pill>
