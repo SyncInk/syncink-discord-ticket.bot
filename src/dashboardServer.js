@@ -140,6 +140,7 @@ function mapActivityRecord(activity, client, guild) {
         title: activity.title,
         description: activity.description,
         createdAt: activity.createdAt,
+        actorId: activity.actorId,
         actor: summarizeUser(client, guild, activity.actorId),
         ticketChannelId: activity.ticketChannelId,
         relatedTicketId: activity.relatedTicketId,
@@ -159,26 +160,33 @@ function mapAuditRecord(audit, client, guild) {
 }
 
 function computeDailySeries(tickets, days = 7) {
-    const now = new Date();
     const buckets = [];
-
-    for (let index = days - 1; index >= 0; index -= 1) {
+    const now = new Date();
+    for (let index = days - 1; index >= 0; index--) {
         const current = new Date(now);
         current.setDate(now.getDate() - index);
         const dateKey = current.toISOString().slice(0, 10);
         buckets.push({
             date: dateKey,
-            count: 0
+            created: 0,
+            closed: 0
         });
     }
 
     const bucketMap = new Map(buckets.map((bucket) => [bucket.date, bucket]));
 
     for (const ticket of tickets) {
-        const dateKey = new Date(ticket.createdAt).toISOString().slice(0, 10);
-        const bucket = bucketMap.get(dateKey);
-        if (bucket) {
-            bucket.count += 1;
+        if (ticket.createdAt) {
+            const createKey = new Date(ticket.createdAt).toISOString().slice(0, 10);
+            if (bucketMap.has(createKey)) {
+                bucketMap.get(createKey).created += 1;
+            }
+        }
+        if (ticket.closedAt) {
+            const closeKey = new Date(ticket.closedAt).toISOString().slice(0, 10);
+            if (bucketMap.has(closeKey)) {
+                bucketMap.get(closeKey).closed += 1;
+            }
         }
     }
 
@@ -360,12 +368,14 @@ async function createDashboardSnapshot(client, guildId) {
             roles,
             adminRoles
         },
-        stats,
+        stats: {
+            ...stats,
+            dailySeries: computeDailySeries(mappedTickets, 7)
+        },
         tickets: mappedTickets,
         activities: mappedActivities,
         audits: mappedAudits,
         analytics: {
-            dailyTickets: computeDailySeries(mappedTickets, 7),
             typeBreakdown,
             statusBreakdown: [
                 { label: 'Open', value: stats.openTickets },
