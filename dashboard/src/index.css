@@ -147,6 +147,11 @@ img {
   display: block;
   font-size: 15px;
   letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #d8b4ff, #8ab4f8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 }
 
 .brand-row span {
@@ -2314,6 +2319,18 @@ canvas {
   border-radius: 4px;
   background: #2b2d31;
   overflow: hidden;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.discord-message-embed:hover {
+  background: #ffffff;
+}
+
+.discord-message-embed:hover .discord-message-embed-title,
+.discord-message-embed:hover .discord-message-embed-desc,
+.discord-message-embed:hover .discord-message-bullet,
+.discord-message-embed:hover .discord-message-embed-desc p {
+  color: #111111;
 }
 
 .discord-message-embed-color {

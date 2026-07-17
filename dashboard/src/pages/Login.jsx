@@ -28,7 +28,16 @@ export default function Login() {
               className="login-logo" 
               style={{ width: 84, height: 84, marginBottom: '20px', borderRadius: '50%', boxShadow: '0 0 40px rgba(165, 136, 255, 0.3)' }} 
             />
-            <h1 style={{ fontSize: '28px', marginBottom: '12px', fontWeight: '700' }}>SyncInk Ticket</h1>
+            <h1 style={{ 
+              fontSize: '28px', 
+              marginBottom: '12px', 
+              fontWeight: '700',
+              background: 'linear-gradient(90deg, #d8b4ff, #8ab4f8)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              color: 'transparent'
+            }}>SyncInk Ticket</h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '15px', lineHeight: 1.6, padding: '0 10px' }}>
               The ticket management system. Manage your support channels, customize your panels, and take full control.
             </p>
