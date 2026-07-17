@@ -322,7 +322,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
           <img src="/ticket-logo.png" alt="SyncInk Ticket" style={{ width: 32, height: 32, borderRadius: 8 }} />
           <div>
             <strong>SyncInk Ticket</strong>
-            <span>Premium Ticket System</span>
+            <span>Ticket System</span>
           </div>
         </div>
 

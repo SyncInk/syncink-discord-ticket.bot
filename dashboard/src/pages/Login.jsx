@@ -30,7 +30,7 @@ export default function Login() {
             />
             <h1 style={{ fontSize: '28px', marginBottom: '12px', fontWeight: '700' }}>SyncInk Ticket</h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '15px', lineHeight: 1.6, padding: '0 10px' }}>
-              The premium ticket management system. Manage your support channels, customize your panels, and take full control.
+              The ticket management system. Manage your support channels, customize your panels, and take full control.
             </p>
           </div>
 
@@ -38,7 +38,7 @@ export default function Login() {
             <div className="login-feature" style={{ border: 'none', padding: 0, gap: '16px' }}>
               <div className="feature-icon" style={{ width: 42, height: 42, borderRadius: '14px', background: 'rgba(165, 136, 255, 0.08)', color: 'var(--accent)' }}><Ticket size={18} /></div>
               <div className="feature-text" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
-                <strong style={{ fontSize: '14px' }}>Premium Ticket Panels</strong>
+                <strong style={{ fontSize: '14px' }}>Ticket Panels</strong>
                 <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Auto-create and manage dynamic support categories</span>
               </div>
             </div>
@@ -94,13 +94,21 @@ export default function Login() {
             className="login-footer" 
             style={{ 
               marginTop: '28px', 
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
               fontSize: '12px', 
               color: 'var(--text-muted)', 
               textAlign: 'center',
               opacity: 0.8
             }}
           >
-            SyncInk Ticket Dashboard &bull; Free for everyone &bull; Built with ♥
+            <div>SyncInk Ticket Dashboard &bull; Free for everyone &bull; Built with ♥</div>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
+              <a href="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</a>
+              <a href="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</a>
+              <a href="/faq" style={{ color: 'inherit', textDecoration: 'none' }}>FAQ</a>
+            </div>
           </div>
         </div>
       </div>
