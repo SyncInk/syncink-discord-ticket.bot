@@ -662,23 +662,13 @@ async function logTicketAction(client, guild, title, description, color, attachm
         : logChannel;
 
     let transcriptMessage = null;
-
-    if (attachment && transcriptChannel) {
-        try {
-            transcriptMessage = await transcriptChannel.send({
-                content: `Transcript archive for **${title}**`,
-                files: [attachment]
-            });
-        } catch (error) {
-            console.error('[TRANSCRIPT ERROR]', error);
-        }
-    }
+    let logMessage = null;
 
     if (!logChannel) {
         return {
             logMessage: null,
-            transcriptMessage,
-            error: guildConfig.logChannelId ? `Cannot see channel <#${guildConfig.logChannelId}>. You MUST add the bot role to this specific channel's settings (Overrides) to bypass the private channel restriction.` : null
+            transcriptMessage: null,
+            error: guildConfig.logChannelId ? `Cannot see the selected log channel. You MUST add the bot role to this specific channel's settings (Overrides) to bypass the private channel restriction.` : null
         };
     }
 
@@ -688,13 +678,6 @@ async function logTicketAction(client, guild, title, description, color, attachm
         .setColor(color)
         .setTimestamp();
 
-    if (transcriptMessage) {
-        embed.addFields({
-            name: 'Transcript',
-            value: `[Download txt](${transcriptMessage.url})`
-        });
-    }
-
     if (dashboardTicketId) {
         const dashboardUrl = process.env.FRONTEND_URL || 'https://syncink-discord-ticketbot.up.railway.app';
         embed.addFields({
@@ -703,20 +686,45 @@ async function logTicketAction(client, guild, title, description, color, attachm
         });
     }
 
-    try {
-        const logMessage = await logChannel.send({ embeds: [embed] });
-        return {
-            logMessage,
-            transcriptMessage
-        };
-    } catch (error) {
-        console.error('[LOG ERROR]', error);
-        return {
-            logMessage: null,
-            transcriptMessage,
-            error: 'Missing access or channel deleted.'
-        };
+    if (transcriptChannel && transcriptChannel.id === logChannel.id) {
+        // Same channel: Combine everything into one message
+        try {
+            logMessage = await logChannel.send({
+                embeds: [embed],
+                files: attachment ? [attachment] : []
+            });
+            transcriptMessage = logMessage;
+        } catch (error) {
+            console.error('[LOG ERROR]', error);
+            return { logMessage: null, transcriptMessage: null, error: 'Missing access or channel deleted.' };
+        }
+    } else {
+        // Different channels: Send transcript first
+        if (transcriptChannel && attachment) {
+            try {
+                transcriptMessage = await transcriptChannel.send({
+                    embeds: [embed],
+                    files: [attachment]
+                });
+            } catch (error) {
+                console.error('[TRANSCRIPT ERROR]', error);
+            }
+        }
+        
+        // Then send log embed
+        if (transcriptMessage) {
+            embed.addFields({ name: 'Transcript', value: `[Download txt](${transcriptMessage.url})` });
+        }
+        
+        try {
+            logMessage = await logChannel.send({ embeds: [embed] });
+        } catch (error) {
+            console.error('[LOG ERROR]', error);
+            return { logMessage: null, transcriptMessage, error: 'Missing access or channel deleted.' };
+        }
     }
+
+    return { logMessage, transcriptMessage };
 }
 
 async function sendConfiguredTicketPanel(channel) {
