@@ -678,7 +678,7 @@ async function logTicketAction(client, guild, title, description, color, attachm
         return {
             logMessage: null,
             transcriptMessage,
-            error: guildConfig.logChannelId ? 'Bot cannot access the log channel. Please grant "View Channel" and "Send Messages" permissions.' : null
+            error: guildConfig.logChannelId ? `Cannot see channel <#${guildConfig.logChannelId}>. You MUST add the bot role to this specific channel's settings (Overrides) to bypass the private channel restriction.` : null
         };
     }
 
