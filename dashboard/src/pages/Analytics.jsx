@@ -32,10 +32,10 @@ export default function Analytics() {
           <div className="chart-tall">
             <Line
               data={{
-                labels: snapshot.analytics.dailyTickets.map((entry) => entry.date.slice(5)),
+                labels: snapshot.stats.dailySeries.map((entry) => entry.date.slice(5)),
                 datasets: [{
                   label: 'Tickets created',
-                  data: snapshot.analytics.dailyTickets.map((entry) => entry.count),
+                  data: snapshot.stats.dailySeries.map((entry) => entry.count),
                   borderColor: '#9d7cff',
                   backgroundColor: 'rgba(157, 124, 255, 0.18)',
                   tension: 0.38,
