@@ -114,9 +114,9 @@ export default function TicketLogs() {
               label: 'Transcript / Actions',
               render: (row) => (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  {row.transcriptAvailable || row.status === 'closed'
+                  {row.transcriptAvailable
                     ? <Link to={`/dashboard/${snapshot.settings.guildId}/transcripts/${row.ticketId}`} className="text-blue-500 hover:underline">Online Transcript</Link>
-                    : <span style={{ color: 'var(--text-muted)' }}>Pending</span>
+                    : <span style={{ color: 'var(--text-muted)' }}>{row.status === 'closed' ? 'Unavailable' : 'Pending'}</span>
                   }
                   {row.status === 'open' && (
                     <button 
