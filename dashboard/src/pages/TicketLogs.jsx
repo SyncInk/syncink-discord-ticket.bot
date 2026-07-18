@@ -111,10 +111,33 @@ export default function TicketLogs() {
             },
             {
               key: 'transcript',
-              label: 'Transcript',
-              render: (row) => row.transcriptAvailable || row.status === 'closed'
-                ? <Link to={`/dashboard/${snapshot.settings.guildId}/transcripts/${row.ticketId}`} className="text-blue-500 hover:underline">Online Transcript</Link>
-                : 'Pending'
+              label: 'Transcript / Actions',
+              render: (row) => (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  {row.transcriptAvailable || row.status === 'closed'
+                    ? <Link to={`/dashboard/${snapshot.settings.guildId}/transcripts/${row.ticketId}`} className="text-blue-500 hover:underline">Online Transcript</Link>
+                    : <span style={{ color: 'var(--text-muted)' }}>Pending</span>
+                  }
+                  {row.status === 'open' && (
+                    <button 
+                      onClick={async () => {
+                        if (confirm('Are you sure you want to force close this ticket and delete its channel?')) {
+                          try {
+                            const res = await fetch(`/api/guilds/${snapshot.settings.guildId}/tickets/${row.ticketId}/close`, { method: 'POST' });
+                            if (res.ok) window.location.reload();
+                            else alert('Failed to force close ticket.');
+                          } catch (e) {
+                            alert('Error closing ticket.');
+                          }
+                        }
+                      }}
+                      style={{ padding: '6px 12px', borderRadius: '6px', background: 'var(--danger)', color: 'white', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
+                    >
+                      Force Close
+                    </button>
+                  )}
+                </div>
+              )
             }
           ]}
           rows={rows}

@@ -747,6 +747,47 @@ async function initDashboard(client) {
         }
     });
 
+    app.post('/api/guilds/:guildId/tickets/:ticketId/close', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
+        try {
+            const { guildId, ticketId } = req.params;
+            const Ticket = db.getMongoModel('Ticket');
+            const ticket = await Ticket.findOne({ guildId, ticketId, status: 'open' });
+
+            if (!ticket) {
+                return res.status(404).json({ error: 'Open ticket not found' });
+            }
+
+            ticket.status = 'closed';
+            ticket.closedAt = Date.now();
+            ticket.closedById = req.session.user.id;
+            await ticket.save();
+
+            const guild = client.guilds.cache.get(guildId);
+            if (guild) {
+                const channel = guild.channels.cache.get(ticket.channelId);
+                if (channel) {
+                    await channel.delete().catch(() => {});
+                }
+            }
+            
+            await db.createActivityLog({
+                guildId,
+                type: 'ticket_closed',
+                title: 'Ticket force-closed from dashboard',
+                description: `Ticket ${ticketId} was force-closed from the web panel.`,
+                actorId: req.session.user.id,
+                actorTag: req.session.user.username,
+                ticketChannelId: ticket.channelId,
+                relatedTicketId: ticketId
+            });
+
+            res.json({ success: true });
+        } catch (error) {
+            console.error('[API ERROR] Failed to force close ticket:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
     app.get('/api/guilds/:guildId/bootstrap', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
         try {
             const snapshot = await createDashboardSnapshot(client, req.params.guildId);
