@@ -677,7 +677,8 @@ async function logTicketAction(client, guild, title, description, color, attachm
     if (!logChannel) {
         return {
             logMessage: null,
-            transcriptMessage
+            transcriptMessage,
+            error: guildConfig.logChannelId ? 'Bot cannot access the log channel. Please grant "View Channel" and "Send Messages" permissions.' : null
         };
     }
 
