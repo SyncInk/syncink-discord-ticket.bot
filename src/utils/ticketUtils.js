@@ -664,14 +664,6 @@ async function logTicketAction(client, guild, title, description, color, attachm
     let transcriptMessage = null;
     let logMessage = null;
 
-    if (!logChannel) {
-        return {
-            logMessage: null,
-            transcriptMessage: null,
-            error: guildConfig.logChannelId ? `Cannot see the selected log channel. You MUST add the bot role to this specific channel's settings (Overrides) to bypass the private channel restriction.` : null
-        };
-    }
-
     const embed = new EmbedBuilder()
         .setTitle(title)
         .setDescription(description)
@@ -686,7 +678,7 @@ async function logTicketAction(client, guild, title, description, color, attachm
         });
     }
 
-    if (transcriptChannel && transcriptChannel.id === logChannel.id) {
+    if (transcriptChannel && logChannel && transcriptChannel.id === logChannel.id) {
         // Same channel: Combine everything into one message
         try {
             logMessage = await logChannel.send({
@@ -696,10 +688,10 @@ async function logTicketAction(client, guild, title, description, color, attachm
             transcriptMessage = logMessage;
         } catch (error) {
             console.error('[LOG ERROR]', error);
-            return { logMessage: null, transcriptMessage: null, error: 'Missing access or channel deleted.' };
+            return { logMessage: null, transcriptMessage: null, error: 'Missing access to log channel.' };
         }
     } else {
-        // Different channels: Send transcript first
+        // Different channels (or only one is set)
         if (transcriptChannel && attachment) {
             try {
                 transcriptMessage = await transcriptChannel.send({
@@ -711,16 +703,19 @@ async function logTicketAction(client, guild, title, description, color, attachm
             }
         }
         
-        // Then send log embed
-        if (transcriptMessage) {
-            embed.addFields({ name: 'Transcript', value: `[Download txt](${transcriptMessage.url})` });
-        }
-        
-        try {
-            logMessage = await logChannel.send({ embeds: [embed] });
-        } catch (error) {
-            console.error('[LOG ERROR]', error);
-            return { logMessage: null, transcriptMessage, error: 'Missing access or channel deleted.' };
+        if (logChannel) {
+            if (transcriptMessage) {
+                embed.addFields({ name: 'Transcript', value: `[Download txt](${transcriptMessage.url})` });
+            }
+            try {
+                logMessage = await logChannel.send({ embeds: [embed] });
+            } catch (error) {
+                console.error('[LOG ERROR]', error);
+                return { logMessage: null, transcriptMessage, error: 'Missing access to log channel.' };
+            }
+        } else if (guildConfig.logChannelId) {
+            // Log channel was configured but could not be fetched
+            return { logMessage: null, transcriptMessage, error: `Cannot see the selected log channel. You MUST add the bot role to this specific channel's settings (Overrides) to bypass the private channel restriction.` };
         }
     }
 
