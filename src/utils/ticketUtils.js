@@ -671,7 +671,7 @@ async function logTicketAction(client, guild, title, description, color, attachm
         .setTimestamp();
 
     if (dashboardTicketId) {
-        const dashboardUrl = process.env.FRONTEND_URL || 'https://syncink-discord-ticketbot.up.railway.app';
+        const dashboardUrl = process.env.FRONTEND_URL || 'https://syncink-ticket-bot.up.railway.app';
         embed.addFields({
             name: 'Online Transcript',
             value: `[View on Dashboard](${dashboardUrl}/dashboard/${guild.id}/transcripts/${dashboardTicketId})`
