@@ -584,7 +584,7 @@ async function handleButton(interaction, client) {
             if (welcomeMsg) {
                 const logEmbed = new EmbedBuilder()
                     .setTitle('Log')
-                    .setDescription(logResult?.logMessage ? `<a:approved:1520913982678896670> [Ticket Log](${logResult.logMessage.url})` : (logResult?.error ? `<a:sync_alert:1513822294831534220> *Failed to log: ${logResult.error}*` : '<a:sync_alert:1513822294831534220> *Log channel not set. Transcript not archived.*'))
+                    .setDescription(logResult?.logMessage ? logResult.logMessage.url : (logResult?.error ? `<a:sync_alert:1513822294831534220> *Failed to log: ${logResult.error}*` : '<a:sync_alert:1513822294831534220> *Log channel not set. Transcript not archived.*'))
                     .setColor('#2b2d31');
                 await welcomeMsg.edit({ embeds: [...welcomeMsg.embeds, logEmbed], components: [] });
             }
