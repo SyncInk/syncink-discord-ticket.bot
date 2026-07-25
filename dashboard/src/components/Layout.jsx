@@ -42,7 +42,7 @@ import {
 import { titleFromEvent } from '../format';
 import Seo from './Seo';
 
-const SUPPORT_URL = 'https://syncink.github.io/syncink-portfolio/#contact';
+const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
 
 const TIER_LEVELS = {
   owner: 5,
@@ -462,6 +462,8 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
         <header className="topbar">
           <div className="topbar-nav">
             <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">Support</a>
+            <button type="button" onClick={() => handleNavigate('/features')}>Features</button>
+            <button type="button" onClick={() => handleNavigate('/commands')}>Commands</button>
             <button type="button" onClick={() => handleNavigate('/reviews')}>Reviews</button>
             <button type="button" onClick={() => handleNavigate('/invite')}>Invite Bot</button>
             <button type="button" onClick={() => handleNavigate('/guide')}>Guide</button>

@@ -20,7 +20,9 @@ import Miscellaneous from './pages/Miscellaneous';
 import Invite from './pages/Invite';
 import Guide from './pages/Guide';
 import Reviews from './pages/Reviews';
-
+import Features from './pages/Features';
+import Commands from './pages/Commands';
+import SupportPage from './pages/SupportPage';
 import TranscriptView from './pages/Transcript';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
@@ -91,7 +93,35 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+      <Route
+        path="/"
+        element={
+          <RootGate
+            user={user}
+            guilds={guilds}
+            selectedGuild={selectedGuild}
+            onSelectGuild={handleSelectGuild}
+          />
+        }
+      >
+        <Route index element={<Overview />} />
+        <Route path="panels" element={<TicketPanels />} />
+        <Route path="categories" element={<TicketCategories />} />
+        <Route path="transfer-options" element={<TransferOptions />} />
+        <Route path="ticket-logs" element={<TicketLogs />} />
+        <Route path="transcripts" element={<Transcripts />} />
+        <Route path="analytics" element={<Analytics />} />
+        <Route path="activity" element={<ActivityFeed />} />
+        <Route path="audit-logs" element={<AuditLogs />} />
+        <Route path="interface" element={<InterfacePage />} />
+        <Route path="bot-profile" element={<BotProfile />} />
+        <Route path="dashboard-access" element={<DashboardAccess />} />
+        <Route path="miscellaneous" element={<Miscellaneous />} />
+      </Route>
       <Route path="/invite" element={<Invite />} />
+      <Route path="/features" element={<Features />} />
+      <Route path="/commands" element={<Commands />} />
+      <Route path="/support" element={<SupportPage />} />
       <Route path="/guide" element={<Guide />} />
       <Route path="/reviews" element={<Reviews user={user} />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -108,31 +138,6 @@ export default function App() {
           />
         ) : <Navigate to="/login" />}
       />
-      <Route
-        path="/"
-        element={(
-          <RootGate
-            user={user}
-            guilds={guilds}
-            selectedGuild={selectedGuild}
-            onSelectGuild={handleSelectGuild}
-          />
-        )}
-      >
-        <Route index element={<Overview />} />
-        <Route path="panels" element={<TicketPanels />} />
-        <Route path="categories" element={<TicketCategories />} />
-        <Route path="transfer-options" element={<TransferOptions />} />
-        <Route path="ticket-logs" element={<TicketLogs />} />
-        <Route path="transcripts" element={<Transcripts />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="activity" element={<ActivityFeed />} />
-        <Route path="audit-logs" element={<AuditLogs />} />
-        <Route path="interface" element={<InterfacePage />} />
-        <Route path="bot-profile" element={<BotProfile />} />
-        <Route path="dashboard-access" element={<DashboardAccess />} />
-        <Route path="miscellaneous" element={<Miscellaneous />} />
-      </Route>
     </Routes>
   );
 }

@@ -1,6 +1,6 @@
-﻿import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BookOpen, LayoutDashboard, MessageSquareText, Shield, Ticket, X } from 'lucide-react';
+import { BookOpen, Command, LayoutDashboard, MessageSquareText, Shield, Sparkles, Ticket, X } from 'lucide-react';
 import Seo from '../components/Seo';
 import './InviteRedesign.css';
 
@@ -30,7 +30,7 @@ export default function Invite() {
     featureList: [
       'Discord ticket panels',
       'Ticket categories and staff routing',
-      'Transcript logging',
+      'Saved ticket transcripts',
       'Dashboard insights',
       'Audit logs and activity feed',
       'Instant dashboard updates'
@@ -147,6 +147,14 @@ export default function Invite() {
         </section>
 
         <nav className="inv-link-grid inv-entrance" aria-label="Primary website links" style={{ '--d': '740ms' }}>
+          <Link to="/features" className="inv-link-card">
+            <Sparkles size={18} />
+            <span>Features</span>
+          </Link>
+          <Link to="/commands" className="inv-link-card">
+            <Command size={18} />
+            <span>Commands</span>
+          </Link>
           <Link to="/guide" className="inv-link-card">
             <BookOpen size={18} />
             <span>Documentation Guide</span>
@@ -176,4 +184,3 @@ export default function Invite() {
     </div>
   );
 }
-

@@ -84,7 +84,7 @@ export default function Guide() {
           If something looks off or you want help refining your setup, reach out and we will help you sort it out quickly.
         </p>
         <a
-          href="https://syncink.github.io/syncink-portfolio/#contact"
+          href="https://discord.gg/rB6gNZaK9u"
           target="_blank"
           rel="noopener noreferrer"
           className="guide-support-btn"
