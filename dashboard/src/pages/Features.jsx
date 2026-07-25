@@ -46,7 +46,7 @@ export default function Features({ user }) {
     <>
       <Seo
         title="Features | SyncInk Ticket Bot"
-        description="Explore the main SyncInk Ticket features including ticket panels, saved transcripts, staff actions, and the premium dashboard experience."
+        description="Explore the main SyncInk Ticket features including ticket panels, saved transcripts, staff actions, and the dashboard experience."
         path="/features"
         keywords="SyncInk Ticket features, Discord ticket bot features, ticket dashboard, ticket transcripts"
       />
@@ -55,7 +55,7 @@ export default function Features({ user }) {
         user={user}
         eyebrow="Product Overview"
         title="Powerful features for clean, fast Discord support"
-        description="SyncInk Ticket combines premium design with practical support tools so your community can manage tickets smoothly from the first click to the final transcript."
+        description="SyncInk Ticket combines clean design with practical support tools so your community can manage tickets smoothly from the first click to the final transcript."
         actions={[
           { label: 'Invite Bot', href: INVITE_URL, external: true, tone: 'primary' },
           { label: 'Open Dashboard', to: dashboardPath, tone: 'secondary' },
@@ -107,7 +107,7 @@ export default function Features({ user }) {
           </div>
           <div className="mk-meta-item">
             <strong>For server leaders</strong>
-            <span>See how your support flow is performing and keep important settings tidy in one premium dashboard.</span>
+            <span>See how your support flow is performing and keep important settings tidy in one powerful dashboard.</span>
           </div>
         </section>
       </MarketingFrame>

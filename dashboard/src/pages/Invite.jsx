@@ -17,7 +17,7 @@ const spotlightCards = [
   {
     icon: LayoutDashboard,
     title: 'Web Dashboard',
-    copy: 'Manage embeds, channels, transcripts, logs, access, and interface preferences from one premium control center.'
+    copy: 'Manage embeds, channels, transcripts, logs, access, and interface preferences from one powerful control center.'
   },
   {
     icon: Shield,
@@ -45,7 +45,7 @@ export default function Invite({ user }) {
     operatingSystem: 'Web, Discord',
     url: `${window.location.origin}/`,
     image: `${window.location.origin}/ticket-logo.png`,
-    description: 'SyncInk Ticket is a Discord ticket bot with customizable ticket panels, saved transcripts, staff tools, and a premium web dashboard.',
+    description: 'SyncInk Ticket is a Discord ticket bot with customizable ticket panels, saved transcripts, staff tools, and a web dashboard.',
     offers: {
       '@type': 'Offer',
       price: '0',
@@ -65,7 +65,7 @@ export default function Invite({ user }) {
     <>
       <Seo
         title="SyncInk Ticket Bot - Discord Ticket Dashboard, Transcripts & Panels"
-        description="SyncInk Ticket is a Discord ticket bot with customizable ticket panels, saved transcripts, ticket transfers, staff tools, and a premium dashboard."
+        description="SyncInk Ticket is a Discord ticket bot with customizable ticket panels, saved transcripts, ticket transfers, staff tools, and a web dashboard."
         path="/"
         canonicalPath="/"
         keywords="SyncInk Ticket Bot, Discord ticket bot, Discord ticket dashboard, ticket transcripts, support ticket system, Discord support bot"
@@ -75,9 +75,9 @@ export default function Invite({ user }) {
       <MarketingFrame
         active="home"
         user={user}
-        eyebrow="Premium Discord Ticket System"
+        eyebrow="Discord Ticket System"
         title="Support that feels polished from the first click to the final transcript"
-        description="SyncInk Ticket is built for communities that want clean ticket panels, reliable staff handling, polished account access, and a dashboard that feels like a premium product."
+        description="SyncInk Ticket is built for communities that want clean ticket panels, reliable staff handling, polished account access, and a dashboard that feels extremely high quality."
         actions={[
           { label: 'Invite to Discord', href: INVITE_URL, external: true, tone: 'primary' },
           { label: user ? 'Open Dashboard' : 'Dashboard Login', to: dashboardPath, tone: 'secondary' },
@@ -120,7 +120,7 @@ export default function Invite({ user }) {
             <div className="mk-panel-header">
               <div>
                 <span className="mk-panel-label">Why communities choose it</span>
-                <h2>Premium visuals with practical tools</h2>
+                <h2>Clean visuals with practical tools</h2>
                 <p>Everything is designed to help your support flow look more organized and feel easier to manage.</p>
               </div>
               <div className="mk-card-icon"><WandSparkles size={22} /></div>

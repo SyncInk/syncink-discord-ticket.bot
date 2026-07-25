@@ -93,7 +93,7 @@ export default function MarketingFrame({
             <img src="/ticket-logo.png" alt="SyncInk Ticket" />
             <div>
               <strong>SyncInk Ticket</strong>
-              <span>Premium Discord ticket system</span>
+              <span>Discord ticket system</span>
             </div>
           </Link>
 
