@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ExternalLink, ChevronDown, Shield, FileText } from 'lucide-react';
 import '../pages/MarketingPages.css';
 
@@ -68,16 +68,16 @@ function AccountChip({ user }) {
 }
 
 export default function MarketingFrame({
-  active,
+  active = 'home',
+  user = null,
   eyebrow,
   title,
   description,
   actions = [],
-  children,
-  user
+  children
 }) {
-  const dashboardPath = user ? '/' : '/login';
-  const dashboardLabel = user ? 'Dashboard' : 'Open Dashboard';
+  const location = useLocation();
+  const dashboardPath = user ? (user.selectedGuildId ? `/dashboard/${user.selectedGuildId}` : '/servers') : '/api/auth/discord';
 
   return (
     <div className="mk-shell">
@@ -137,9 +137,11 @@ export default function MarketingFrame({
           )}
         </section>
 
-        <div className="mk-body">
-          {children}
-        </div>
+          <div className="mk-body">
+            <div key={location.pathname} className="page-transition">
+              {children}
+            </div>
+          </div>
       </div>
     </div>
   );

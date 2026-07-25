@@ -597,23 +597,25 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
               <button className="action-button tone-primary" onClick={() => handleNavigate('/servers')}>Return to Server List</button>
             </div>
           ) : (
-            <Outlet
-              context={{
-                busy,
-                currentLabel,
-                deployPanel,
-                guilds,
-                openConfirm,
-                onSelectGuild,
-                refreshSnapshot,
-                saveSettings,
-                selectedGuild,
-                snapshot,
-                user,
-                setUnsavedChanges,
-                setSaveAction
-              }}
-            />
+            <div key={location.pathname} className="page-transition">
+              <Outlet
+                context={{
+                  busy,
+                  currentLabel,
+                  deployPanel,
+                  guilds,
+                  openConfirm,
+                  onSelectGuild,
+                  refreshSnapshot,
+                  saveSettings,
+                  selectedGuild,
+                  snapshot,
+                  user,
+                  setUnsavedChanges,
+                  setSaveAction
+                }}
+              />
+            </div>
           )}
         </div>
       </main>

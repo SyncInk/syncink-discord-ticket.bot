@@ -3329,3 +3329,8 @@ canvas {
     transform: translateY(0) scale(1);
   }
 }
+
+.page-transition {
+  animation: slideUpFade 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
