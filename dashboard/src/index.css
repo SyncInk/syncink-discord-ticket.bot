@@ -3073,7 +3073,8 @@ canvas {
   visibility: visible;
   transform: translate(-50%, 0) scale(1);
 }
-.topbar-dropdown-menu button {
+.topbar-dropdown-menu button,
+.topbar-dropdown-menu a {
   width: 100%;
   text-align: left;
   padding: 10px 14px;
@@ -3087,14 +3088,17 @@ canvas {
   display: flex;
   align-items: center;
   gap: 10px;
+  text-decoration: none;
 }
-.topbar-dropdown-menu button:hover {
+.topbar-dropdown-menu button:hover,
+.topbar-dropdown-menu a:hover {
   background: rgb(var(--accent-rgb) / 0.12);
   color: #fff;
   transform: translateX(4px);
 }
 
-.topbar-dropdown-menu button svg {
+.topbar-dropdown-menu button svg,
+.topbar-dropdown-menu a svg {
   color: var(--accent);
 }
 

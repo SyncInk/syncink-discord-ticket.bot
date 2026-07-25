@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, LogOut } from 'lucide-react';
+import { ExternalLink, ChevronDown, Shield, FileText } from 'lucide-react';
 import '../pages/MarketingPages.css';
 
 const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
@@ -103,6 +103,15 @@ export default function MarketingFrame({
                 {item.label}
               </Link>
             ))}
+            <div className="topbar-dropdown">
+              <button type="button" className="topbar-dropdown-btn mk-nav-link" style={{background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit'}}>
+                Legal <ChevronDown size={14} style={{marginLeft: 4}} />
+              </button>
+              <div className="topbar-dropdown-menu">
+                <Link to="/privacy" className="topbar-dropdown-item"><Shield size={16} /> Privacy Policy</Link>
+                <Link to="/terms" className="topbar-dropdown-item"><FileText size={16} /> Terms of Service</Link>
+              </div>
+            </div>
             <a
               href={SUPPORT_URL}
               target="_blank"
@@ -113,16 +122,6 @@ export default function MarketingFrame({
               <ExternalLink size={14} />
             </a>
           </nav>
-
-          <div className="mk-topbar-actions">
-            <Link to={dashboardPath} className="mk-dashboard-link">{dashboardLabel}</Link>
-            {user ? <AccountChip user={user} /> : null}
-            {user ? (
-              <a href="/api/auth/logout" className="mk-signout-link" aria-label="Sign out" title="Sign out">
-                <LogOut size={18} />
-              </a>
-            ) : null}
-          </div>
         </header>
 
         <section className="mk-hero">
