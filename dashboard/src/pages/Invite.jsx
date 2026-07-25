@@ -11,7 +11,7 @@ export default function Invite() {
 
   const INVITE_URL =
     'https://discord.com/oauth2/authorize?client_id=1513075101992747158&permissions=361046068240&integration_type=0&scope=bot+applications.commands';
-  const SUPPORT_URL = 'https://discord.gg/FnsJYbmW4A';
+  const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
 
   const seoSchema = {
     '@context': 'https://schema.org',

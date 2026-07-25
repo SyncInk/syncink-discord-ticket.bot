@@ -57,7 +57,7 @@ export default function TermsOfService() {
               <div className="support-embed">
                 <h3>SyncInk Support Hub</h3>
                 <p>Join our official Discord server for fast support, updates, and community.</p>
-                <a href="https://discord.gg/FnsJYbmW4A" target="_blank" rel="noopener noreferrer" className="action-button tone-primary">
+                <a href="https://discord.gg/rB6gNZaK9u" target="_blank" rel="noopener noreferrer" className="action-button tone-primary">
                   Join Support Server
                 </a>
               </div>

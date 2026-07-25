@@ -233,11 +233,13 @@
 .inv-cta {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 14px 32px;
   border-radius: 14px;
   font-size: 15px;
   font-weight: 600;
+  line-height: 1;
   color: #ffffff;
   text-decoration: none;
   background: linear-gradient(135deg, #9333EA 0%, #7E22CE 100%);
@@ -249,7 +251,7 @@
     box-shadow 250ms ease,
     background 250ms ease;
   will-change: transform;
-  margin-bottom: 56px;
+  min-height: 56px;
 }
 
 .inv-cta-group {
@@ -258,6 +260,7 @@
   gap: 14px;
   flex-wrap: wrap;
   justify-content: center;
+  margin-bottom: 56px;
 }
 
 .inv-cta:hover {
@@ -279,13 +282,18 @@
 }
 
 .inv-secondary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 14px 24px;
+  min-height: 56px;
   border-radius: 14px;
   border: 1px solid rgba(192, 132, 252, 0.24);
   background: rgba(12, 10, 22, 0.88);
   color: #f5f3ff;
   font-size: 15px;
   font-weight: 600;
+  line-height: 1;
   cursor: pointer;
   transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease, box-shadow 200ms ease;
 }
