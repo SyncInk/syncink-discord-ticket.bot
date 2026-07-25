@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Star, ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import '../css/reviews.css';
+import Seo from '../components/Seo';
 
 export default function Reviews({ user }) {
   const [reviews, setReviews] = useState([]);
@@ -134,6 +135,12 @@ export default function Reviews({ user }) {
 
   return (
     <div className="reviews-page-wrapper">
+      <Seo
+        title="Reviews | SyncInk Ticket Bot"
+        description="See what Discord communities say about SyncInk Ticket and how they use the ticket bot dashboard, staff tools, and transcripts."
+        path="/reviews"
+        keywords="SyncInk Ticket reviews, Discord ticket bot reviews, ticket bot dashboard"
+      />
       <Link to="/" className="back-to-dashboard">
         <ChevronLeft size={20} /> Back to Dashboard
       </Link>

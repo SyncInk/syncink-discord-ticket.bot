@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldCheck, Ticket, Settings } from 'lucide-react';
+import Seo from '../components/Seo';
 
 export default function Login() {
   const handleLogin = () => {
@@ -8,6 +9,12 @@ export default function Login() {
 
   return (
     <div className="login-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Seo
+        title="Login | SyncInk Ticket Dashboard"
+        description="Log in with Discord to access the private SyncInk Ticket dashboard."
+        path="/login"
+        robots="noindex,nofollow"
+      />
       <div className="login-ambient-glow" />
 
       <div 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Layout from './components/Layout';
 import Login from './pages/Login';
@@ -25,6 +25,27 @@ import TranscriptView from './pages/Transcript';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import FAQ from './pages/FAQ';
+
+function RootGate({ user, guilds, selectedGuild, onSelectGuild }) {
+  const location = useLocation();
+
+  if (!user) {
+    return location.pathname === '/' ? <Invite /> : <Navigate to="/login" />;
+  }
+
+  if (!selectedGuild) {
+    return <Navigate to="/servers" />;
+  }
+
+  return (
+    <Layout
+      guilds={guilds}
+      onSelectGuild={onSelectGuild}
+      selectedGuild={selectedGuild}
+      user={user}
+    />
+  );
+}
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -71,7 +92,7 @@ export default function App() {
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
       <Route path="/invite" element={<Invite />} />
-      <Route path="/guide" element={user ? <Guide /> : <Navigate to="/login" />} />
+      <Route path="/guide" element={<Guide />} />
       <Route path="/reviews" element={<Reviews user={user} />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
@@ -89,19 +110,13 @@ export default function App() {
       />
       <Route
         path="/"
-        element={user ? (
-          selectedGuild ? (
-            <Layout
-              guilds={guilds}
-              onSelectGuild={handleSelectGuild}
-              selectedGuild={selectedGuild}
-              user={user}
-            />
-          ) : (
-            <Navigate to="/servers" />
-          )
-        ) : (
-          <Navigate to="/login" />
+        element={(
+          <RootGate
+            user={user}
+            guilds={guilds}
+            selectedGuild={selectedGuild}
+            onSelectGuild={handleSelectGuild}
+          />
         )}
       >
         <Route index element={<Overview />} />

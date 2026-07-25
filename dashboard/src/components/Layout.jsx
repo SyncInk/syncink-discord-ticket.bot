@@ -40,6 +40,7 @@ import {
   ToastViewport
 } from './Common';
 import { titleFromEvent } from '../format';
+import Seo from './Seo';
 
 const SUPPORT_URL = 'https://syncink.github.io/syncink-portfolio/#contact';
 
@@ -317,6 +318,12 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
 
   return (
     <div className="dashboard-shell">
+      <Seo
+        title={`${currentLabel} | SyncInk Ticket Dashboard`}
+        description="Private Discord ticket bot dashboard for authorized server owners and administrators."
+        path={location.pathname}
+        robots="noindex,nofollow"
+      />
       <aside className="sidebar">
         <div className="brand-row">
           <img src="/ticket-logo.png" alt="SyncInk Ticket" style={{ width: 32, height: 32, borderRadius: 8 }} />

@@ -1,12 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader, SectionCard } from '../components/Common';
+import Seo from '../components/Seo';
 
 export default function Guide() {
   const navigate = useNavigate();
 
   return (
     <div className="page-stack guide-page">
+      <Seo
+        title="Guide | SyncInk Ticket Bot Setup & Dashboard Documentation"
+        description="Learn how to configure SyncInk Ticket panels, categories, logs, transcripts, and dashboard access without changing the bot's existing workflow."
+        path="/guide"
+        keywords="SyncInk Ticket guide, Discord ticket bot setup, ticket dashboard documentation, ticket panels, transcripts"
+      />
+
       <div className="guide-header-nav">
         <button type="button" onClick={() => navigate('/')}>Back to Dashboard</button>
       </div>

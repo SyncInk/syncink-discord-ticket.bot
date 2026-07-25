@@ -252,6 +252,14 @@
   margin-bottom: 56px;
 }
 
+.inv-cta-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .inv-cta:hover {
   transform: translateY(-3px);
   background: linear-gradient(135deg, #A855F7 0%, #9333EA 100%);
@@ -268,6 +276,24 @@
 .inv-cta svg {
   width: 20px; height: 20px;
   flex-shrink: 0;
+}
+
+.inv-secondary-cta {
+  padding: 14px 24px;
+  border-radius: 14px;
+  border: 1px solid rgba(192, 132, 252, 0.24);
+  background: rgba(12, 10, 22, 0.88);
+  color: #f5f3ff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.inv-secondary-cta:hover {
+  transform: translateY(-3px);
+  border-color: rgba(192, 132, 252, 0.5);
+  box-shadow: 0 16px 40px rgba(88, 28, 135, 0.2);
 }
 
 /* ─── Feature Cards + Animated Border ─────────────────────────────────────── */
@@ -383,6 +409,67 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
+.inv-copy-card {
+  width: 100%;
+  max-width: 840px;
+  margin-bottom: 28px;
+  padding: 26px 28px;
+  border-radius: 24px;
+  border: 1px solid rgba(192, 132, 252, 0.16);
+  background: linear-gradient(180deg, rgba(19, 15, 34, 0.96), rgba(10, 8, 18, 0.96));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
+}
+
+.inv-copy-card h2 {
+  margin: 0 0 14px;
+  font-size: clamp(1.4rem, 2vw, 1.9rem);
+  color: #ffffff;
+}
+
+.inv-copy-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.75;
+}
+
+.inv-copy-card p + p {
+  margin-top: 14px;
+}
+
+.inv-link-grid {
+  width: 100%;
+  max-width: 840px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.inv-link-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  text-decoration: none;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(11, 10, 20, 0.9);
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.inv-link-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(192, 132, 252, 0.42);
+  box-shadow: 0 18px 36px rgba(88, 28, 135, 0.18);
+}
+
+.inv-link-card span {
+  font-size: 14px;
+  font-weight: 600;
+}
+
 /* ─── Back Button ─────────────────────────────────────────────────────────── */
 
 .inv-back {
@@ -435,5 +522,11 @@
   }
   .inv-cards {
     grid-template-columns: 1fr;
+  }
+  .inv-link-grid {
+    grid-template-columns: 1fr;
+  }
+  .inv-copy-card {
+    padding: 22px 18px;
   }
 }
