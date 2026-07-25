@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader, SectionCard } from '../components/Common';
 import { FileText } from 'lucide-react';
@@ -35,7 +35,7 @@ export default function TermsOfService() {
               <p>You agree to use the bot and dashboard only for lawful purposes and in a way that does not infringe the rights of, restrict, or inhibit anyone else&apos;s use and enjoyment of the service.</p>
               <ul>
                 <li>You must not use the service to harass, abuse, or harm another person.</li>
-                <li>You must not attempt to gain unauthorized access to our dashboard or database.</li>
+                <li>You must not attempt to gain unauthorized access to our dashboard or private systems.</li>
                 <li>You must comply with Discord&apos;s Terms of Service and Community Guidelines.</li>
               </ul>
 
@@ -68,3 +68,4 @@ export default function TermsOfService() {
     </div>
   );
 }
+

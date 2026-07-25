@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ShieldCheck, Ticket, Settings } from 'lucide-react';
 import Seo from '../components/Seo';
 
@@ -62,8 +62,8 @@ export default function Login() {
             <div className="login-feature" style={{ border: 'none', padding: 0, gap: '16px' }}>
               <div className="feature-icon" style={{ width: 42, height: 42, borderRadius: '14px', background: 'rgba(165, 136, 255, 0.08)', color: 'var(--accent)' }}><Settings size={18} /></div>
               <div className="feature-text" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
-                <strong style={{ fontSize: '14px' }}>Granular Permissions</strong>
-                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Full role and server-level toggle control</span>
+                <strong style={{ fontSize: '14px' }}>Staff Controls</strong>
+                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Easy role and server settings control</span>
               </div>
             </div>
 
@@ -71,7 +71,7 @@ export default function Login() {
               <div className="feature-icon" style={{ width: 42, height: 42, borderRadius: '14px', background: 'rgba(165, 136, 255, 0.08)', color: 'var(--accent)' }}><ShieldCheck size={18} /></div>
               <div className="feature-text" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
                 <strong style={{ fontSize: '14px' }}>Secure & Private</strong>
-                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Discord OAuth2 protected dashboard</span>
+                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Secure Discord dashboard access</span>
               </div>
             </div>
           </div>
@@ -119,7 +119,7 @@ export default function Login() {
               opacity: 0.8
             }}
           >
-            <div>SyncInk Ticket Dashboard &bull; Free for everyone &bull; Built with ♥</div>
+            <div>SyncInk Ticket Dashboard &bull; Free for everyone &bull; Built with â™¥</div>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
               <a href="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</a>
               <a href="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</a>
@@ -131,3 +131,4 @@ export default function Login() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader, SectionCard } from '../components/Common';
 import Seo from '../components/Seo';
@@ -10,7 +10,7 @@ export default function Guide() {
     <div className="page-stack guide-page">
       <Seo
         title="Guide | SyncInk Ticket Bot Setup & Dashboard Documentation"
-        description="Learn how to configure SyncInk Ticket panels, categories, logs, transcripts, and dashboard access without changing the bot's existing workflow."
+        description="Learn how to configure SyncInk Ticket panels, categories, logs, transcripts, and dashboard access without changing the bot's existing flow."
         path="/guide"
         keywords="SyncInk Ticket guide, Discord ticket bot setup, ticket dashboard documentation, ticket panels, transcripts"
       />
@@ -30,11 +30,11 @@ export default function Guide() {
           <div className="guide-steps">
             <div className="guide-step">
               <strong>Invite the bot</strong>
-              <p>Add SyncInk Ticket to your server from the Invite Bot page and ensure it has the permissions it needs to operate correctly.</p>
+              <p>Add SyncInk Ticket to your server from the Invite Bot page and make sure it has the access it needs to run correctly.</p>
             </div>
             <div className="guide-step">
               <strong>Sign in securely</strong>
-              <p>Log in with Discord OAuth2. Only the server owner and users with Administrator access can enter the dashboard.</p>
+              <p>Log in with Discord securely. Only the server owner and users with administrator access can enter the dashboard.</p>
             </div>
           </div>
         </SectionCard>
@@ -95,3 +95,4 @@ export default function Guide() {
     </div>
   );
 }
+

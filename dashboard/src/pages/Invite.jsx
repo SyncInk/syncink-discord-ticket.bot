@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+﻿import React, { useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BookOpen, LayoutDashboard, MessageSquareText, Shield, Ticket, X } from 'lucide-react';
 import Seo from '../components/Seo';
@@ -21,7 +21,7 @@ export default function Invite() {
     operatingSystem: 'Web, Discord',
     url: `${window.location.origin}/`,
     image: `${window.location.origin}/ticket-logo.png`,
-    description: 'SyncInk Ticket is a Discord ticket bot with customizable ticket panels, transcripts, analytics, staff workflows, and a real-time web dashboard.',
+    description: 'SyncInk Ticket is a Discord ticket bot with customizable ticket panels, saved transcripts, staff tools, and a premium web dashboard.',
     offers: {
       '@type': 'Offer',
       price: '0',
@@ -31,9 +31,9 @@ export default function Invite() {
       'Discord ticket panels',
       'Ticket categories and staff routing',
       'Transcript logging',
-      'Dashboard analytics',
+      'Dashboard insights',
       'Audit logs and activity feed',
-      'Real-time MongoDB synchronization'
+      'Instant dashboard updates'
     ]
   };
 
@@ -58,7 +58,7 @@ export default function Invite() {
     <div className="inv" ref={rootRef}>
       <Seo
         title="SyncInk Ticket Bot - Discord Ticket Dashboard, Transcripts & Panels"
-        description="SyncInk Ticket is a Discord ticket bot with customizable ticket panels, transcripts, analytics, ticket transfers, staff tools, and a premium real-time dashboard."
+        description="SyncInk Ticket is a Discord ticket bot with customizable ticket panels, saved transcripts, ticket transfers, staff tools, and a premium dashboard."
         path="/"
         canonicalPath="/"
         keywords="SyncInk Ticket Bot, Discord ticket bot, Discord ticket dashboard, ticket transcripts, support ticket system, Discord support bot"
@@ -90,7 +90,7 @@ export default function Invite() {
 
         <p className="inv-sub inv-entrance" style={{ '--d': '220ms' }}>
           SyncInk Ticket is a Discord ticket bot built for modern communities that need fast support,
-          clean ticket panels, reliable transcripts, staff routing, analytics, and a premium dashboard experience.
+          clean ticket panels, reliable transcripts, staff routing, clear activity tracking, and a premium dashboard experience.
         </p>
 
         <div className="inv-entrance inv-cta-group" style={{ '--d': '320ms' }}>
@@ -115,7 +115,7 @@ export default function Invite() {
             <div className="inv-card-content">
               <div className="inv-card-icon"><Ticket size={20} /></div>
               <h3>Ticket Management</h3>
-              <p>Create organized support flows with configurable ticket panels, categories, staff roles, and live Discord actions.</p>
+              <p>Create organized support flows with flexible ticket panels, categories, staff roles, and smooth Discord actions.</p>
             </div>
           </div>
           <div className="inv-card inv-entrance" style={{ '--d': '490ms' }}>
@@ -129,7 +129,7 @@ export default function Invite() {
             <div className="inv-card-content">
               <div className="inv-card-icon"><Shield size={20} /></div>
               <h3>Full Control</h3>
-              <p>Give your team the tools they need with claims, transfers, transcript logging, audit trails, and safe configuration controls.</p>
+              <p>Give your team the tools they need with claims, transfers, saved conversations, activity history, and safe configuration controls.</p>
             </div>
           </div>
         </div>
@@ -138,8 +138,7 @@ export default function Invite() {
           <h2>Advanced Discord ticket bot for support teams</h2>
           <p>
             SyncInk Ticket helps Discord servers manage support tickets professionally with customizable ticket embeds,
-            category-based routing, transcript storage, activity tracking, audit logs, and real-time synchronization between
-            Discord, MongoDB, and the dashboard.
+            category-based routing, saved transcripts, activity tracking, admin history, and instant updates across the dashboard.
           </p>
           <p>
             Server owners and administrators can control panel appearance, embed text, colors, channel destinations,
@@ -177,3 +176,4 @@ export default function Invite() {
     </div>
   );
 }
+

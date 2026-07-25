@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/Common';
 import { ChevronDown, HelpCircle } from 'lucide-react';
@@ -12,18 +12,18 @@ const FAQS = [
   },
   {
     question: 'What permissions does the bot actually need?',
-    answerText: 'The bot does not require Administrator. It only needs the permissions required for ticket creation, staff access, threads, messages, and transcript visibility.',
-    answer: <>The bot does NOT require the <code>Administrator</code> permission. For maximum security, it only requests the specific permissions it needs to operate: <code>Manage Channels</code>, <code>Manage Roles</code>, <code>Create Private Threads</code>, <code>Send Messages</code>, <code>Send Messages in Threads</code>, <code>Read Message History</code>, and <code>View Channels</code>.</>
+    answerText: 'The bot only asks for the access it needs to open tickets, help staff manage them, and save conversations properly.',
+    answer: <>The bot does not need full control of your server. It only asks for the access required to open tickets, help staff manage them, and save conversations properly.</>
   },
   {
     question: "Why aren't my ticket transcripts generating?",
-    answerText: 'Make sure the bot can read message history and view ticket channels, then verify that a valid transcript or log destination is configured in the dashboard.',
-    answer: <>Ensure the bot has the <code>Read Message History</code> and <code>View Channels</code> permissions in your ticket categories, and verify that you have configured a valid log channel in the dashboard settings.</>
+    answerText: 'Make sure the bot can fully access your ticket channels and that you have chosen the correct log channel in the dashboard.',
+    answer: <>Make sure the bot can fully access your ticket channels, and verify that you have selected the correct log channel in the dashboard settings.</>
   },
   {
     question: 'How are transcripts generated and stored?',
-    answerText: 'When a ticket closes, the bot compiles the conversation into an HTML transcript and sends it to the configured Discord log channel for permanent review.',
-    answer: <>When a ticket is closed, the bot automatically compiles all messages, attachments, and metadata into a permanent HTML file. This file is sent directly to your designated Discord log channel, ensuring you always have a secure backup of the conversation.</>
+    answerText: 'When a ticket closes, the bot saves the conversation and sends it to your chosen log channel so your team can review it later.',
+    answer: <>When a ticket is closed, the bot saves the conversation and sends it to your chosen log channel so your team can review it later whenever needed.</>
   },
   {
     question: 'Can I customize the ticket categories?',
@@ -32,8 +32,8 @@ const FAQS = [
   },
   {
     question: 'How do I add staff members?',
-    answerText: 'Assign staff roles from Dashboard Access and Ticket Categories. Those roles will be granted ticket access automatically in new tickets.',
-    answer: <>You can assign staff roles directly from the dashboard under <code>Dashboard Access</code> and <code>Ticket Categories</code>. Anyone with those roles will automatically be granted <code>View Channel</code> and <code>Send Messages</code> access in new tickets.</>
+    answerText: 'Assign staff roles from Dashboard Access and Ticket Categories. Those roles will be able to handle new tickets automatically.',
+    answer: <>You can assign staff roles directly from the dashboard under <code>Dashboard Access</code> and <code>Ticket Categories</code>. Anyone with those roles will automatically be able to handle new tickets.</>
   }
 ];
 
@@ -62,7 +62,7 @@ export default function FAQ() {
     <div className="dashboard-shell" style={{ display: 'block', height: '100vh', overflowY: 'auto' }}>
       <Seo
         title="FAQ | SyncInk Ticket Bot"
-        description="Read answers about SyncInk Ticket setup, permissions, transcripts, staff roles, and Discord dashboard access."
+        description="Read answers about SyncInk Ticket setup, access, transcripts, staff roles, and dashboard controls."
         path="/faq"
         keywords="SyncInk Ticket FAQ, Discord ticket bot help, transcript setup, dashboard access"
         schema={faqSchema}
@@ -109,3 +109,5 @@ export default function FAQ() {
     </div>
   );
 }
+
+
