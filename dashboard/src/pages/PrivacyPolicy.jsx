@@ -1,73 +1,84 @@
-﻿import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { PageHeader, SectionCard } from '../components/Common';
-import { Shield } from 'lucide-react';
+import React from 'react';
 import Seo from '../components/Seo';
+import MarketingFrame from '../components/MarketingFrame';
 
-export default function PrivacyPolicy() {
-  const navigate = useNavigate();
+const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
+
+const privacySections = [
+  {
+    title: 'Information We Collect',
+    body: [
+      'We collect the details needed to sign you in, recognize your servers, and help your team manage tickets smoothly.',
+      'This can include Discord profile details, server information, ticket content, and saved conversation records when tickets are closed.'
+    ]
+  },
+  {
+    title: 'How Your Information Is Used',
+    body: [
+      'Your information is used to run the support experience, keep dashboard access secure, and deliver the records your team expects.',
+      'This includes ticket creation, staff actions, saved transcripts, dashboard sign-in, and support-related improvements.'
+    ]
+  },
+  {
+    title: 'Storage and Security',
+    body: [
+      'We take reasonable steps to keep your information secure and available only to the people who should have access to it.',
+      'Saved transcripts and ticket records are intended for authorized staff and approved dashboard users only.'
+    ]
+  },
+  {
+    title: 'Data Removal',
+    body: [
+      'If you remove the bot from your server or contact support, your server data can be scheduled for removal.',
+      'Depending on the request, ticket records and saved settings may no longer be available after deletion is completed.'
+    ]
+  }
+];
+
+export default function PrivacyPolicy({ user }) {
+  const dashboardPath = user ? '/' : '/login';
 
   return (
-    <div className="dashboard-shell" style={{ display: 'block', height: '100vh', overflowY: 'auto' }}>
+    <>
       <Seo
         title="Privacy Policy | SyncInk Ticket"
         description="Read the SyncInk Ticket privacy policy covering account details, transcripts, ticket logs, and dashboard sign-in."
         path="/privacy"
       />
-      <main className="main-shell" style={{ margin: '0 auto', maxWidth: '900px', padding: '40px 20px' }}>
-        <div className="content-shell page-stack">
-          <button type="button" className="action-button tone-secondary" onClick={() => navigate(-1)} style={{ width: 'fit-content' }}>
-            Go Back
-          </button>
 
-          <PageHeader
-            title="Privacy Policy"
-            description="Last updated: June 2026"
-            icon={Shield}
-          />
-
-          <SectionCard>
-            <div className="legal-document">
-              <h2>1. Information We Collect</h2>
-              <p>We collect information you provide directly to us when you use our bot and dashboard. This includes:</p>
-              <ul>
-                <li><strong>Discord Profile Information:</strong> Your Discord account name and basic profile details to sign you in.</li>
-                <li><strong>Server Information:</strong> Your server details, roles, and channel layout to provide ticketing features.</li>
-                <li><strong>Ticket Data and Transcripts:</strong> Messages sent within ticket conversations, including text and attachments, to create saved ticket records for your logs.</li>
-              </ul>
-
-              <h2>2. How We Use Your Information</h2>
-              <p>We use the information we collect to operate, maintain, and improve our services, including:</p>
-              <ul>
-                <li>Creating and managing support tickets on your Discord server.</li>
-                <li>Generating permanent transcripts of closed tickets for moderation and review.</li>
-                <li>Signing you in to the web dashboard.</li>
-              </ul>
-
-              <h2>3. Data Storage and Security</h2>
-              <p>Your data is kept securely. We do not sell your personal information. Saved transcripts are only available to authorized server staff through the dashboard or chosen Discord log channels.</p>
-
-              <h2>4. Data Deletion</h2>
-              <p>You can request the deletion of your server&apos;s data at any time by removing the bot from your server or contacting our support team. Upon removal, ticket logs and configurations may be permanently deleted.</p>
-
-              <h2>5. Contact Us</h2>
-              <p>If you have any questions about this privacy policy, please contact us via our support server.</p>
-
-              <div className="support-embed">
-                <h3>SyncInk Support Hub</h3>
-                <p>Join our official Discord server for fast support, updates, and community.</p>
-                <a href="https://discord.gg/rB6gNZaK9u" target="_blank" rel="noopener noreferrer" className="action-button tone-primary">
-                  Join Support Server
-                </a>
+      <MarketingFrame
+        active="privacy"
+        user={user}
+        eyebrow="Privacy"
+        title="Privacy information for SyncInk Ticket"
+        description="This page explains what information is used to provide the ticket experience, how it supports your server, and how to reach us if you need help."
+        actions={[
+          { label: 'Open Dashboard', to: dashboardPath, tone: 'primary' },
+          { label: 'Support Server', href: SUPPORT_URL, external: true, tone: 'secondary' }
+        ]}
+      >
+        <section className="mk-panel">
+          <div className="mk-legal-copy">
+            <p className="mk-legal-updated">Last updated: July 25, 2026</p>
+            {privacySections.map((section, index) => (
+              <div key={section.title} className="mk-legal-section">
+                <h2>{index + 1}. {section.title}</h2>
+                {section.body.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
               </div>
+            ))}
 
-              <h2>6. Intellectual Property and Copyright</h2>
-              <p>The design, name, branding, and source code of SyncInk are strictly protected by international copyright law. Any unauthorized copying, cloning, reproduction, or distribution of our layout, assets, or identity is strictly prohibited and will be met with immediate legal action.</p>
+            <div className="mk-support-cta">
+              <h3>Need help with a privacy question?</h3>
+              <p>Join the support server if you want clarification about your account, records, or your server setup.</p>
+              <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="mk-action mk-action-primary">
+                Join Support Server
+              </a>
             </div>
-          </SectionCard>
-        </div>
-      </main>
-    </div>
+          </div>
+        </section>
+      </MarketingFrame>
+    </>
   );
 }
-

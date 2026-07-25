@@ -39,7 +39,9 @@ const featureCards = [
   }
 ];
 
-export default function Features() {
+export default function Features({ user }) {
+  const dashboardPath = user ? '/' : '/login';
+
   return (
     <>
       <Seo
@@ -50,12 +52,13 @@ export default function Features() {
       />
       <MarketingFrame
         active="features"
+        user={user}
         eyebrow="Product Overview"
         title="Powerful features for clean, fast Discord support"
         description="SyncInk Ticket combines premium design with practical support tools so your community can manage tickets smoothly from the first click to the final transcript."
         actions={[
           { label: 'Invite Bot', href: INVITE_URL, external: true, tone: 'primary' },
-          { label: 'Open Dashboard', to: '/login', tone: 'secondary' },
+          { label: 'Open Dashboard', to: dashboardPath, tone: 'secondary' },
           { label: 'Support Server', href: SUPPORT_URL, external: true, tone: 'secondary' }
         ]}
       >

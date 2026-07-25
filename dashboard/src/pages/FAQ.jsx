@@ -1,45 +1,46 @@
-﻿import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { PageHeader } from '../components/Common';
-import { ChevronDown, HelpCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import Seo from '../components/Seo';
+import MarketingFrame from '../components/MarketingFrame';
+
+const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
 
 const FAQS = [
   {
-    question: 'How do I setup the bot for the first time?',
-    answerText: "Go to your dashboard, open the Ticket Panels page, configure your categories, and deploy the interactive ticket panel to your Discord server.",
-    answer: <>Go to your dashboard, navigate to the <code>Ticket Panels</code> page, configure your categories, and click <code>Deploy Panel</code> to send the interactive ticket menu to your Discord server.</>
+    question: 'How do I set up the bot for the first time?',
+    answerText: 'Open the dashboard, configure your categories, and deploy the ticket panel to your chosen Discord channel.',
+    answer: 'Open the dashboard, configure your categories, and deploy the ticket panel to your chosen Discord channel.'
   },
   {
-    question: 'What permissions does the bot actually need?',
-    answerText: 'The bot only asks for the access it needs to open tickets, help staff manage them, and save conversations properly.',
-    answer: <>The bot does not need full control of your server. It only asks for the access required to open tickets, help staff manage them, and save conversations properly.</>
+    question: 'What permissions does the bot need?',
+    answerText: 'The bot only needs the access required to open tickets, help staff manage them, and save conversations correctly.',
+    answer: 'The bot only needs the access required to open tickets, help staff manage them, and save conversations correctly.'
   },
   {
-    question: "Why aren't my ticket transcripts generating?",
-    answerText: 'Make sure the bot can fully access your ticket channels and that you have chosen the correct log channel in the dashboard.',
-    answer: <>Make sure the bot can fully access your ticket channels, and verify that you have selected the correct log channel in the dashboard settings.</>
+    question: 'Why are my transcripts not appearing?',
+    answerText: 'Double-check that the bot can access ticket channels and that the transcript destination has been selected correctly.',
+    answer: 'Double-check that the bot can access ticket channels and that the transcript destination has been selected correctly.'
   },
   {
-    question: 'How are transcripts generated and stored?',
-    answerText: 'When a ticket closes, the bot saves the conversation and sends it to your chosen log channel so your team can review it later.',
-    answer: <>When a ticket is closed, the bot saves the conversation and sends it to your chosen log channel so your team can review it later whenever needed.</>
+    question: 'Can I customize ticket categories and staff routing?',
+    answerText: 'Yes. You can rename categories, change descriptions, add emojis, and assign support roles directly from the dashboard.',
+    answer: 'Yes. You can rename categories, change descriptions, add emojis, and assign support roles directly from the dashboard.'
   },
   {
-    question: 'Can I customize the ticket categories?',
-    answerText: 'Yes. You can rename categories, add emojis, edit descriptions, and assign staff roles for each category from the dashboard.',
-    answer: <>Yes. Navigate to the <code>Ticket Categories</code> tab on your dashboard. You can add custom emojis, titles, descriptions, and assign specific staff roles to each category to route users to the right team.</>
+    question: 'Who can access the dashboard?',
+    answerText: 'Only the server owner and members with administrator access are allowed into the dashboard.',
+    answer: 'Only the server owner and members with administrator access are allowed into the dashboard.'
   },
   {
-    question: 'How do I add staff members?',
-    answerText: 'Assign staff roles from Dashboard Access and Ticket Categories. Those roles will be able to handle new tickets automatically.',
-    answer: <>You can assign staff roles directly from the dashboard under <code>Dashboard Access</code> and <code>Ticket Categories</code>. Anyone with those roles will automatically be able to handle new tickets.</>
+    question: 'Can I manage panel appearance without affecting ticket behavior?',
+    answerText: 'Yes. The dashboard focuses on appearance, routing, and safe configuration while keeping the underlying support flow intact.',
+    answer: 'Yes. The dashboard focuses on appearance, routing, and safe configuration while keeping the underlying support flow intact.'
   }
 ];
 
-export default function FAQ() {
-  const navigate = useNavigate();
-  const [openIndex, setOpenIndex] = useState(null);
+export default function FAQ({ user }) {
+  const [openIndex, setOpenIndex] = useState(0);
+  const dashboardPath = user ? '/' : '/login';
 
   const faqSchema = {
     '@context': 'https://schema.org',
@@ -54,12 +55,8 @@ export default function FAQ() {
     }))
   };
 
-  const toggleAccordion = (index) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
-
   return (
-    <div className="dashboard-shell" style={{ display: 'block', height: '100vh', overflowY: 'auto' }}>
+    <>
       <Seo
         title="FAQ | SyncInk Ticket Bot"
         description="Read answers about SyncInk Ticket setup, access, transcripts, staff roles, and dashboard controls."
@@ -67,47 +64,38 @@ export default function FAQ() {
         keywords="SyncInk Ticket FAQ, Discord ticket bot help, transcript setup, dashboard access"
         schema={faqSchema}
       />
-      <main className="main-shell" style={{ margin: '0 auto', maxWidth: '900px', padding: '40px 20px' }}>
-        <div className="content-shell page-stack">
-          <button type="button" className="action-button tone-secondary" onClick={() => navigate(-1)} style={{ width: 'fit-content' }}>
-            Go Back
-          </button>
 
-          <PageHeader
-            title="Frequently Asked Questions"
-            description="Find answers to common questions about using SyncInk Ticket."
-            icon={HelpCircle}
-          />
-
-          <div className="faq-list">
-            {FAQS.map((faq, index) => (
-              <div key={faq.question} className="faq-item">
-                <button
-                  type="button"
-                  className="faq-question"
-                  onClick={() => toggleAccordion(index)}
-                >
-                  {faq.question}
-                  <ChevronDown
-                    size={20}
-                    style={{
-                      transition: 'transform 0.3s',
-                      transform: openIndex === index ? 'rotate(180deg)' : 'rotate(0)'
-                    }}
-                  />
-                </button>
-                {openIndex === index && (
-                  <div className="faq-answer">
-                    {faq.answer}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
-    </div>
+      <MarketingFrame
+        active="faq"
+        user={user}
+        eyebrow="FAQ"
+        title="Quick answers to the questions teams ask most"
+        description="If you want the short version before you jump into setup, this page covers the things server owners and staff usually want to know first."
+        actions={[
+          { label: 'Open Dashboard', to: dashboardPath, tone: 'primary' },
+          { label: 'Support Server', href: SUPPORT_URL, external: true, tone: 'secondary' }
+        ]}
+      >
+        <section className="mk-faq-list">
+          {FAQS.map((faq, index) => (
+            <article key={faq.question} className={`mk-faq-item ${openIndex === index ? 'open' : ''}`}>
+              <button
+                type="button"
+                className="mk-faq-question"
+                onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
+              >
+                <span>{faq.question}</span>
+                <ChevronDown size={18} />
+              </button>
+              {openIndex === index ? (
+                <div className="mk-faq-answer">
+                  <p>{faq.answer}</p>
+                </div>
+              ) : null}
+            </article>
+          ))}
+        </section>
+      </MarketingFrame>
+    </>
   );
 }
-
-

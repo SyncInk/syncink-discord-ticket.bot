@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Star, ChevronLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Star } from 'lucide-react';
 import '../css/reviews.css';
 import Seo from '../components/Seo';
+import MarketingFrame from '../components/MarketingFrame';
+
+const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
 
 export default function Reviews({ user }) {
   const [reviews, setReviews] = useState([]);
@@ -51,13 +53,11 @@ export default function Reviews({ user }) {
     setSubmittingReply(true);
     try {
       const res = await axios.post(`/api/reviews/${reviewId}/reply`, { content: replyContent });
-      setReviews(reviews.map(r => {
-        if (r._id === reviewId) {
-          const newReplies = [...(r.replies || []), res.data];
-          return { ...r, replies: newReplies };
-        }
-        return r;
-      }));
+      setReviews(reviews.map((review) => (
+        review._id === reviewId
+          ? { ...review, replies: [...(review.replies || []), res.data] }
+          : review
+      )));
       setReplyContent('');
       setReplyingTo(null);
     } catch (error) {
@@ -69,15 +69,14 @@ export default function Reviews({ user }) {
   };
 
   const handleDeleteReply = async (reviewId, replyId) => {
-    if (!window.confirm("Are you sure you want to delete this reply?")) return;
+    if (!window.confirm('Are you sure you want to delete this reply?')) return;
     try {
       await axios.delete(`/api/reviews/${reviewId}/reply/${replyId}`);
-      setReviews(reviews.map(r => {
-        if (r._id === reviewId) {
-          return { ...r, replies: r.replies.filter(rep => rep.replyId !== replyId) };
-        }
-        return r;
-      }));
+      setReviews(reviews.map((review) => (
+        review._id === reviewId
+          ? { ...review, replies: review.replies.filter((reply) => reply.replyId !== replyId) }
+          : review
+      )));
     } catch (error) {
       console.error('Failed to delete reply:', error);
       alert('Failed to delete reply.');
@@ -86,21 +85,22 @@ export default function Reviews({ user }) {
 
   const handlePinReview = async (reviewId, currentState) => {
     try {
-      const newState = !currentState;
-      await axios.patch(`/api/reviews/${reviewId}/pin`, { pinned: newState });
-      setReviews(reviews.map(r => {
-        if (r._id === reviewId) {
-          return { ...r, pinned: newState };
-        }
-        return r;
-      }).sort((a, b) => {
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      }));
+      const nextState = !currentState;
+      await axios.patch(`/api/reviews/${reviewId}/pin`, { pinned: nextState });
+      setReviews(
+        reviews
+          .map((review) => (
+            review._id === reviewId ? { ...review, pinned: nextState } : review
+          ))
+          .sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          })
+      );
     } catch (error) {
       console.error('Failed to toggle pin:', error);
-      alert('Failed to pin/unpin review.');
+      alert('Failed to pin or unpin review.');
     }
   };
 
@@ -127,204 +127,214 @@ export default function Reviews({ user }) {
     }
   };
 
-  const renderStars = (count) => {
-    return Array.from({ length: 5 }).map((_, i) => (
-      <Star key={i} size={14} fill={i < count ? 'currentColor' : 'none'} opacity={i < count ? 1 : 0.3} />
-    ));
-  };
+  const renderStars = (count) => Array.from({ length: 5 }).map((_, index) => (
+    <Star key={index} size={14} fill={index < count ? 'currentColor' : 'none'} opacity={index < count ? 1 : 0.3} />
+  ));
+
+  const dashboardPath = user ? '/' : '/login';
 
   return (
-    <div className="reviews-page-wrapper">
+    <>
       <Seo
         title="Reviews | SyncInk Ticket Bot"
         description="See what Discord communities say about SyncInk Ticket and how they use the ticket bot dashboard, staff tools, and transcripts."
         path="/reviews"
         keywords="SyncInk Ticket reviews, Discord ticket bot reviews, ticket bot dashboard"
       />
-      <Link to="/" className="back-to-dashboard">
-        <ChevronLeft size={20} /> Back to Dashboard
-      </Link>
 
-      <div className="reviews-header">
-        <h1>SyncInk Ticket Reviews</h1>
-        <p>See what the community has to say about our bot</p>
-      </div>
-
-      <div className="write-review-section">
-        {user ? (
-          <form onSubmit={handleSubmit}>
-            <h2>Write a Review</h2>
-            <div className="rating-input">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  className={`star-btn ${star <= rating ? 'active' : ''}`}
-                  onClick={() => setRating(star)}
-                >
-                  <Star size={28} fill={star <= rating ? 'currentColor' : 'none'} />
-                </button>
-              ))}
-            </div>
-            <textarea
-              className="review-textarea"
-              placeholder="Tell us what you think about SyncInk Ticket... (minimum 60 characters)"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              minLength={60}
-              required
-            />
-            <div className="char-counter" style={{ color: content.trim().length < 60 ? '#EF4444' : '#2ECC71', fontSize: '0.8rem', textAlign: 'right', marginBottom: '16px' }}>
-              {content.trim().length} / 60 minimum characters
-            </div>
-            <button type="submit" className="submit-review-btn" disabled={submitting || content.trim().length < 60}>
-              {submitting ? 'Submitting...' : 'Post Review'}
-            </button>
-          </form>
-        ) : (
-          <div className="login-prompt">
-            <p>You must be logged in to write a review.</p>
-            <a href="/api/auth/login">Login with Discord</a>
-          </div>
-        )}
-      </div>
-
-      <div className="reviews-container">
-        {loading ? (
-          <p style={{ textAlign: 'center', color: '#94A3B8', gridColumn: '1 / -1' }}>Loading reviews...</p>
-        ) : reviews.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#94A3B8', gridColumn: '1 / -1' }}>No reviews yet. Be the first!</p>
-        ) : (
-          reviews.map((review) => (
-            <div key={review._id} className={`review-card ${review.pinned ? 'pinned-review-card' : ''} ${review.username === 'syncky_wink' ? 'developer-review-card' : ''}`}>
-              <div className="review-card-header">
-                {review.avatar ? (
-                  <img
-                    className="review-avatar"
-                    src={`https://cdn.discordapp.com/avatars/${review.userId}/${review.avatar}.png`}
-                    alt={review.username}
-                  />
-                ) : (
-                  <div className="review-avatar-fallback">
-                    {review.globalName ? review.globalName.charAt(0) : review.username.charAt(0)}
-                  </div>
-                )}
-                <div className="review-user-info">
-                  <span className="review-username">{review.globalName || review.username}</span>
-                </div>
-                {review.pinned && (
-                  <div className="pinned-badge" title="Pinned Review">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
-                  </div>
-                )}
-              </div>
-              <div className="review-stars">
-                {renderStars(review.rating)}
-              </div>
-              <div className="review-content">
-                {review.content}
-              </div>
-              <div className="review-footer">
-                <div className="review-meta">
-                  {review.username === 'syncky_wink' ? (
-                    <>
-                      <span className="review-tier tier-developer">
-                        <span className="tier-icon">{getTierIcon('developer')}</span>
-                        DEVELOPER
-                      </span>
-                      <span className="meta-dot">•</span>
-                      <span className="meta-server-name">SYNCINK TICKET BOT</span>
-                    </>
-                  ) : review.highestTier && review.highestTierGuildName && (
-                    <>
-                      <span className={`review-tier tier-${review.highestTier.toLowerCase()}`}>
-                        <span className="tier-icon">{getTierIcon(review.highestTier)}</span>
-                        {review.highestTier.toUpperCase()}
-                      </span>
-                      <span className="meta-dot">•</span>
-                      <span className="meta-server-name">{review.highestTierGuildName}</span>
-                    </>
-                  )}
-                </div>
-                <div className="review-date">
-                  {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-                </div>
-              </div>
-
-              {(review.replies || []).length > 0 && (
-                <div className="review-replies-section">
-                  <div className="replies-divider" />
-                  {review.replies.map(reply => (
-                    <div key={reply.replyId} className="review-reply-card">
-                      <div className="reply-header">
-                        {reply.avatar ? (
-                          <img className="reply-avatar" src={`https://cdn.discordapp.com/avatars/${reply.userId}/${reply.avatar}.png`} alt={reply.username} />
-                        ) : (
-                          <div className="reply-avatar-fallback">{reply.globalName ? reply.globalName.charAt(0) : reply.username.charAt(0)}</div>
-                        )}
-                        <div className="reply-user-info">
-                          <span className="reply-username">{reply.globalName || reply.username}</span>
-                          <span className="reply-subtitle">Creator of SyncInk</span>
-                          <span className="review-tier tier-owner" style={{marginTop: '4px'}}>
-                            <span className="tier-icon">{getTierIcon('owner')}</span>
-                            OWNER
-                          </span>
-                        </div>
-                        {user?.isBotOwner && (
-                          <button className="delete-reply-btn" onClick={() => handleDeleteReply(review._id, reply.replyId)}>Delete</button>
-                        )}
-                      </div>
-                      <div className="reply-content">
-                        {reply.content}
-                      </div>
-                      <div className="reply-date">
-                        {new Date(reply.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-                      </div>
-                    </div>
+      <MarketingFrame
+        active="reviews"
+        user={user}
+        eyebrow="Reviews"
+        title="Feedback from the communities using SyncInk Ticket"
+        description="See what server owners, staff teams, and community managers have said after using the bot in real support workflows."
+        actions={[
+          { label: 'Open Dashboard', to: dashboardPath, tone: 'primary' },
+          { label: 'Support Server', href: SUPPORT_URL, external: true, tone: 'secondary' }
+        ]}
+      >
+        <div className="reviews-page-wrapper">
+          <div className="write-review-section">
+            {user ? (
+              <form onSubmit={handleSubmit}>
+                <h2>Write a Review</h2>
+                <div className="rating-input">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      className={`star-btn ${star <= rating ? 'active' : ''}`}
+                      onClick={() => setRating(star)}
+                    >
+                      <Star size={28} fill={star <= rating ? 'currentColor' : 'none'} />
+                    </button>
                   ))}
                 </div>
-              )}
-
-              {user?.isBotOwner && (
-                <div className="owner-reply-actions">
-                  {replyingTo === review._id ? (
-                    <div className="reply-form">
-                      <textarea
-                        className="review-textarea"
-                        placeholder="Write your official response..."
-                        value={replyContent}
-                        onChange={(e) => setReplyContent(e.target.value)}
-                        autoFocus
-                      />
-                      <div className="reply-form-buttons">
-                        <button className="submit-review-btn" onClick={() => handleReplySubmit(review._id)} disabled={submittingReply || !replyContent.trim()}>
-                          {submittingReply ? 'Posting...' : 'Post Reply'}
-                        </button>
-                        <button className="cancel-reply-btn" onClick={() => { setReplyingTo(null); setReplyContent(''); }}>
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                      <button className="owner-reply-btn" onClick={() => setReplyingTo(review._id)}>
-                        Reply as Owner
-                      </button>
-                      <button className="owner-pin-btn" onClick={() => handlePinReview(review._id, review.pinned)} title={review.pinned ? 'Unpin' : 'Pin'}>
-                        {review.pinned ? (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
-                        ) : (
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
-                        )}
-                      </button>
-                    </div>
-                  )}
+                <textarea
+                  className="review-textarea"
+                  placeholder="Tell us what you think about SyncInk Ticket... (minimum 60 characters)"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  minLength={60}
+                  required
+                />
+                <div className="char-counter" style={{ color: content.trim().length < 60 ? '#ef4444' : '#2ecc71', fontSize: '0.8rem', textAlign: 'right', marginBottom: '16px' }}>
+                  {content.trim().length} / 60 minimum characters
                 </div>
-              )}
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+                <button type="submit" className="submit-review-btn" disabled={submitting || content.trim().length < 60}>
+                  {submitting ? 'Submitting...' : 'Post Review'}
+                </button>
+              </form>
+            ) : (
+              <div className="login-prompt">
+                <p>You must be logged in to write a review.</p>
+                <a href="/api/auth/login">Login with Discord</a>
+              </div>
+            )}
+          </div>
+
+          <div className="reviews-container">
+            {loading ? (
+              <p style={{ textAlign: 'center', color: '#94a3b8', gridColumn: '1 / -1' }}>Loading reviews...</p>
+            ) : reviews.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#94a3b8', gridColumn: '1 / -1' }}>No reviews yet. Be the first!</p>
+            ) : (
+              reviews.map((review) => (
+                <div key={review._id} className={`review-card ${review.pinned ? 'pinned-review-card' : ''} ${review.username === 'syncky_wink' ? 'developer-review-card' : ''}`}>
+                  <div className="review-card-header">
+                    {review.avatar ? (
+                      <img
+                        className="review-avatar"
+                        src={`https://cdn.discordapp.com/avatars/${review.userId}/${review.avatar}.png`}
+                        alt={review.username}
+                      />
+                    ) : (
+                      <div className="review-avatar-fallback">
+                        {review.globalName ? review.globalName.charAt(0) : review.username.charAt(0)}
+                      </div>
+                    )}
+
+                    <div className="review-user-info">
+                      <span className="review-username">{review.globalName || review.username}</span>
+                    </div>
+
+                    {review.pinned ? (
+                      <div className="pinned-badge" title="Pinned Review">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="17" x2="12" y2="22" /><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" /></svg>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div className="review-stars">
+                    {renderStars(review.rating)}
+                  </div>
+
+                  <div className="review-content">
+                    {review.content}
+                  </div>
+
+                  <div className="review-footer">
+                    <div className="review-meta">
+                      {review.username === 'syncky_wink' ? (
+                        <>
+                          <span className="review-tier tier-developer">
+                            <span className="tier-icon">{getTierIcon('developer')}</span>
+                            DEVELOPER
+                          </span>
+                          <span className="meta-dot">&bull;</span>
+                          <span className="meta-server-name">SYNCINK TICKET BOT</span>
+                        </>
+                      ) : review.highestTier && review.highestTierGuildName ? (
+                        <>
+                          <span className={`review-tier tier-${review.highestTier.toLowerCase()}`}>
+                            <span className="tier-icon">{getTierIcon(review.highestTier)}</span>
+                            {review.highestTier.toUpperCase()}
+                          </span>
+                          <span className="meta-dot">&bull;</span>
+                          <span className="meta-server-name">{review.highestTierGuildName}</span>
+                        </>
+                      ) : null}
+                    </div>
+
+                    <div className="review-date">
+                      {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </div>
+                  </div>
+
+                  {(review.replies || []).length > 0 ? (
+                    <div className="review-replies-section">
+                      <div className="replies-divider" />
+                      {review.replies.map((reply) => (
+                        <div key={reply.replyId} className="review-reply-card">
+                          <div className="reply-header">
+                            {reply.avatar ? (
+                              <img className="reply-avatar" src={`https://cdn.discordapp.com/avatars/${reply.userId}/${reply.avatar}.png`} alt={reply.username} />
+                            ) : (
+                              <div className="reply-avatar-fallback">{reply.globalName ? reply.globalName.charAt(0) : reply.username.charAt(0)}</div>
+                            )}
+                            <div className="reply-user-info">
+                              <span className="reply-username">{reply.globalName || reply.username}</span>
+                              <span className="reply-subtitle">Creator of SyncInk</span>
+                              <span className="review-tier tier-owner" style={{ marginTop: '4px' }}>
+                                <span className="tier-icon">{getTierIcon('owner')}</span>
+                                OWNER
+                              </span>
+                            </div>
+                            {user?.isBotOwner ? (
+                              <button className="delete-reply-btn" onClick={() => handleDeleteReply(review._id, reply.replyId)}>Delete</button>
+                            ) : null}
+                          </div>
+                          <div className="reply-content">{reply.content}</div>
+                          <div className="reply-date">
+                            {new Date(reply.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {user?.isBotOwner ? (
+                    <div className="owner-reply-actions">
+                      {replyingTo === review._id ? (
+                        <div className="reply-form">
+                          <textarea
+                            className="review-textarea"
+                            placeholder="Write your official response..."
+                            value={replyContent}
+                            onChange={(e) => setReplyContent(e.target.value)}
+                            autoFocus
+                          />
+                          <div className="reply-form-buttons">
+                            <button className="submit-review-btn" onClick={() => handleReplySubmit(review._id)} disabled={submittingReply || !replyContent.trim()}>
+                              {submittingReply ? 'Posting...' : 'Post Reply'}
+                            </button>
+                            <button className="cancel-reply-btn" onClick={() => { setReplyingTo(null); setReplyContent(''); }}>
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                          <button className="owner-reply-btn" onClick={() => setReplyingTo(review._id)}>
+                            Reply as Owner
+                          </button>
+                          <button className="owner-pin-btn" onClick={() => handlePinReview(review._id, review.pinned)} title={review.pinned ? 'Unpin' : 'Pin'}>
+                            {review.pinned ? (
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="17" x2="12" y2="22" /><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" /></svg>
+                            ) : (
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="17" x2="12" y2="22" /><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" /></svg>
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </MarketingFrame>
+    </>
   );
 }

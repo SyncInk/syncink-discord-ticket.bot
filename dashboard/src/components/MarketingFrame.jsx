@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, LogOut } from 'lucide-react';
 import '../pages/MarketingPages.css';
 
 const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
@@ -10,7 +10,8 @@ const NAV_ITEMS = [
   { key: 'features', label: 'Features', to: '/features' },
   { key: 'commands', label: 'Commands', to: '/commands' },
   { key: 'guide', label: 'Guide', to: '/guide' },
-  { key: 'reviews', label: 'Reviews', to: '/reviews' }
+  { key: 'reviews', label: 'Reviews', to: '/reviews' },
+  { key: 'faq', label: 'FAQ', to: '/faq' }
 ];
 
 function ActionButton({ action }) {
@@ -36,7 +37,48 @@ function ActionButton({ action }) {
   );
 }
 
-export default function MarketingFrame({ active, eyebrow, title, description, actions = [], children }) {
+function getAvatarUrl(user) {
+  if (!user?.id || !user?.avatar) {
+    return null;
+  }
+
+  return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+}
+
+function AccountChip({ user }) {
+  const avatarUrl = getAvatarUrl(user);
+  const primaryName = user?.global_name || user?.username || 'Dashboard User';
+  const handle = user?.username ? `@${user.username}` : 'Signed in';
+
+  return (
+    <Link to="/" className="mk-account-chip" aria-label="Open dashboard">
+      {avatarUrl ? (
+        <img src={avatarUrl} alt={primaryName} className="mk-account-avatar" />
+      ) : (
+        <div className="mk-account-avatar mk-account-fallback">
+          {(primaryName || 'U').charAt(0).toUpperCase()}
+        </div>
+      )}
+      <div className="mk-account-copy">
+        <strong>{primaryName}</strong>
+        <span>{handle}</span>
+      </div>
+    </Link>
+  );
+}
+
+export default function MarketingFrame({
+  active,
+  eyebrow,
+  title,
+  description,
+  actions = [],
+  children,
+  user
+}) {
+  const dashboardPath = user ? '/' : '/login';
+  const dashboardLabel = user ? 'Dashboard' : 'Open Dashboard';
+
   return (
     <div className="mk-shell">
       <div className="mk-orbs" aria-hidden="true">
@@ -72,7 +114,15 @@ export default function MarketingFrame({ active, eyebrow, title, description, ac
             </a>
           </nav>
 
-          <Link to="/login" className="mk-dashboard-link">Dashboard</Link>
+          <div className="mk-topbar-actions">
+            <Link to={dashboardPath} className="mk-dashboard-link">{dashboardLabel}</Link>
+            {user ? <AccountChip user={user} /> : null}
+            {user ? (
+              <a href="/api/auth/logout" className="mk-signout-link" aria-label="Sign out" title="Sign out">
+                <LogOut size={18} />
+              </a>
+            ) : null}
+          </div>
         </header>
 
         <section className="mk-hero">

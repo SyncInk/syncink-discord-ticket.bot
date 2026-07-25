@@ -32,7 +32,7 @@ function RootGate({ user, guilds, selectedGuild, onSelectGuild }) {
   const location = useLocation();
 
   if (!user) {
-    return location.pathname === '/' ? <Invite /> : <Navigate to="/login" />;
+    return location.pathname === '/' ? <Invite user={user} /> : <Navigate to="/login" />;
   }
 
   if (!selectedGuild) {
@@ -118,15 +118,15 @@ export default function App() {
         <Route path="dashboard-access" element={<DashboardAccess />} />
         <Route path="miscellaneous" element={<Miscellaneous />} />
       </Route>
-      <Route path="/invite" element={<Invite />} />
-      <Route path="/features" element={<Features />} />
-      <Route path="/commands" element={<Commands />} />
-      <Route path="/support" element={<SupportPage />} />
-      <Route path="/guide" element={<Guide />} />
+      <Route path="/invite" element={<Invite user={user} />} />
+      <Route path="/features" element={<Features user={user} />} />
+      <Route path="/commands" element={<Commands user={user} />} />
+      <Route path="/support" element={<SupportPage user={user} />} />
+      <Route path="/guide" element={<Guide user={user} />} />
       <Route path="/reviews" element={<Reviews user={user} />} />
-      <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/terms" element={<TermsOfService />} />
-      <Route path="/faq" element={<FAQ />} />
+      <Route path="/privacy" element={<PrivacyPolicy user={user} />} />
+      <Route path="/terms" element={<TermsOfService user={user} />} />
+      <Route path="/faq" element={<FAQ user={user} />} />
       <Route path="/dashboard/:guildId/transcripts/:ticketId" element={user ? <TranscriptView /> : <Navigate to="/login" />} />
       <Route
         path="/servers"

@@ -1,71 +1,78 @@
-﻿import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { PageHeader, SectionCard } from '../components/Common';
-import { FileText } from 'lucide-react';
+import React from 'react';
 import Seo from '../components/Seo';
+import MarketingFrame from '../components/MarketingFrame';
 
-export default function TermsOfService() {
-  const navigate = useNavigate();
+const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
+
+const termsSections = [
+  {
+    title: 'Acceptance of Terms',
+    body: 'By inviting SyncInk Ticket to your server or using the dashboard, you agree to follow these terms while using the service.'
+  },
+  {
+    title: 'Using the Service',
+    body: 'You agree to use the bot and dashboard responsibly, avoid misuse, and respect Discord rules as well as the people using your server.'
+  },
+  {
+    title: 'Availability',
+    body: 'We aim to keep the service available and dependable, but uptime cannot be guaranteed at every moment.'
+  },
+  {
+    title: 'Termination',
+    body: 'Access may be limited or removed if the service is abused, used to harm others, or used in a way that breaks these terms.'
+  },
+  {
+    title: 'Changes to These Terms',
+    body: 'We may update these terms over time. Important changes can be shared through the dashboard, support server, or other official notices.'
+  },
+  {
+    title: 'Support and Contact',
+    body: 'If you have questions about these terms or need clarification, the support server is the best place to reach us.'
+  }
+];
+
+export default function TermsOfService({ user }) {
+  const dashboardPath = user ? '/' : '/login';
 
   return (
-    <div className="dashboard-shell" style={{ display: 'block', height: '100vh', overflowY: 'auto' }}>
+    <>
       <Seo
         title="Terms of Service | SyncInk Ticket"
         description="Review the SyncInk Ticket terms of service for using the Discord ticket bot and dashboard."
         path="/terms"
       />
-      <main className="main-shell" style={{ margin: '0 auto', maxWidth: '900px', padding: '40px 20px' }}>
-        <div className="content-shell page-stack">
-          <button type="button" className="action-button tone-secondary" onClick={() => navigate(-1)} style={{ width: 'fit-content' }}>
-            Go Back
-          </button>
 
-          <PageHeader
-            title="Terms of Service"
-            description="Last updated: June 2026"
-            icon={FileText}
-          />
-
-          <SectionCard>
-            <div className="legal-document">
-              <h2>1. Acceptance of Terms</h2>
-              <p>By inviting our bot to your Discord server and using the dashboard, you agree to be bound by these terms of service. If you disagree with any part of these terms, you may not use our service.</p>
-
-              <h2>2. Use of Service</h2>
-              <p>You agree to use the bot and dashboard only for lawful purposes and in a way that does not infringe the rights of, restrict, or inhibit anyone else&apos;s use and enjoyment of the service.</p>
-              <ul>
-                <li>You must not use the service to harass, abuse, or harm another person.</li>
-                <li>You must not attempt to gain unauthorized access to our dashboard or private systems.</li>
-                <li>You must comply with Discord&apos;s Terms of Service and Community Guidelines.</li>
-              </ul>
-
-              <h2>3. Service Availability</h2>
-              <p>We strive to ensure 99.9% uptime, but we do not guarantee that the service will always be available or uninterrupted. We reserve the right to suspend or withdraw the service at any time without notice.</p>
-
-              <h2>4. Termination</h2>
-              <p>We may terminate or suspend access to our service immediately, without prior notice or liability, for any reason whatsoever, including if you breach these terms.</p>
-
-              <h2>5. Changes to Terms</h2>
-              <p>We reserve the right to modify or replace these terms at any time. We will notify users of any significant changes via our support server or dashboard announcements.</p>
-
-              <h2>6. Intellectual Property and Copyright</h2>
-              <p>The design, name, branding, and source code of SyncInk are strictly protected by international copyright law. Any unauthorized copying, cloning, reproduction, or distribution of our layout, assets, or identity is strictly prohibited and will be met with immediate legal action.</p>
-
-              <h2>7. Support and Contact</h2>
-              <p>If you have any questions or concerns regarding these terms, please contact us on our official support server.</p>
-
-              <div className="support-embed">
-                <h3>SyncInk Support Hub</h3>
-                <p>Join our official Discord server for fast support, updates, and community.</p>
-                <a href="https://discord.gg/rB6gNZaK9u" target="_blank" rel="noopener noreferrer" className="action-button tone-primary">
-                  Join Support Server
-                </a>
+      <MarketingFrame
+        active="terms"
+        user={user}
+        eyebrow="Terms"
+        title="Terms for using SyncInk Ticket"
+        description="These terms explain the basic expectations for using the ticket bot, the dashboard, and the public website responsibly."
+        actions={[
+          { label: 'Open Dashboard', to: dashboardPath, tone: 'primary' },
+          { label: 'Support Server', href: SUPPORT_URL, external: true, tone: 'secondary' }
+        ]}
+      >
+        <section className="mk-panel">
+          <div className="mk-legal-copy">
+            <p className="mk-legal-updated">Last updated: July 25, 2026</p>
+            {termsSections.map((section, index) => (
+              <div key={section.title} className="mk-legal-section">
+                <h2>{index + 1}. {section.title}</h2>
+                <p>{section.body}</p>
               </div>
+            ))}
+
+            <div className="mk-support-cta">
+              <h3>Questions about these terms?</h3>
+              <p>Reach out through the support server if you want help understanding how these terms apply to your server.</p>
+              <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="mk-action mk-action-primary">
+                Join Support Server
+              </a>
             </div>
-          </SectionCard>
-        </div>
-      </main>
-    </div>
+          </div>
+        </section>
+      </MarketingFrame>
+    </>
   );
 }
-

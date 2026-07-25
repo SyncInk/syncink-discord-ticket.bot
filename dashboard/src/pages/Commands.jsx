@@ -63,7 +63,9 @@ const commandGroups = [
   }
 ];
 
-export default function Commands() {
+export default function Commands({ user }) {
+  const dashboardPath = user ? '/' : '/login';
+
   return (
     <>
       <Seo
@@ -74,12 +76,13 @@ export default function Commands() {
       />
       <MarketingFrame
         active="commands"
+        user={user}
         eyebrow="Commands"
         title="The main commands your team will actually use"
         description="SyncInk Ticket keeps the command set clean and practical, with straightforward tools for setup and everyday ticket handling."
         actions={[
           { label: 'Invite Bot', href: INVITE_URL, external: true, tone: 'primary' },
-          { label: 'Open Dashboard', to: '/login', tone: 'secondary' },
+          { label: 'Open Dashboard', to: dashboardPath, tone: 'secondary' },
           { label: 'Support Server', href: SUPPORT_URL, external: true, tone: 'secondary' }
         ]}
       >

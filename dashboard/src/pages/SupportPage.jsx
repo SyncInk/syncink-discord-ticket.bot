@@ -6,7 +6,9 @@ import MarketingFrame from '../components/MarketingFrame';
 const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
 const INVITE_URL = 'https://discord.com/oauth2/authorize?client_id=1513075101992747158&permissions=361046068240&integration_type=0&scope=bot+applications.commands';
 
-export default function SupportPage() {
+export default function SupportPage({ user }) {
+  const dashboardPath = user ? '/' : '/login';
+
   return (
     <>
       <Seo
@@ -17,13 +19,14 @@ export default function SupportPage() {
       />
       <MarketingFrame
         active="support"
+        user={user}
         eyebrow="Support"
         title="Need help? Join the official support server"
         description="If you need setup help, want advice on your ticket flow, or just want quick answers, the support server is the fastest place to reach us."
         actions={[
           { label: 'Join Support Server', href: SUPPORT_URL, external: true, tone: 'primary' },
           { label: 'Invite Bot', href: INVITE_URL, external: true, tone: 'secondary' },
-          { label: 'Open Dashboard', to: '/login', tone: 'secondary' }
+          { label: 'Open Dashboard', to: dashboardPath, tone: 'secondary' }
         ]}
       >
         <section className="mk-grid mk-grid-3">
