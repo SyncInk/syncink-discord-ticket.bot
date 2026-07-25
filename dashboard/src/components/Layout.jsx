@@ -74,6 +74,35 @@ const helpItems = [
   { path: '/guide', label: 'Dashboard Guide', icon: BookOpen, external: false }
 ];
 
+const DEFAULT_DASHBOARD_PREFS = {
+  accentColor: '#9d7cff',
+  density: 'comfortable',
+  motion: 'full',
+  glass: true,
+  clarity: 'balanced'
+};
+
+function hexToRgbTriplet(hex) {
+  if (!hex || typeof hex !== 'string') {
+    return '157 124 255';
+  }
+
+  const normalized = hex.replace('#', '');
+  const value = normalized.length === 3
+    ? normalized.split('').map((char) => `${char}${char}`).join('')
+    : normalized;
+
+  if (!/^[0-9a-fA-F]{6}$/.test(value)) {
+    return '157 124 255';
+  }
+
+  const int = parseInt(value, 16);
+  const r = (int >> 16) & 255;
+  const g = (int >> 8) & 255;
+  const b = int & 255;
+  return `${r} ${g} ${b}`;
+}
+
 function toastFromEvent(event) {
   const info = {
     title: titleFromEvent(event.type),
@@ -289,6 +318,54 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
 
   const userTier = snapshot?.userTier || selectedGuild?.dashboardTier || (selectedGuild?.owner ? 'owner' : 'staff');
   const userLevel = TIER_LEVELS[userTier] || 0;
+  const dashboardPreferences = {
+    ...DEFAULT_DASHBOARD_PREFS,
+    ...(snapshot?.settings?.dashboardPreferences || {})
+  };
+  const accentColor = dashboardPreferences.accentColor || DEFAULT_DASHBOARD_PREFS.accentColor;
+  const accentRgb = hexToRgbTriplet(accentColor);
+  const clarity = dashboardPreferences.clarity || DEFAULT_DASHBOARD_PREFS.clarity;
+  const clarityMap = {
+    soft: {
+      blur: dashboardPreferences.glass === false ? '0px' : '20px',
+      panelBlur: dashboardPreferences.glass === false ? '0px' : '16px',
+      topbarOpacity: '0.84',
+      panelOpacity: '0.88',
+      borderAlpha: '0.10',
+      bloomAlpha: '0.10'
+    },
+    balanced: {
+      blur: dashboardPreferences.glass === false ? '0px' : '28px',
+      panelBlur: dashboardPreferences.glass === false ? '0px' : '22px',
+      topbarOpacity: '0.72',
+      panelOpacity: '0.82',
+      borderAlpha: '0.12',
+      bloomAlpha: '0.14'
+    },
+    crystal: {
+      blur: dashboardPreferences.glass === false ? '0px' : '36px',
+      panelBlur: dashboardPreferences.glass === false ? '0px' : '26px',
+      topbarOpacity: '0.62',
+      panelOpacity: '0.76',
+      borderAlpha: '0.15',
+      bloomAlpha: '0.18'
+    }
+  };
+  const claritySettings = clarityMap[clarity] || clarityMap.balanced;
+  const shellStyle = {
+    '--accent': accentColor,
+    '--accent-strong': accentColor,
+    '--accent-rgb': accentRgb,
+    '--accent-ring': `rgb(${accentRgb} / 0.2)`,
+    '--bg-hover': `rgb(${accentRgb} / 0.12)`,
+    '--border-strong': `rgb(${accentRgb} / 0.26)`,
+    '--liquid-blur': claritySettings.blur,
+    '--liquid-panel-blur': claritySettings.panelBlur,
+    '--liquid-topbar-opacity': claritySettings.topbarOpacity,
+    '--liquid-panel-opacity': claritySettings.panelOpacity,
+    '--liquid-border-alpha': claritySettings.borderAlpha,
+    '--liquid-bloom-alpha': claritySettings.bloomAlpha
+  };
 
   const allowedNavItems = ALL_NAV_ITEMS.filter((item) => {
     const requiredLevel = TIER_LEVELS[item.minTier] || 0;
@@ -317,7 +394,10 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
   };
 
   return (
-    <div className="dashboard-shell">
+    <div
+      className={`dashboard-shell dashboard-clarity-${clarity} dashboard-density-${dashboardPreferences.density || 'comfortable'} dashboard-motion-${dashboardPreferences.motion || 'full'} ${dashboardPreferences.glass === false ? 'dashboard-glass-off' : 'dashboard-glass-on'}`}
+      style={shellStyle}
+    >
       <Seo
         title={`${currentLabel} | SyncInk Ticket Dashboard`}
         description="Private Discord ticket bot dashboard for authorized server owners and administrators."

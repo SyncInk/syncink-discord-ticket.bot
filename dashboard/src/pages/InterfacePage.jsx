@@ -14,7 +14,7 @@ import LockedOverlay from '../components/LockedOverlay';
 export default function InterfacePage() {
   const { busy, saveSettings, snapshot, setUnsavedChanges, setSaveAction } = useOutletContext();
   const { canEditSettings, getLockTooltip } = usePermissions();
-  const defaultPrefs = { accentColor: '#9d7cff', density: 'comfortable', motion: 'full', glass: true, theme: 'dark', sidebarBehavior: 'auto', toastDuration: 'medium' };
+  const defaultPrefs = { accentColor: '#9d7cff', density: 'comfortable', motion: 'full', glass: true, clarity: 'balanced', theme: 'dark', sidebarBehavior: 'auto', toastDuration: 'medium' };
   const [prefs, setPrefs] = useState(snapshot.settings?.dashboardPreferences || defaultPrefs);
 
   useEffect(() => {
@@ -74,6 +74,14 @@ export default function InterfacePage() {
               </SelectInput>
             </Field>
 
+            <Field label="Glass Clarity">
+              <SelectInput value={prefs.clarity || 'balanced'} onChange={(event) => updateField('clarity', event.target.value)} disabled={!canEditSettings}>
+                <option value="soft">Soft clarity (Denser glass)</option>
+                <option value="balanced">Balanced clarity</option>
+                <option value="crystal">Crystal clarity (Sharper refraction)</option>
+              </SelectInput>
+            </Field>
+
             <Field label="Density">
               <SelectInput value={prefs.density || 'comfortable'} onChange={(event) => updateField('density', event.target.value)} disabled={!canEditSettings}>
                 <option value="comfortable">Comfortable</option>
@@ -103,8 +111,8 @@ export default function InterfacePage() {
               <Toggle
                 checked={prefs.glass !== false}
                 onChange={(value) => updateField('glass', value)}
-                label="Glassmorphism surfaces"
-                description="Keep the translucent card styling for toasts and modals."
+                label="Liquid glass surfaces"
+                description="Keep the translucent dashboard shell, cards, toasts, and modal styling enabled."
                 disabled={!canEditSettings}
               />
             </div>
@@ -112,11 +120,19 @@ export default function InterfacePage() {
 
           <SectionCard title="Preview" description="A quick look at your interface settings.">
             <div className="theme-preview">
-              <div className="theme-preview-card" style={{ boxShadow: `0 25px 80px ${prefs.accentColor}25`, padding: prefs.density === 'compact' ? '12px' : '20px' }}>
+              <div
+                className="theme-preview-card"
+                style={{
+                  boxShadow: `0 25px 80px ${prefs.accentColor}25`,
+                  padding: prefs.density === 'compact' ? '12px' : '20px',
+                  backdropFilter: prefs.glass === false ? 'none' : prefs.clarity === 'crystal' ? 'blur(26px)' : prefs.clarity === 'soft' ? 'blur(14px)' : 'blur(20px)'
+                }}
+              >
                 <div className="theme-preview-bar" style={{ background: prefs.accentColor }} />
                 <strong>SyncInk UI Preview</strong>
                 <span>Density: {prefs.density}</span>
                 <span>Motion: {prefs.motion}</span>
+                <span>Clarity: {prefs.clarity || 'balanced'}</span>
                 <span>Sidebar: {prefs.sidebarBehavior}</span>
                 <button className="preview-btn" style={{ background: prefs.accentColor }}>Test Button</button>
               </div>
