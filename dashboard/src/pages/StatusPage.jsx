@@ -32,6 +32,14 @@ const COMPONENTS = [
 
 export default function StatusPage({ user }) {
   const days = 90;
+  const [expandedRows, setExpandedRows] = React.useState({});
+
+  const toggleRow = (id) => {
+    setExpandedRows(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
   
   // Calculate the date range
   const endDate = new Date();
@@ -87,15 +95,7 @@ export default function StatusPage({ user }) {
     return { bars, finalUptime: (Math.round(finalUptime * 100) / 100).toFixed(2) };
   };
 
-  const activeIncident = {
-    title: "We're currently experiencing issues",
-    subtitle: "Elevated errors affecting Ticket Processing Engine",
-    description: "Mitigation has been implemented, and we are monitoring the recovery of ticket routing and creation.",
-    status: "Monitoring",
-    timeString: "Ongoing for 2 hours"
-  };
-  // To show 'All systems operational', set activeIncident to null:
-  // const activeIncident = null;
+  const activeIncident = null;
 
   return (
     <MarketingFrame
@@ -145,8 +145,8 @@ export default function StatusPage({ user }) {
               const { bars, finalUptime } = generateBars(comp.id, comp.baseUptime);
               
               return (
-                <div key={comp.id} className="status-component-row">
-                  <div className="status-component-header">
+                <div key={comp.id} className={`status-component-row ${expandedRows[comp.id] ? 'expanded' : ''}`}>
+                  <div className="status-component-header" onClick={() => toggleRow(comp.id)}>
                     <div className="status-component-name-wrap">
                       <CheckCircle2 size={18} className="status-icon-ok" />
                       <strong>{comp.name}</strong>

@@ -354,3 +354,19 @@
 .status-bar.major_outage {
   background-color: #ef4444; /* Rose red */
 }
+.status-component-header {
+  cursor: pointer;
+  user-select: none;
+}
+.status-mobile-chevron {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.status-component-row.expanded .status-mobile-chevron {
+  transform: rotate(180deg);
+}
+@media (max-width: 768px) {
+  .status-component-row.expanded .status-bars-container {
+    display: flex !important;
+    margin-top: 16px;
+  }
+}
