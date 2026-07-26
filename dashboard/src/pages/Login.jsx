@@ -1,5 +1,5 @@
-﻿import React from 'react';
-import { ShieldCheck, Ticket, Settings } from 'lucide-react';
+import React from 'react';
+import { ShieldCheck, Ticket, Settings, Heart } from 'lucide-react';
 import Seo from '../components/Seo';
 
 export default function Login() {
@@ -119,11 +119,15 @@ export default function Login() {
               opacity: 0.8
             }}
           >
-            <div>SyncInk Ticket Dashboard &bull; Free for everyone &bull; Built with â™¥</div>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
-              <a href="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</a>
-              <a href="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</a>
-              <a href="/faq" style={{ color: 'inherit', textDecoration: 'none' }}>FAQ</a>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+              SyncInk Ticket Dashboard &bull; Free for everyone &bull; Built with <Heart size={12} color="#ef4444" fill="#ef4444" style={{ marginTop: '1px' }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' }}>
+              <a href="/terms" className="glow-link">Terms</a>
+              <span style={{ color: 'var(--border-strong)', fontSize: '10px' }}>┃</span>
+              <a href="/privacy" className="glow-link">Privacy</a>
+              <span style={{ color: 'var(--border-strong)', fontSize: '10px' }}>┃</span>
+              <a href="/faq" className="glow-link">FAQ</a>
             </div>
           </div>
         </div>

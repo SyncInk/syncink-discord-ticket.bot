@@ -3334,3 +3334,16 @@ canvas {
   animation: slideUpFade 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   opacity: 0;
 }
+
+/* Footer glowing links */
+.glow-link {
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.glow-link:hover {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 16px rgba(165, 136, 255, 0.4);
+}
