@@ -28,7 +28,6 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
 }
 
 /* Incident Card */
@@ -123,6 +122,8 @@
   padding: 24px 30px;
   border-bottom: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.02);
+  border-top-left-radius: calc(var(--radius-lg) - 1px);
+  border-top-right-radius: calc(var(--radius-lg) - 1px);
 }
 
 .status-card-title {
@@ -244,6 +245,33 @@
   border-width: 6px;
   border-style: solid;
   border-color: var(--border-strong) transparent transparent transparent;
+}
+
+/* Edge Case Tooltips */
+.status-bar-wrapper:nth-child(-n+15) .status-tooltip {
+  left: 0;
+  transform: translateX(-10px) translateY(5px);
+}
+.status-bar-wrapper:nth-child(-n+15):hover .status-tooltip {
+  transform: translateX(-10px) translateY(0);
+}
+.status-bar-wrapper:nth-child(-n+15) .status-tooltip::after {
+  left: 14px;
+  transform: none;
+}
+
+.status-bar-wrapper:nth-last-child(-n+15) .status-tooltip {
+  left: auto;
+  right: 0;
+  transform: translateX(10px) translateY(5px);
+}
+.status-bar-wrapper:nth-last-child(-n+15):hover .status-tooltip {
+  transform: translateX(10px) translateY(0);
+}
+.status-bar-wrapper:nth-last-child(-n+15) .status-tooltip::after {
+  left: auto;
+  right: 14px;
+  transform: none;
 }
 
 .tooltip-date {
