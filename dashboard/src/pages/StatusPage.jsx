@@ -102,15 +102,10 @@ export default function StatusPage({ user }) {
       active="status"
       user={user}
       eyebrow="System Status"
-      title="Real-time and historical data"
-      description="View the current operational status of all SyncInk Ticket bot components and services."
+      title="Platform Status"
+      description="Real-time insights and historical data on system performance, API connectivity, and infrastructure uptime."
     >
       <div className="status-page-wrapper">
-        <div className="status-header-area">
-          <h1>SyncInk Status</h1>
-          <p>Real-time and historical data on system performance and uptime.</p>
-        </div>
-
         {activeIncident ? (
           <div className="status-incident-card active">
             <div className="status-incident-header">
