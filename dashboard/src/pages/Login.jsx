@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Ticket, Settings, Heart } from 'lucide-react';
+import { ShieldCheck, Ticket, Settings } from 'lucide-react';
 import Seo from '../components/Seo';
 
 export default function Login() {
@@ -120,7 +120,7 @@ export default function Login() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-              SyncInk Ticket Dashboard &bull; Free for everyone &bull; Built with <Heart size={12} color="#ef4444" fill="#ef4444" style={{ marginTop: '1px' }} />
+              SyncInk Ticket Dashboard &bull; Free for everyone &bull; Built with <span style={{ color: '#ef4444', fontSize: '14px', lineHeight: 1 }}>&hearts;</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' }}>
               <a href="/terms" className="glow-link">Terms</a>
