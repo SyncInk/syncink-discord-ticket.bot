@@ -561,7 +561,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
               <ExternalLink size={18} />
               <span>Guide</span>
             </button>
-            <button type="button" className="nav-item" onClick={signOut}>
+            <button type="button" className="nav-item" onClick={() => window.location.href = '/api/auth/logout'}>
               <LogOut size={18} />
               <span>Sign Out</span>
             </button>
