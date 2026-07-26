@@ -143,6 +143,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
   const [saveAction, setSaveAction] = useState(null);
   const [pendingAction, setPendingAction] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileProfileOpen, setMobileProfileOpen] = useState(false);
   const refreshTimer = useRef(null);
   const socketRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -545,27 +546,6 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
               <span>Refresh Data</span>
             </button>
           </div>
-
-          {/* Mobile Only Navigation Group */}
-          <div className="sidebar-group mobile-only-sidebar-links">
-            <div className="sidebar-label">Profile & Links</div>
-            <button type="button" className="nav-item" onClick={() => handleNavigate('/features')}>
-              <ExternalLink size={18} />
-              <span>Features</span>
-            </button>
-            <button type="button" className="nav-item" onClick={() => handleNavigate('/commands')}>
-              <ExternalLink size={18} />
-              <span>Commands</span>
-            </button>
-            <button type="button" className="nav-item" onClick={() => handleNavigate('/guide')}>
-              <ExternalLink size={18} />
-              <span>Guide</span>
-            </button>
-            <button type="button" className="nav-item" onClick={() => window.location.href = '/api/auth/logout'}>
-              <LogOut size={18} />
-              <span>Sign Out</span>
-            </button>
-          </div>
         </div>
       </aside>
 
@@ -620,9 +600,45 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                 <span>Discord ticket system</span>
               </div>
             </div>
-            <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(true)}>
-              <Menu size={24} />
-            </button>
+            <div className="mobile-header-actions">
+              <button 
+                className={`mobile-menu-btn ${mobileMenuOpen ? 'active' : ''}`}
+                onClick={() => { setMobileProfileOpen(false); setMobileMenuOpen(!mobileMenuOpen); }}
+              >
+                <Menu size={24} />
+              </button>
+              <button 
+                className={`mobile-menu-btn ${mobileProfileOpen ? 'active' : ''}`}
+                onClick={() => { setMobileMenuOpen(false); setMobileProfileOpen(!mobileProfileOpen); }}
+              >
+                {user?.avatar ? (
+                  <img
+                    src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`}
+                    alt={user.username}
+                    style={{ width: 24, height: 24, borderRadius: '50%' }}
+                  />
+                ) : (
+                  <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--brand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 'bold' }}>
+                    {user?.username?.charAt(0) || 'U'}
+                  </div>
+                )}
+              </button>
+            </div>
+            
+            {mobileProfileOpen && (
+              <div className="mobile-profile-dropdown">
+                <div className="mobile-profile-header">
+                  <strong>{user?.global_name || user?.username}</strong>
+                  <span>@{user?.username}</span>
+                </div>
+                <div className="mobile-profile-links">
+                  <button type="button" onClick={() => handleNavigate('/features')}><ExternalLink size={16} /> Features</button>
+                  <button type="button" onClick={() => handleNavigate('/commands')}><ExternalLink size={16} /> Commands</button>
+                  <button type="button" onClick={() => handleNavigate('/guide')}><ExternalLink size={16} /> Guide</button>
+                  <a href="/api/auth/logout" className="mobile-logout"><LogOut size={16} /> Sign Out</a>
+                </div>
+              </div>
+            )}
           </div>
 
           {showAnnouncement && (
