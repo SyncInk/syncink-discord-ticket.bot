@@ -120,7 +120,7 @@ export default function Login() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-              SyncInk Ticket Dashboard &bull; Free for everyone &bull; Built with <span style={{ color: '#ef4444', fontSize: '14px', lineHeight: 1 }}>&hearts;</span>
+              SyncInk Ticket Dashboard &bull; Free for everyone &bull; Built with <span style={{ color: '#a588ff', fontSize: '14px', lineHeight: 1 }}>&hearts;</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' }}>
               <a href="/terms" className="glow-link">Terms</a>
