@@ -545,6 +545,27 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
               <span>Refresh Data</span>
             </button>
           </div>
+
+          {/* Mobile Only Navigation Group */}
+          <div className="sidebar-group mobile-only-sidebar-links">
+            <div className="sidebar-label">Profile & Links</div>
+            <button type="button" className="nav-item" onClick={() => handleNavigate('/features')}>
+              <ExternalLink size={18} />
+              <span>Features</span>
+            </button>
+            <button type="button" className="nav-item" onClick={() => handleNavigate('/commands')}>
+              <ExternalLink size={18} />
+              <span>Commands</span>
+            </button>
+            <button type="button" className="nav-item" onClick={() => handleNavigate('/guide')}>
+              <ExternalLink size={18} />
+              <span>Guide</span>
+            </button>
+            <button type="button" className="nav-item" onClick={signOut}>
+              <LogOut size={18} />
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
       </aside>
 
