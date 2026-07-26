@@ -86,12 +86,48 @@ export default function StatusPage() {
     return { bars, finalUptime: (Math.round(finalUptime * 100) / 100).toFixed(2) };
   };
 
+  const activeIncident = {
+    title: "We're currently experiencing issues",
+    subtitle: "Elevated errors affecting Ticket Processing Engine",
+    description: "Mitigation has been implemented, and we are monitoring the recovery of ticket routing and creation.",
+    status: "Monitoring",
+    timeString: "Ongoing for 2 hours"
+  };
+  // To show 'All systems operational', set activeIncident to null:
+  // const activeIncident = null;
+
   return (
     <div className="status-page-wrapper">
       <div className="status-header-area">
         <h1>SyncInk Status</h1>
         <p>Real-time and historical data on system performance and uptime.</p>
       </div>
+
+      {activeIncident ? (
+        <div className="status-incident-card active">
+          <div className="status-incident-header">
+            <AlertTriangle size={20} className="incident-icon-warning" />
+            <span className="incident-title">{activeIncident.title}</span>
+          </div>
+          <div className="status-incident-body">
+            <div className="incident-subtitle">
+              <span className="incident-dot red"></span>
+              {activeIncident.subtitle}
+            </div>
+            <p className="incident-desc">{activeIncident.description}</p>
+            <div className="incident-footer">
+              <span className="incident-status-text">{activeIncident.status}</span>
+              <span className="incident-bullet">&middot;</span>
+              <span className="incident-time">{activeIncident.timeString}</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="status-incident-card ok">
+          <CheckCircle2 size={24} className="incident-icon-ok" />
+          <span className="incident-title">All Systems Operational</span>
+        </div>
+      )}
 
       <div className="status-card">
         <div className="status-card-header">
