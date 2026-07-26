@@ -118,8 +118,8 @@ export default function App() {
         <Route path="bot-profile" element={<BotProfile />} />
         <Route path="dashboard-access" element={<DashboardAccess />} />
         <Route path="miscellaneous" element={<Miscellaneous />} />
-        <Route path="status" element={<StatusPage />} />
       </Route>
+      <Route path="/status" element={<StatusPage user={user} />} />
       <Route path="/invite" element={<Invite user={user} />} />
       <Route path="/features" element={<Features user={user} />} />
       <Route path="/commands" element={<Commands user={user} />} />
