@@ -186,6 +186,11 @@
   color: var(--text-soft);
 }
 
+.status-mobile-chevron {
+  display: none;
+  color: var(--text-muted);
+}
+
 .status-bars-container {
   display: flex;
   gap: 2px;
@@ -293,6 +298,49 @@
 .tooltip-icon.operational { color: #10b981; }
 .tooltip-icon.partial_outage { color: #f59e0b; }
 .tooltip-icon.major_outage { color: #ef4444; }
+
+/* Responsive Mobile Layout */
+@media (max-width: 768px) {
+  .status-page-wrapper {
+    padding: 20px 16px;
+  }
+  
+  .status-bars-container {
+    display: none; /* Hide 90-day bars entirely on mobile to match screenshot */
+  }
+
+  .status-uptime-val,
+  .status-nodes-count {
+    display: none; /* Simplify text on mobile */
+  }
+
+  .status-mobile-chevron {
+    display: block; /* Show dropdown chevron on mobile */
+  }
+
+  .status-component-header {
+    margin-bottom: 0; /* Remove bottom margin since bars are hidden */
+  }
+
+  .status-component-row {
+    padding: 16px 20px;
+  }
+  
+  .status-card-header,
+  .status-incident-header,
+  .status-incident-body {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  
+  .status-header-area h1 {
+    font-size: 26px;
+  }
+  
+  .status-header-area p {
+    font-size: 14px;
+  }
+}
 
 /* Status colors adapted for dark mode */
 .status-bar.operational {

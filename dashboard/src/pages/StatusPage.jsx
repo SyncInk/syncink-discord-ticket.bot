@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Activity, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
+import { Activity, CheckCircle2, AlertCircle, AlertTriangle, ChevronDown } from 'lucide-react';
 import './StatusPage.css';
 
 // Simple pseudo-random string hasher for deterministic results
@@ -152,6 +152,7 @@ export default function StatusPage() {
                   <div className="status-uptime-val">
                     {finalUptime}% uptime
                   </div>
+                  <ChevronDown size={18} className="status-mobile-chevron" />
                 </div>
                 
                 <div className="status-bars-container">
