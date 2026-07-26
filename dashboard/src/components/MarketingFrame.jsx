@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ExternalLink, ChevronDown, Shield, FileText } from 'lucide-react';
+import { ExternalLink, ChevronDown, Shield, FileText, Menu, X } from 'lucide-react';
 import '../pages/MarketingPages.css';
 
 const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
@@ -77,6 +77,7 @@ export default function MarketingFrame({
   children
 }) {
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dashboardPath = user ? (user.selectedGuildId ? `/dashboard/${user.selectedGuildId}` : '/servers') : '/api/auth/discord';
 
   return (
@@ -88,14 +89,19 @@ export default function MarketingFrame({
       </div>
 
       <div className="mk-content">
-        <header className="mk-topbar">
-          <Link to="/" className="mk-brand">
-            <img src="/ticket-logo.png" alt="SyncInk Ticket" />
-            <div>
-              <strong>SyncInk Ticket</strong>
-              <span>Discord ticket system</span>
-            </div>
-          </Link>
+        <header className={`mk-topbar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+          <div className="mk-topbar-header-mobile">
+            <Link to="/" className="mk-brand">
+              <img src="/ticket-logo.png" alt="SyncInk Ticket" />
+              <div>
+                <strong>SyncInk Ticket</strong>
+                <span>Discord ticket system</span>
+              </div>
+            </Link>
+            <button className="mk-mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
 
           <nav className="mk-nav">
             {NAV_ITEMS.map((item) => (

@@ -18,6 +18,7 @@ import {
   LayoutDashboard,
   LifeBuoy,
   LogOut,
+  Menu,
   MessageSquareMore,
   PanelsTopLeft,
   Plus,
@@ -141,6 +142,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [saveAction, setSaveAction] = useState(null);
   const [pendingAction, setPendingAction] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const refreshTimer = useRef(null);
   const socketRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -158,6 +160,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
   }, [unsavedChanges]);
 
   const handleNavigate = (path) => {
+    if (mobileMenuOpen) setMobileMenuOpen(false);
     if (unsavedChanges) {
       setPendingAction(() => () => navigate(path));
     } else {
@@ -396,7 +399,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
 
   return (
     <div
-      className={`dashboard-shell dashboard-clarity-${clarity} dashboard-density-${dashboardPreferences.density || 'comfortable'} dashboard-motion-${dashboardPreferences.motion || 'full'} ${dashboardPreferences.glass === false ? 'dashboard-glass-off' : 'dashboard-glass-on'}`}
+      className={`dashboard-shell dashboard-clarity-${clarity} dashboard-density-${dashboardPreferences.density || 'comfortable'} dashboard-motion-${dashboardPreferences.motion || 'full'} ${dashboardPreferences.glass === false ? 'dashboard-glass-off' : 'dashboard-glass-on'} ${mobileMenuOpen ? 'mobile-menu-open' : ''}`}
       style={shellStyle}
     >
       <Seo
@@ -405,6 +408,12 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
         path={location.pathname}
         robots="noindex,nofollow"
       />
+
+      {/* Mobile Backdrop */}
+      {mobileMenuOpen && (
+        <div className="mobile-sidebar-backdrop" onClick={() => setMobileMenuOpen(false)} />
+      )}
+
       <aside className="sidebar">
         <div className="brand-row">
           <img src="/ticket-logo.png" alt="SyncInk Ticket" style={{ width: 32, height: 32, borderRadius: 8 }} />
@@ -581,6 +590,18 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
         </header>
 
         <div className="content-shell">
+          {/* Mobile Header (Only visible on small screens) */}
+          <div className="mobile-header">
+            <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(true)}>
+              <Menu size={24} />
+            </button>
+            <div className="mobile-header-brand">
+              <img src="/ticket-logo.png" alt="SyncInk" style={{ width: 24, height: 24 }} />
+              <strong>SyncInk</strong>
+            </div>
+            <div style={{ width: 24 }} /> {/* spacer */}
+          </div>
+
           {showAnnouncement && (
             <div className="announcement-bar">
               <span className="announcement-icon">ℹ</span>

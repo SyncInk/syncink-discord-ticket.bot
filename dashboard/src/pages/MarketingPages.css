@@ -764,3 +764,52 @@
     height: 64px;
   }
 }
+/* Marketing Mobile Overrides */
+@media (max-width: 960px) {
+  .mk-topbar-header-mobile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  .mk-mobile-menu-btn {
+    display: block;
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .mk-topbar {
+    flex-direction: column;
+    border-radius: 24px;
+    padding: 16px;
+    align-items: flex-start;
+  }
+  .mk-topbar::before {
+    border-radius: 23px;
+  }
+  .mk-nav, .mk-topbar-actions {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    margin-top: 20px;
+    gap: 12px;
+  }
+  .mk-topbar.mobile-open .mk-nav,
+  .mk-topbar.mobile-open .mk-topbar-actions {
+    display: flex;
+  }
+  .mk-nav-link, .mk-dashboard-link {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+@media (min-width: 961px) {
+  .mk-mobile-menu-btn {
+    display: none;
+  }
+  .mk-topbar-header-mobile {
+    display: contents;
+  }
+}
