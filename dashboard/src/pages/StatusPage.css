@@ -1,0 +1,133 @@
+.status-page-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.status-header-area {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.status-header-area h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #fff 0%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: 'Sora', sans-serif;
+}
+
+.status-header-area p {
+  color: var(--text-soft);
+  font-size: 16px;
+}
+
+.status-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.status-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 30px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.status-card-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.status-card-date-range {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.status-components-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-component-row {
+  padding: 24px 30px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.status-component-row:last-child {
+  border-bottom: none;
+}
+
+.status-component-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.status-component-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-icon-ok {
+  color: #10b981;
+}
+
+.status-component-name-wrap strong {
+  font-size: 16px;
+  color: #e2e8f0;
+}
+
+.status-nodes-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-left: 8px;
+  padding-left: 12px;
+  border-left: 1px solid var(--border);
+}
+
+.status-uptime-val {
+  font-size: 15px;
+  color: var(--text-soft);
+}
+
+.status-bars-container {
+  display: flex;
+  gap: 2px;
+  height: 36px;
+  width: 100%;
+}
+
+.status-bar {
+  flex: 1;
+  border-radius: 2px;
+  background-color: #2e3643; /* default fallback */
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.status-bar:hover {
+  opacity: 0.7;
+}
+
+/* Status colors adapted for dark mode */
+.status-bar.operational {
+  background-color: #10b981; /* Emerald green */
+}
+
+.status-bar.partial_outage {
+  background-color: #f59e0b; /* Amber yellow */
+}
+
+.status-bar.major_outage {
+  background-color: #ef4444; /* Rose red */
+}

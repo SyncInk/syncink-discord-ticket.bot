@@ -27,6 +27,7 @@ import TranscriptView from './pages/Transcript';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import FAQ from './pages/FAQ';
+import StatusPage from './pages/StatusPage';
 
 function RootGate({ user, guilds, selectedGuild, onSelectGuild }) {
   const location = useLocation();
@@ -117,6 +118,7 @@ export default function App() {
         <Route path="bot-profile" element={<BotProfile />} />
         <Route path="dashboard-access" element={<DashboardAccess />} />
         <Route path="miscellaneous" element={<Miscellaneous />} />
+        <Route path="status" element={<StatusPage />} />
       </Route>
       <Route path="/invite" element={<Invite user={user} />} />
       <Route path="/features" element={<Features user={user} />} />

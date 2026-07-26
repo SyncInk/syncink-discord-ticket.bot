@@ -70,6 +70,7 @@ const ALL_NAV_ITEMS = [
 ];
 
 const helpItems = [
+  { path: '/status', label: 'System Status', icon: Activity, external: false },
   { path: '/invite', label: 'Invite Bot', icon: Plus, external: false },
   { path: '/guide', label: 'Dashboard Guide', icon: BookOpen, external: false }
 ];
