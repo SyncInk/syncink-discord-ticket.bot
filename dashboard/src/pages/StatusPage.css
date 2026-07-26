@@ -300,47 +300,43 @@
 .tooltip-icon.major_outage { color: #ef4444; }
 
 /* Responsive Mobile Layout */
-@media (max-width: 768px) {
-  .status-page-wrapper {
-    padding: 20px 16px;
-  }
-  
-  .status-bars-container {
-    display: none; /* Hide 90-day bars entirely on mobile to match screenshot */
-  }
+  @media (max-width: 768px) {
+    .status-page-wrapper {
+      padding: 20px 16px;
+    }
 
-  .status-uptime-val,
-  .status-nodes-count {
-    display: none; /* Simplify text on mobile */
-  }
-
-  .status-mobile-chevron {
-    display: block; /* Show dropdown chevron on mobile */
-  }
-
-  .status-component-header {
-    margin-bottom: 0; /* Remove bottom margin since bars are hidden */
-  }
-
-  .status-component-row {
-    padding: 16px 20px;
-  }
+    .status-uptime-val,
+    .status-nodes-count {
+      display: none; /* Simplify text on mobile header */
+    }
   
-  .status-card-header,
-  .status-incident-header,
-  .status-incident-body {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
+    .status-mobile-chevron {
+      display: block; /* Show dropdown chevron on mobile */
+    }
   
-  .status-header-area h1 {
-    font-size: 26px;
-  }
+    .status-component-header {
+      margin-bottom: 0 !important; /* Remove bottom margin since bars are in accordion */
+    }
   
-  .status-header-area p {
-    font-size: 14px;
+    .status-component-row {
+      padding: 16px 20px;
+    }
+    
+    .status-card-header,
+    .status-incident-header,
+    .status-incident-body {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    
+    .status-header-area h1 {
+      font-size: 26px;
+    }
+    
+    .status-header-area p {
+      font-size: 14px;
+    }
   }
-}
 
 /* Status colors adapted for dark mode */
 .status-bar.operational {
@@ -354,19 +350,46 @@
 .status-bar.major_outage {
   background-color: #ef4444; /* Rose red */
 }
-.status-component-header {
-  cursor: pointer;
-  user-select: none;
-}
-.status-mobile-chevron {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.status-component-row.expanded .status-mobile-chevron {
-  transform: rotate(180deg);
-}
-@media (max-width: 768px) {
-  .status-component-row.expanded .status-bars-container {
-    display: flex !important;
-    margin-top: 16px;
+  .status-component-header {
+    cursor: pointer;
+    user-select: none;
   }
-}
+  .status-mobile-chevron {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .status-component-row.expanded .status-mobile-chevron {
+    transform: rotate(180deg);
+  }
+  
+  /* Desktop defaults for expansion wrapper */
+  .status-mobile-expansion-wrapper {
+    display: block;
+  }
+  .status-mobile-details {
+    display: none;
+  }
+  
+  /* Mobile accordion animation */
+  @media (max-width: 768px) {
+    .status-mobile-expansion-wrapper {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .status-component-row.expanded .status-mobile-expansion-wrapper {
+      grid-template-rows: 1fr;
+    }
+    .status-mobile-expansion-inner {
+      overflow: hidden;
+    }
+    .status-mobile-details {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 13px;
+      padding-top: 16px;
+      margin-bottom: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 16px;
+    }
+  }

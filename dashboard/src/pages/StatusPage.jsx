@@ -158,25 +158,33 @@ export default function StatusPage({ user }) {
                     <ChevronDown size={18} className="status-mobile-chevron" />
                   </div>
                   
-                  <div className="status-bars-container">
-                    {bars.map((bar, i) => (
-                      <div key={i} className="status-bar-wrapper">
-                        <div className={`status-bar ${bar.status}`} />
-                        <div className="status-tooltip">
-                          <div className="tooltip-date">{bar.date}</div>
-                          <div className="tooltip-status">
-                            {bar.status === 'operational' ? (
-                              <CheckCircle2 size={16} className="tooltip-icon operational" />
-                            ) : bar.status === 'partial_outage' ? (
-                              <AlertTriangle size={16} className="tooltip-icon partial_outage" />
-                            ) : (
-                              <AlertCircle size={16} className="tooltip-icon major_outage" />
-                            )}
-                            <span>{bar.tooltip}</span>
-                          </div>
-                        </div>
+                  <div className="status-mobile-expansion-wrapper">
+                    <div className="status-mobile-expansion-inner">
+                      <div className="status-mobile-details">
+                        <span>{comp.nodes} {comp.nodes === 1 ? 'component' : 'components'}</span>
+                        <span>{finalUptime}% uptime</span>
                       </div>
-                    ))}
+                      <div className="status-bars-container">
+                        {bars.map((bar, i) => (
+                          <div key={i} className="status-bar-wrapper">
+                            <div className={`status-bar ${bar.status}`} />
+                            <div className="status-tooltip">
+                              <div className="tooltip-date">{bar.date}</div>
+                              <div className="tooltip-status">
+                                {bar.status === 'operational' ? (
+                                  <CheckCircle2 size={16} className="tooltip-icon operational" />
+                                ) : bar.status === 'partial_outage' ? (
+                                  <AlertTriangle size={16} className="tooltip-icon partial_outage" />
+                                ) : (
+                                  <AlertCircle size={16} className="tooltip-icon major_outage" />
+                                )}
+                                <span>{bar.tooltip}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
