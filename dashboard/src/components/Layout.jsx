@@ -592,14 +592,16 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
         <div className="content-shell">
           {/* Mobile Header (Only visible on small screens) */}
           <div className="mobile-header">
+            <div className="mobile-header-brand">
+              <img src="/ticket-logo.png" alt="SyncInk" style={{ width: 36, height: 36, borderRadius: '12px', boxShadow: '0 0 20px rgba(147, 51, 234, 0.2)' }} />
+              <div className="mobile-header-text">
+                <strong>SyncInk Ticket</strong>
+                <span>Discord ticket system</span>
+              </div>
+            </div>
             <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(true)}>
               <Menu size={24} />
             </button>
-            <div className="mobile-header-brand">
-              <img src="/ticket-logo.png" alt="SyncInk" style={{ width: 24, height: 24 }} />
-              <strong>SyncInk</strong>
-            </div>
-            <div style={{ width: 24 }} /> {/* spacer */}
           </div>
 
           {showAnnouncement && (
