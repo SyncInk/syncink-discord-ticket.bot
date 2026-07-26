@@ -107,6 +107,12 @@
   width: 100%;
 }
 
+.status-bar-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
 .status-bar {
   flex: 1;
   border-radius: 2px;
@@ -115,9 +121,65 @@
   transition: opacity 0.2s;
 }
 
-.status-bar:hover {
+.status-bar-wrapper:hover .status-bar {
   opacity: 0.7;
 }
+
+/* Tooltip Styling */
+.status-tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: var(--bg-panel-strong);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  min-width: max-content;
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.status-bar-wrapper:hover .status-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.status-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: var(--border-strong) transparent transparent transparent;
+}
+
+.tooltip-date {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.tooltip-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.tooltip-icon.operational { color: #10b981; }
+.tooltip-icon.partial_outage { color: #f59e0b; }
+.tooltip-icon.major_outage { color: #ef4444; }
 
 /* Status colors adapted for dark mode */
 .status-bar.operational {

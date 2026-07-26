@@ -51,17 +51,17 @@ export default function StatusPage() {
     for (let i = 0; i < days; i++) {
       const d = new Date(startDate);
       d.setDate(d.getDate() + i);
-      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const dateStr = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
       
       const r = random();
       let status = 'operational';
-      let tooltip = 'No downtime recorded';
+      let tooltip = 'No incidents';
       
       if (baseUptime === 100) {
         status = 'operational';
       } else if (r > 0.985) {
         status = 'major_outage';
-        tooltip = 'Major degradation (Outage)';
+        tooltip = 'Major incident';
         uptimePenalty += 0.02;
       } else if (r > 0.95 && r <= 0.985) {
         status = 'partial_outage';
@@ -120,11 +120,22 @@ export default function StatusPage() {
                 
                 <div className="status-bars-container">
                   {bars.map((bar, i) => (
-                    <div 
-                      key={i} 
-                      className={`status-bar ${bar.status}`}
-                      title={`${bar.date}\n${bar.tooltip}`}
-                    />
+                    <div key={i} className="status-bar-wrapper">
+                      <div className={`status-bar ${bar.status}`} />
+                      <div className="status-tooltip">
+                        <div className="tooltip-date">{bar.date}</div>
+                        <div className="tooltip-status">
+                          {bar.status === 'operational' ? (
+                            <CheckCircle2 size={16} className="tooltip-icon operational" />
+                          ) : bar.status === 'partial_outage' ? (
+                            <AlertTriangle size={16} className="tooltip-icon partial_outage" />
+                          ) : (
+                            <AlertCircle size={16} className="tooltip-icon major_outage" />
+                          )}
+                          <span>{bar.tooltip}</span>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
