@@ -33,6 +33,7 @@ const COMPONENTS = [
 export default function StatusPage({ user }) {
   const days = 90;
   const [expandedRows, setExpandedRows] = React.useState({});
+  const [offsetDays, setOffsetDays] = React.useState(0);
 
   const toggleRow = (id) => {
     setExpandedRows(prev => ({
@@ -43,8 +44,10 @@ export default function StatusPage({ user }) {
   
   // Calculate the date range
   const endDate = new Date();
-  const startDate = new Date();
-  startDate.setDate(endDate.getDate() - days);
+  endDate.setDate(endDate.getDate() - offsetDays);
+
+  const startDate = new Date(endDate);
+  startDate.setDate(startDate.getDate() - days);
 
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -52,7 +55,7 @@ export default function StatusPage({ user }) {
 
   const generateBars = (compId, baseUptime) => {
     const bars = [];
-    const seed = hashString(compId + startDate.getFullYear() + startDate.getMonth());
+    const seed = hashString(compId + startDate.getFullYear() + startDate.getMonth() + offsetDays);
     const random = mulberry32(seed);
 
     let uptimePenalty = 0;
@@ -136,7 +139,22 @@ export default function StatusPage({ user }) {
           <div className="status-card-header">
             <div className="status-card-title">System status</div>
             <div className="status-card-date-range">
-              &lt; {formatDate(startDate)} - {formatDate(endDate)} &gt;
+              <button 
+                className="status-date-btn" 
+                onClick={() => setOffsetDays(prev => prev + 90)}
+                aria-label="Previous 90 days"
+              >
+                &lt;
+              </button>
+              <span>{formatDate(startDate)} - {formatDate(endDate)}</span>
+              <button 
+                className="status-date-btn" 
+                onClick={() => setOffsetDays(prev => Math.max(0, prev - 90))}
+                disabled={offsetDays === 0}
+                aria-label="Next 90 days"
+              >
+                &gt;
+              </button>
             </div>
           </div>
 

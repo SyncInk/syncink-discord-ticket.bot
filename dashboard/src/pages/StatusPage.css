@@ -417,3 +417,27 @@
 .powered-logo svg {
   margin-top: -2px;
 }
+.status-card-date-range {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.status-date-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.status-date-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.status-date-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
