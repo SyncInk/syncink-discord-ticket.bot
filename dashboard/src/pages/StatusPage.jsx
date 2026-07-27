@@ -49,7 +49,7 @@ export default function StatusPage({ user }) {
   const startDate = new Date(endDate);
   startDate.setDate(startDate.getDate() - days);
 
-  const BOT_START_DATE = new Date('2024-01-01');
+  const BOT_START_DATE = new Date('2026-04-01');
   const canGoBack = startDate > BOT_START_DATE;
 
   const formatDate = (date) => {
