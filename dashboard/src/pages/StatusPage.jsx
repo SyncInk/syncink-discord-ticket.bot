@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Activity, CheckCircle2, AlertCircle, AlertTriangle, ChevronDown } from 'lucide-react';
+import { Activity, CheckCircle2, AlertCircle, AlertTriangle, ChevronDown, Flame } from 'lucide-react';
 import MarketingFrame from '../components/MarketingFrame';
 import './StatusPage.css';
 
@@ -189,6 +189,14 @@ export default function StatusPage({ user }) {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        <div className="status-powered-by">
+          <span className="powered-text">Powered by</span>
+          <div className="powered-logo">
+            <Flame size={16} fill="currentColor" />
+            <strong>incident.io</strong>
           </div>
         </div>
       </div>
