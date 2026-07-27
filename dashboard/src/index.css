@@ -3536,22 +3536,31 @@ canvas {
   margin-left: auto;
 }
 .live-status-dot {
+  position: relative;
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background-color: #ef4444;
-  box-shadow: 0 0 8px #ef4444;
-  animation: pulseAggressive 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
-@keyframes pulseAggressive {
-  0%, 100% {
+.live-status-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background-color: #ef4444;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: waveAggressive 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes waveAggressive {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
-    transform: scale(1);
-    box-shadow: 0 0 8px #ef4444, 0 0 12px #ef4444;
   }
-  50% {
-    opacity: 0.4;
-    transform: scale(0.85);
-    box-shadow: 0 0 2px #ef4444;
+  100% {
+    transform: translate(-50%, -50%) scale(3.5);
+    opacity: 0;
   }
 }
