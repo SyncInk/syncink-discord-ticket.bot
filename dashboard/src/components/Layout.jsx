@@ -538,6 +538,12 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                 >
                   <Icon size={18} />
                   <span>{item.label}</span>
+                  {item.path === '/status' && (
+                    <span className="live-status-badge">
+                      <span className="live-status-dot"></span>
+                      LIVE
+                    </span>
+                  )}
                 </button>
               );
             })}
