@@ -49,6 +49,9 @@ export default function StatusPage({ user }) {
   const startDate = new Date(endDate);
   startDate.setDate(startDate.getDate() - days);
 
+  const BOT_START_DATE = new Date('2024-01-01');
+  const canGoBack = startDate > BOT_START_DATE;
+
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
@@ -142,6 +145,7 @@ export default function StatusPage({ user }) {
               <button 
                 className="status-date-btn" 
                 onClick={() => setOffsetDays(prev => prev + 90)}
+                disabled={!canGoBack}
                 aria-label="Previous 90 days"
               >
                 &lt;
