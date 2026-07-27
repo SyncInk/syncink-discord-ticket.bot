@@ -11,7 +11,8 @@ const NAV_ITEMS = [
   { key: 'commands', label: 'Commands', to: '/commands' },
   { key: 'guide', label: 'Guide', to: '/guide' },
   { key: 'reviews', label: 'Reviews', to: '/reviews' },
-  { key: 'faq', label: 'FAQ', to: '/faq' }
+  { key: 'faq', label: 'FAQ', to: '/faq' },
+  { key: 'status', label: 'Status', to: '/status' }
 ];
 
 function ActionButton({ action }) {
