@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://syncink-ticket-bot.up.railway.app/sitemap.xml
