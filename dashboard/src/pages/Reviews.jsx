@@ -4,6 +4,7 @@ import { Star } from 'lucide-react';
 import '../css/reviews.css';
 import Seo from '../components/Seo';
 import MarketingFrame from '../components/MarketingFrame';
+import { getApiUrl } from '../api';
 
 const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
 
@@ -188,7 +189,7 @@ export default function Reviews({ user }) {
             ) : (
               <div className="login-prompt">
                 <p>You must be logged in to write a review.</p>
-                <a href="/api/auth/login">Login with Discord</a>
+                <a href={getApiUrl('/api/auth/login')}>Login with Discord</a>
               </div>
             )}
           </div>

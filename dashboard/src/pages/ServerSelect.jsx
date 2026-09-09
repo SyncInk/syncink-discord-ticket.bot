@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Crown, ShieldCheck, User } from 'lucide-react';
+import { getApiUrl } from '../api';
 
 export default function ServerSelect({ guilds, onSelect, selectedGuildId }) {
   const navigate = useNavigate();
@@ -73,7 +74,7 @@ export default function ServerSelect({ guilds, onSelect, selectedGuildId }) {
           <p style={{ margin: '0 0 14px' }}>
             SyncInk Ticket is not available in any servers where this account currently has the required permissions.
           </p>
-          <a href="/api/auth/logout" style={{ color: 'var(--accent)', fontWeight: 700 }}>Log out and refresh session</a>
+          <a href={getApiUrl('/api/auth/logout')} style={{ color: 'var(--accent)', fontWeight: 700 }}>Log out and refresh session</a>
         </div>
       ) : null}
     </div>

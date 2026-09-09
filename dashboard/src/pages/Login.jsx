@@ -1,10 +1,11 @@
 import React from 'react';
 import { ShieldCheck, Ticket, Settings } from 'lucide-react';
 import Seo from '../components/Seo';
+import { getApiUrl } from '../api';
 
 export default function Login() {
   const handleLogin = () => {
-    window.location.href = '/api/auth/login';
+    window.location.href = getApiUrl('/api/auth/login');
   };
 
   return (

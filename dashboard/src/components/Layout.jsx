@@ -2,6 +2,7 @@ import React, { startTransition, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import { API_BASE_URL, getApiUrl } from '../api';
 import {
   Activity,
   ArrowRightLeft,
@@ -209,7 +210,10 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
     if (!selectedGuild?.id) return;
 
     socketRef.current?.disconnect();
-    const socket = io('/', { withCredentials: true });
+    const socket = io(API_BASE_URL || window.location.origin, {
+      withCredentials: true,
+      transports: ['websocket', 'polling']
+    });
     socketRef.current = socket;
 
     socket.on('connect', () => {
@@ -590,7 +594,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                 <span>@{user?.username}</span>
               </div>
             </button>
-            <a href="/api/auth/logout" className="logout-btn" title="Logout">
+            <a href={getApiUrl('/api/auth/logout')} className="logout-btn" title="Logout">
               <LogOut size={16} />
             </a>
           </div>
@@ -641,7 +645,7 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
                   <button type="button" onClick={() => handleNavigate('/features')}><ExternalLink size={16} /> Features</button>
                   <button type="button" onClick={() => handleNavigate('/commands')}><ExternalLink size={16} /> Commands</button>
                   <button type="button" onClick={() => handleNavigate('/guide')}><ExternalLink size={16} /> Guide</button>
-                  <a href="/api/auth/logout" className="mobile-logout"><LogOut size={16} /> Sign Out</a>
+                  <a href={getApiUrl('/api/auth/logout')} className="mobile-logout"><LogOut size={16} /> Sign Out</a>
                 </div>
               </div>
             )}

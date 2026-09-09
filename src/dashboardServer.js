@@ -388,12 +388,30 @@ async function createDashboardSnapshot(client, guildId) {
 
 async function initDashboard(client) {
     const app = express();
+    app.set('trust proxy', 1);
+
+    const isCrossDomain = Boolean(
+        process.env.FRONTEND_URL && !process.env.FRONTEND_URL.includes('localhost')
+    );
+
+    const corsOptions = {
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true);
+            const frontendUrl = (process.env.FRONTEND_URL || '').replace(/\/+$/, '');
+            if (frontendUrl && (origin === frontendUrl || origin.startsWith(frontendUrl))) {
+                return callback(null, true);
+            }
+            if (origin.endsWith('.vercel.app') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+                return callback(null, true);
+            }
+            return callback(null, true);
+        },
+        credentials: true
+    };
+
     const server = createServer(app);
     const io = new Server(server, {
-        cors: {
-            origin: true,
-            credentials: true
-        }
+        cors: corsOptions
     });
 
     const sessionMiddleware = session({
@@ -403,12 +421,13 @@ async function initDashboard(client) {
         store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
         cookie: {
             maxAge: 1000 * 60 * 60 * 24 * 7,
-            sameSite: 'lax',
-            secure: false
+            sameSite: isCrossDomain ? 'none' : 'lax',
+            secure: isCrossDomain,
+            httpOnly: true
         }
     });
 
-    app.use(cors({ origin: true, credentials: true }));
+    app.use(cors(corsOptions));
     app.use(express.json({ limit: '1mb' }));
     app.use(sessionMiddleware);
     setSocketServer(io);
@@ -444,8 +463,9 @@ async function initDashboard(client) {
     });
 
     app.get('/api/auth/callback', async (req, res) => {
+        const frontendBase = (process.env.FRONTEND_URL || '').replace(/\/+$/, '');
         if (!req.query.code) {
-            return res.redirect('/login');
+            return res.redirect(frontendBase ? `${frontendBase}/login` : '/login');
         }
 
         try {
@@ -523,10 +543,14 @@ async function initDashboard(client) {
             req.session.adminGuilds = adminGuilds;
             req.session.accessToken = accessToken;
 
-            return res.redirect('/servers');
+            req.session.save((saveErr) => {
+                if (saveErr) console.error('[DASHBOARD] Session save error:', saveErr);
+                return res.redirect(frontendBase ? `${frontendBase}/servers` : '/servers');
+            });
         } catch (error) {
             console.error('[DASHBOARD AUTH ERROR]', error.response?.data || error.message);
-            return res.redirect('/login?error=auth_failed');
+            const frontendBase = (process.env.FRONTEND_URL || '').replace(/\/+$/, '');
+            return res.redirect(frontendBase ? `${frontendBase}/login?error=auth_failed` : '/login?error=auth_failed');
         }
     });
 
@@ -560,8 +584,9 @@ async function initDashboard(client) {
     });
 
     app.get('/api/auth/logout', (req, res) => {
+        const frontendBase = (process.env.FRONTEND_URL || '').replace(/\/+$/, '');
         req.session.destroy(() => {
-            res.redirect('/login');
+            res.redirect(frontendBase ? `${frontendBase}/login` : '/login');
         });
     });
 

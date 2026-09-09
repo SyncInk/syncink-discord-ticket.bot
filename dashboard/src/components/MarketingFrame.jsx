@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ExternalLink, ChevronDown, Shield, FileText, Menu, X } from 'lucide-react';
+import { getApiUrl } from '../api';
 import '../pages/MarketingPages.css';
 
 const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
@@ -79,7 +80,7 @@ export default function MarketingFrame({
 }) {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const dashboardPath = user ? (user.selectedGuildId ? `/dashboard/${user.selectedGuildId}` : '/servers') : '/api/auth/discord';
+  const dashboardPath = user ? (user.selectedGuildId ? `/dashboard/${user.selectedGuildId}` : '/servers') : getApiUrl('/api/auth/login');
 
   return (
     <div className="mk-shell">
