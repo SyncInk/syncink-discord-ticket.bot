@@ -148,6 +148,8 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
   const refreshTimer = useRef(null);
   const socketRef = useRef(null);
   const dropdownRef = useRef(null);
+  const isRefreshingRef = useRef(false);
+  const queuedRefreshRef = useRef(false);
 
   // Warn on browser close/refresh
   useEffect(() => {
@@ -182,6 +184,11 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
 
   const refreshSnapshot = React.useCallback(async (showLoader = false) => {
     if (!selectedGuild?.id) return;
+    if (isRefreshingRef.current) {
+      queuedRefreshRef.current = true;
+      return;
+    }
+    isRefreshingRef.current = true;
     if (showLoader) setLoading(true);
 
     try {
@@ -196,7 +203,12 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
         tone: 'error'
       });
     } finally {
+      isRefreshingRef.current = false;
       setLoading(false);
+      if (queuedRefreshRef.current) {
+        queuedRefreshRef.current = false;
+        refreshSnapshot(false);
+      }
     }
   }, [selectedGuild?.id, pushToast]);
 

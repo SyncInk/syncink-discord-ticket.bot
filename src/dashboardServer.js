@@ -6,6 +6,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo').default;
 const axios = require('axios');
 const path = require('path');
+const zlib = require('zlib');
 const { ChannelType } = require('discord.js');
 
 const db = require('./utils/database');
@@ -389,6 +390,38 @@ async function createDashboardSnapshot(client, guildId) {
 async function initDashboard(client) {
     const app = express();
     app.set('trust proxy', 1);
+
+    // Gzip response compression for minimal data traffic
+    app.use((req, res, next) => {
+        const acceptEncoding = req.headers['accept-encoding'] || '';
+        if (!acceptEncoding.includes('gzip')) return next();
+
+        const originalSend = res.send;
+        res.send = function (body) {
+            if ((typeof body === 'string' || Buffer.isBuffer(body)) && Buffer.byteLength(body) > 1024) {
+                res.setHeader('Content-Encoding', 'gzip');
+                res.removeHeader('Content-Length');
+                const compressed = zlib.gzipSync(body);
+                return originalSend.call(this, compressed);
+            }
+            return originalSend.call(this, body);
+        };
+
+        const originalJson = res.json;
+        res.json = function (obj) {
+            const jsonString = JSON.stringify(obj);
+            if (Buffer.byteLength(jsonString) > 1024) {
+                res.setHeader('Content-Type', 'application/json');
+                res.setHeader('Content-Encoding', 'gzip');
+                res.removeHeader('Content-Length');
+                const compressed = zlib.gzipSync(jsonString);
+                return originalSend.call(this, compressed);
+            }
+            return originalJson.call(this, obj);
+        };
+
+        next();
+    });
 
     const isCrossDomain = Boolean(
         process.env.FRONTEND_URL && !process.env.FRONTEND_URL.includes('localhost')
