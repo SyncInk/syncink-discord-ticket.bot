@@ -487,6 +487,12 @@ async function initDashboard(client) {
     });
 
     app.get('/api/auth/login', (req, res) => {
+        if (req.query.redirect) {
+            req.session.returnTo = req.query.redirect;
+            req.session.save((err) => {
+                if (err) console.error('[DASHBOARD] Session save error on login:', err);
+            });
+        }
         const clientId = process.env.DISCORD_CLIENT_ID || client.user.id;
         const redirectUri = encodeURIComponent(
             process.env.DISCORD_REDIRECT_URI || 'http://localhost:3000/api/auth/callback'
@@ -496,7 +502,7 @@ async function initDashboard(client) {
     });
 
     app.get('/api/auth/callback', async (req, res) => {
-        const frontendBase = (process.env.FRONTEND_URL || '').replace(/\/+$/, '');
+        const frontendBase = (req.session?.returnTo || process.env.FRONTEND_URL || '').replace(/\/+$/, '');
         if (!req.query.code) {
             return res.redirect(frontendBase ? `${frontendBase}/login` : '/login');
         }
@@ -582,7 +588,7 @@ async function initDashboard(client) {
             });
         } catch (error) {
             console.error('[DASHBOARD AUTH ERROR]', error.response?.data || error.message);
-            const frontendBase = (process.env.FRONTEND_URL || '').replace(/\/+$/, '');
+            const frontendBase = (req.session?.returnTo || process.env.FRONTEND_URL || '').replace(/\/+$/, '');
             return res.redirect(frontendBase ? `${frontendBase}/login?error=auth_failed` : '/login?error=auth_failed');
         }
     });
@@ -617,7 +623,7 @@ async function initDashboard(client) {
     });
 
     app.get('/api/auth/logout', (req, res) => {
-        const frontendBase = (process.env.FRONTEND_URL || '').replace(/\/+$/, '');
+        const frontendBase = (req.query.redirect || req.session?.returnTo || process.env.FRONTEND_URL || '').replace(/\/+$/, '');
         req.session.destroy(() => {
             res.redirect(frontendBase ? `${frontendBase}/login` : '/login');
         });

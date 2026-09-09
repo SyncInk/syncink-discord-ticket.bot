@@ -1,4 +1,4 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 
 // Public API Base URL when deployed separately (e.g. Vercel -> Termux tunnel)
 // Defaults to empty string for same-origin local development
@@ -15,7 +15,12 @@ axios.defaults.withCredentials = true;
  */
 export function getApiUrl(path) {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  return API_BASE_URL ? `${API_BASE_URL}${normalizedPath}` : normalizedPath;
+  const base = API_BASE_URL ? `${API_BASE_URL}${normalizedPath}` : normalizedPath;
+  if (typeof window !== 'undefined' && (path.includes('/api/auth/login') || path.includes('/api/auth/logout'))) {
+    const separator = base.includes('?') ? '&' : '?';
+    return `${base}${separator}redirect=${encodeURIComponent(window.location.origin)}`;
+  }
+  return base;
 }
 
 export default axios;
