@@ -463,6 +463,18 @@ async function initDashboard(client) {
     app.use(cors(corsOptions));
     app.use(express.json({ limit: '1mb' }));
     app.use(sessionMiddleware);
+    app.use((req, res, next) => {
+        const origin = req.headers.origin || req.headers.referer;
+        if (origin) {
+            try {
+                const parsed = new URL(origin);
+                if (parsed.hostname.endsWith('.vercel.app')) {
+                    global.frontendUrl = parsed.origin;
+                }
+            } catch (e) {}
+        }
+        next();
+    });
     app.get('/health', (req, res) => res.status(200).send('OK'));
     app.get('/api/health', (req, res) => res.status(200).json({ status: 'healthy', uptime: process.uptime() }));
     setSocketServer(io);
@@ -504,7 +516,10 @@ async function initDashboard(client) {
     });
 
     app.get('/api/auth/callback', async (req, res) => {
-        const frontendBase = (req.session?.returnTo || process.env.FRONTEND_URL || '').replace(/\/+$/, '');
+        let frontendBase = (process.env.FRONTEND_URL || global.frontendUrl || 'https://syncink-discord-ticket-bot.vercel.app').replace(/\/+$/, '');
+        if (frontendBase.includes('railway.app')) {
+            frontendBase = 'https://syncink-discord-ticket-bot.vercel.app';
+        }
         if (!req.query.code) {
             return res.redirect(frontendBase ? `${frontendBase}/login` : '/login');
         }
@@ -586,11 +601,15 @@ async function initDashboard(client) {
 
             req.session.save((saveErr) => {
                 if (saveErr) console.error('[DASHBOARD] Session save error:', saveErr);
-                return res.redirect(frontendBase ? `${frontendBase}/servers` : '/servers');
+                let target = req.session?.returnTo;
+                delete req.session.returnTo;
+                if (!target || target.includes('railway.app') || target.endsWith('/login')) {
+                    target = frontendBase ? `${frontendBase}/servers` : '/servers';
+                }
+                return res.redirect(target);
             });
         } catch (error) {
             console.error('[DASHBOARD AUTH ERROR]', error.response?.data || error.message);
-            const frontendBase = (req.session?.returnTo || process.env.FRONTEND_URL || '').replace(/\/+$/, '');
             return res.redirect(frontendBase ? `${frontendBase}/login?error=auth_failed` : '/login?error=auth_failed');
         }
     });
@@ -625,7 +644,10 @@ async function initDashboard(client) {
     });
 
     app.get('/api/auth/logout', (req, res) => {
-        const frontendBase = (req.query.redirect || req.session?.returnTo || process.env.FRONTEND_URL || '').replace(/\/+$/, '');
+        let frontendBase = (req.query.redirect || req.session?.returnTo || process.env.FRONTEND_URL || global.frontendUrl || 'https://syncink-discord-ticket-bot.vercel.app').replace(/\/+$/, '');
+        if (frontendBase.includes('railway.app')) {
+            frontendBase = 'https://syncink-discord-ticket-bot.vercel.app';
+        }
         req.session.destroy(() => {
             res.redirect(frontendBase ? `${frontendBase}/login` : '/login');
         });
@@ -997,7 +1019,7 @@ async function initDashboard(client) {
         }
     });
 
-    app.get('/api/guilds/:guildId/tickets/:ticketId/transcript', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
+    app.get('/api/guilds/:guildId/tickets/:ticketId/transcript', async (req, res) => {
         try {
             const Ticket = db.getMongoModel();
             const ticket = await Ticket.findOne({ ticketId: req.params.ticketId, guildId: req.params.guildId });

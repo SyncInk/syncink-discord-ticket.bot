@@ -34,7 +34,7 @@ async function start() {
         await initDatabase();
         await migrateLegacySqlite();
         loadHandlers();
-        await initDashboard(client); // Start web server immediately for Railway health checks
+        await initDashboard(client); // Start web server immediately for cloud health checks (Render / UptimeRobot)
         await client.login(process.env.DISCORD_TOKEN);
     } catch (err) {
         console.error('[CRITICAL] Error starting the ticket system:', err);

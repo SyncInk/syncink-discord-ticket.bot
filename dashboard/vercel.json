@@ -1,6 +1,10 @@
-﻿{
+{
   "framework": "vite",
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://syncink-ticket.onrender.com/api/$1"
+    },
     {
       "source": "/(.*)",
       "destination": "/"

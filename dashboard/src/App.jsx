@@ -132,7 +132,7 @@ export default function App() {
         <Route path="/privacy" element={<PrivacyPolicy user={user} />} />
         <Route path="/terms" element={<TermsOfService user={user} />} />
         <Route path="/faq" element={<FAQ user={user} />} />
-        <Route path="/dashboard/:guildId/transcripts/:ticketId" element={user ? <TranscriptView /> : <Navigate to="/login" />} />
+        <Route path="/dashboard/:guildId/transcripts/:ticketId" element={<TranscriptView user={user} />} />
         <Route
           path="/servers"
           element={user ? (

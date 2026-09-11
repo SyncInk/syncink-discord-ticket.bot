@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import axios, { getApiUrl } from '../api';
+import Seo from '../components/Seo';
 import '../css/transcript.css';
 
 export default function Transcript() {
@@ -17,13 +18,32 @@ export default function Transcript() {
       })
       .catch(err => {
         console.error(err);
-        setError('Failed to load transcript.');
+        setError(err.response?.data?.error || 'Failed to load transcript.');
         setLoading(false);
       });
   }, [guildId, ticketId]);
 
   if (loading) return <div className="transcript-loading">Loading transcript...</div>;
-  if (error) return <div className="transcript-error">{error}</div>;
+  if (error) {
+    return (
+      <div className="transcript-page">
+        <Seo
+          title={`Transcript ${ticketId} | SyncInk Ticket`}
+          description="View Discord ticket transcript"
+          path={`/dashboard/${guildId}/transcripts/${ticketId}`}
+          robots="noindex,nofollow"
+        />
+        <div className="transcript-empty" style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <h2>Unable to Load Transcript</h2>
+          <p style={{ color: 'var(--text-muted)', margin: '16px 0 24px' }}>{error}</p>
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center' }}>
+            <Link to="/transcripts" className="back-link">← Go to Dashboard</Link>
+            <a href={getApiUrl('/api/auth/login')} className="old-transcript-btn">Login with Discord</a>
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (!ticket || !ticket.messages || ticket.messages.length === 0) {
     return (
       <div className="transcript-empty">
@@ -41,6 +61,12 @@ export default function Transcript() {
 
   return (
     <div className="transcript-page">
+      <Seo
+        title={`Transcript ${ticket?.ticketId || ticketId} | SyncInk Ticket`}
+        description={`View closed ticket transcript ${ticket?.ticketId || ticketId}`}
+        path={`/dashboard/${guildId}/transcripts/${ticketId}`}
+        robots="noindex,nofollow"
+      />
       <div className="transcript-header">
         <Link to="/transcripts" className="back-link">← Back to Dashboard</Link>
         <h1>Transcript: {ticket.ticketId}</h1>

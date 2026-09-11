@@ -28,6 +28,17 @@ function renderTicketOpeningMessage(template, guildName, targetUserId, staffPing
         .replaceAll('{server}', guildName);
 }
 
+function getFrontendUrl() {
+    let url = process.env.FRONTEND_URL || global.frontendUrl || process.env.DASHBOARD_URL || 'https://syncink-discord-ticket-bot.vercel.app';
+    if (typeof url === 'string') {
+        url = url.trim().replace(/\/+$/, '');
+    }
+    if (!url || url.includes('railway.app')) {
+        url = 'https://syncink-discord-ticket-bot.vercel.app';
+    }
+    return url;
+}
+
 async function handleSelectMenu(interaction, client) {
     if (interaction.customId === 'ticket_select_type') {
         const guildConfig = await db.getGuildConfig(interaction.guild.id);
@@ -578,6 +589,9 @@ async function handleButton(interaction, client) {
             }
         });
 
+        const dashboardUrl = getFrontendUrl();
+        const transcriptUrl = `${dashboardUrl}/dashboard/${guild.id}/transcripts/${ticket.ticketId}`;
+
         try {
             const firstMsgCollection = await thread.messages.fetch({ after: '1', limit: 10 });
             const welcomeMsg = firstMsgCollection.find((message) => message.author.id === client.user.id && message.embeds.length >= 2);
@@ -586,16 +600,37 @@ async function handleButton(interaction, client) {
                     .setTitle('Log')
                     .setDescription(logResult?.logMessage ? logResult.logMessage.url : (logResult?.error ? `<a:sync_alert:1513822294831534220> *Failed to log: ${logResult.error}*` : '<a:sync_alert:1513822294831534220> *Log channel not set. Transcript not archived.*'))
                     .setColor('#2b2d31');
-                await welcomeMsg.edit({ embeds: [...welcomeMsg.embeds, logEmbed], components: [] });
+
+                const welcomeComponents = [];
+                if (transcriptUrl) {
+                    welcomeComponents.push(
+                        new ActionRowBuilder().addComponents(
+                            new ButtonBuilder()
+                                .setLabel('View Online Transcript')
+                                .setStyle(ButtonStyle.Link)
+                                .setURL(transcriptUrl)
+                        )
+                    );
+                }
+
+                await welcomeMsg.edit({ embeds: [...welcomeMsg.embeds, logEmbed], components: welcomeComponents });
             }
         } catch (error) {
             console.error('[CLOSE] Error adding log embed:', error);
         }
 
         const successEmbed = new EmbedBuilder()
-            .setDescription('<a:approved:1520913982678896670> **| Ticket is closed successfully.**')
+            .setDescription(`<a:approved:1520913982678896670> **| Ticket is closed successfully.**\n\n📄 **Online Transcript:** [View on Dashboard](${transcriptUrl})`)
             .setColor(config.colors.success);
-        await thread.send({ embeds: [successEmbed] });
+
+        const closeRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setLabel('View Online Transcript')
+                .setStyle(ButtonStyle.Link)
+                .setURL(transcriptUrl)
+        );
+
+        await thread.send({ embeds: [successEmbed], components: [closeRow] });
         await thread.members.remove(ticket.creatorId).catch(() => {});
         await thread.setLocked(true).catch(() => {});
         await thread.setArchived(true).catch(() => {});
@@ -670,12 +705,21 @@ async function logTicketAction(client, guild, title, description, color, attachm
         .setColor(color)
         .setTimestamp();
 
+    let components = [];
     if (dashboardTicketId) {
-        const dashboardUrl = process.env.FRONTEND_URL || 'https://syncink-ticket-bot.up.railway.app';
+        const dashboardUrl = getFrontendUrl();
+        const transcriptUrl = `${dashboardUrl}/dashboard/${guild.id}/transcripts/${dashboardTicketId}`;
         embed.addFields({
             name: 'Online Transcript',
-            value: `[View on Dashboard](${dashboardUrl}/dashboard/${guild.id}/transcripts/${dashboardTicketId})`
+            value: `[View on Dashboard](${transcriptUrl})`
         });
+
+        const transcriptBtn = new ButtonBuilder()
+            .setLabel('View Online Transcript')
+            .setStyle(ButtonStyle.Link)
+            .setURL(transcriptUrl);
+
+        components = [new ActionRowBuilder().addComponents(transcriptBtn)];
     }
 
     if (transcriptChannel && logChannel && transcriptChannel.id === logChannel.id) {
@@ -683,6 +727,7 @@ async function logTicketAction(client, guild, title, description, color, attachm
         try {
             logMessage = await logChannel.send({
                 embeds: [embed],
+                components: components.length > 0 ? components : [],
                 files: attachment ? [attachment] : []
             });
             transcriptMessage = logMessage;
@@ -696,6 +741,7 @@ async function logTicketAction(client, guild, title, description, color, attachm
             try {
                 transcriptMessage = await transcriptChannel.send({
                     embeds: [embed],
+                    components: components.length > 0 ? components : [],
                     files: [attachment]
                 });
             } catch (error) {
@@ -708,7 +754,10 @@ async function logTicketAction(client, guild, title, description, color, attachm
                 embed.addFields({ name: 'Transcript', value: `[Download txt](${transcriptMessage.url})` });
             }
             try {
-                logMessage = await logChannel.send({ embeds: [embed] });
+                logMessage = await logChannel.send({
+                    embeds: [embed],
+                    components: components.length > 0 ? components : []
+                });
             } catch (error) {
                 console.error('[LOG ERROR]', error);
                 return { logMessage: null, transcriptMessage, error: 'Missing access to log channel.' };

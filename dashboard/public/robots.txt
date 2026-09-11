@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://syncink-ticket-bot.up.railway.app/sitemap.xml
+Sitemap: https://syncink-discord-ticket-bot.vercel.app/sitemap.xml
