@@ -434,7 +434,14 @@ async function initDashboard(client) {
             if (frontendUrl && (origin === frontendUrl || origin.startsWith(frontendUrl))) {
                 return callback(null, true);
             }
-            if (origin.endsWith('.vercel.app') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+            if (
+                origin.endsWith('.vercel.app') ||
+                origin.endsWith('syncink.site') ||
+                origin === 'https://www.syncink.site' ||
+                origin === 'https://syncink.site' ||
+                origin.includes('localhost') ||
+                origin.includes('127.0.0.1')
+            ) {
                 return callback(null, true);
             }
             return callback(null, true);
@@ -468,7 +475,7 @@ async function initDashboard(client) {
         if (origin) {
             try {
                 const parsed = new URL(origin);
-                if (parsed.hostname.endsWith('.vercel.app')) {
+                if (parsed.hostname.endsWith('.vercel.app') || parsed.hostname.endsWith('syncink.site')) {
                     global.frontendUrl = parsed.origin;
                 }
             } catch (e) {}
@@ -516,12 +523,12 @@ async function initDashboard(client) {
     });
 
     app.get('/api/auth/callback', async (req, res) => {
-        let frontendBase = (process.env.FRONTEND_URL || global.frontendUrl || 'https://syncink-discord-ticket-bot.vercel.app').replace(/\/+$/, '');
-        if (frontendBase.includes('railway.app')) {
-            frontendBase = 'https://syncink-discord-ticket-bot.vercel.app';
+        let frontendBase = (process.env.FRONTEND_URL || global.frontendUrl || 'https://www.syncink.site/dashboard/tickets').replace(/\/+$/, '');
+        if (frontendBase.includes('railway.app') || frontendBase.includes('syncink-discord-ticket-bot.vercel.app')) {
+            frontendBase = 'https://www.syncink.site/dashboard/tickets';
         }
         if (!req.query.code) {
-            return res.redirect(frontendBase ? `${frontendBase}/login` : '/login');
+            return res.redirect(frontendBase ? `${frontendBase}` : '/dashboard/tickets');
         }
 
         try {
@@ -603,14 +610,14 @@ async function initDashboard(client) {
                 if (saveErr) console.error('[DASHBOARD] Session save error:', saveErr);
                 let target = req.session?.returnTo;
                 delete req.session.returnTo;
-                if (!target || target.includes('railway.app') || target.endsWith('/login')) {
-                    target = frontendBase ? `${frontendBase}/servers` : '/servers';
+                if (!target || target.includes('railway.app') || target.endsWith('/login') || target.endsWith('/servers')) {
+                    target = frontendBase || 'https://www.syncink.site/dashboard/tickets';
                 }
                 return res.redirect(target);
             });
         } catch (error) {
             console.error('[DASHBOARD AUTH ERROR]', error.response?.data || error.message);
-            return res.redirect(frontendBase ? `${frontendBase}/login?error=auth_failed` : '/login?error=auth_failed');
+            return res.redirect(frontendBase ? `${frontendBase}?error=auth_failed` : 'https://www.syncink.site/dashboard/tickets?error=auth_failed');
         }
     });
 

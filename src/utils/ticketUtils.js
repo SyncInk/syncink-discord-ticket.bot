@@ -29,14 +29,23 @@ function renderTicketOpeningMessage(template, guildName, targetUserId, staffPing
 }
 
 function getFrontendUrl() {
-    let url = process.env.FRONTEND_URL || global.frontendUrl || process.env.DASHBOARD_URL || 'https://syncink-discord-ticket-bot.vercel.app';
+    let url = process.env.FRONTEND_URL || global.frontendUrl || process.env.DASHBOARD_URL || 'https://www.syncink.site/dashboard/tickets';
     if (typeof url === 'string') {
         url = url.trim().replace(/\/+$/, '');
     }
-    if (!url || url.includes('railway.app')) {
-        url = 'https://syncink-discord-ticket-bot.vercel.app';
+    if (!url || url.includes('railway.app') || url.includes('syncink-discord-ticket-bot.vercel.app')) {
+        url = 'https://www.syncink.site/dashboard/tickets';
     }
     return url;
+}
+
+function buildTranscriptUrl(guildId, ticketId) {
+    let base = getFrontendUrl();
+    base = base.replace(/\/+$/, '');
+    if (base.includes('/dashboard/tickets')) {
+        return `${base}/transcripts/${ticketId}`;
+    }
+    return `${base}/dashboard/tickets/transcripts/${ticketId}`;
 }
 
 async function handleSelectMenu(interaction, client) {
@@ -589,8 +598,7 @@ async function handleButton(interaction, client) {
             }
         });
 
-        const dashboardUrl = getFrontendUrl();
-        const transcriptUrl = `${dashboardUrl}/dashboard/${guild.id}/transcripts/${ticket.ticketId}`;
+        const transcriptUrl = buildTranscriptUrl(guild.id, ticket.ticketId);
 
         try {
             const firstMsgCollection = await thread.messages.fetch({ after: '1', limit: 10 });
@@ -707,8 +715,7 @@ async function logTicketAction(client, guild, title, description, color, attachm
 
     let components = [];
     if (dashboardTicketId) {
-        const dashboardUrl = getFrontendUrl();
-        const transcriptUrl = `${dashboardUrl}/dashboard/${guild.id}/transcripts/${dashboardTicketId}`;
+        const transcriptUrl = buildTranscriptUrl(guild.id, dashboardTicketId);
         embed.addFields({
             name: 'Online Transcript',
             value: `[View on Dashboard](${transcriptUrl})`
