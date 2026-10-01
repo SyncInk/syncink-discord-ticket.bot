@@ -29,12 +29,12 @@ function renderTicketOpeningMessage(template, guildName, targetUserId, staffPing
 }
 
 function getFrontendUrl() {
-    let url = process.env.FRONTEND_URL || global.frontendUrl || process.env.DASHBOARD_URL || 'https://syncink-discord-ticket-bot.vercel.app';
+    let url = process.env.FRONTEND_URL || global.frontendUrl || process.env.DASHBOARD_URL || 'https://www.syncink.site/dashboard/tickets';
     if (typeof url === 'string') {
         url = url.trim().replace(/\/+$/, '');
     }
     if (!url || url.includes('railway.app')) {
-        url = 'https://syncink-discord-ticket-bot.vercel.app';
+        url = 'https://www.syncink.site/dashboard/tickets';
     }
     return url;
 }
@@ -42,7 +42,10 @@ function getFrontendUrl() {
 function buildTranscriptUrl(guildId, ticketId) {
     let base = getFrontendUrl();
     base = base.replace(/\/+$/, '');
-    return `${base}/dashboard/${guildId}/transcripts/${ticketId}`;
+    if (base.includes('/dashboard/tickets')) {
+        return `${base}?tab=transcripts&ticketId=${ticketId}`;
+    }
+    return `${base}/dashboard/tickets?tab=transcripts&ticketId=${ticketId}`;
 }
 
 async function handleSelectMenu(interaction, client) {
