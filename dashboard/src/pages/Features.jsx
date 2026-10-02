@@ -1,5 +1,5 @@
-import React from 'react';
-import { Activity, ArrowRightLeft, FileText, PanelsTopLeft, ScrollText, ShieldCheck, Ticket } from 'lucide-react';
+import React, { useState } from 'react';
+import { Activity, ArrowRightLeft, FileText, PanelsTopLeft, ScrollText, ShieldCheck, Ticket, Sparkles, Zap, Lock, BarChart3, Sliders, CheckCircle2 } from 'lucide-react';
 import Seo from '../components/Seo';
 import MarketingFrame from '../components/MarketingFrame';
 
@@ -9,38 +9,83 @@ const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
 const featureCards = [
   {
     icon: PanelsTopLeft,
-    title: 'Custom ticket panels',
-    copy: 'Create polished ticket entry panels with your own colors, text, and category choices so members know exactly where to go.'
+    badge: 'Customizable',
+    tag: 'panels',
+    title: 'Custom Ticket Panels',
+    copy: 'Create polished ticket entry panels with your custom titles, rich descriptions, brand hex colors, and custom emojis so members always feel at home.'
   },
   {
     icon: Ticket,
-    title: 'Category-based support routing',
-    copy: 'Guide members into the right support path with labeled categories, role assignment, and clear ticket organization.'
+    badge: 'Smart Routing',
+    tag: 'routing',
+    title: 'Category-Based Support Routing',
+    copy: 'Direct members into specialized private channels by category, automatically pinging the right staff roles while keeping the channel list uncluttered.'
   },
   {
     icon: ArrowRightLeft,
-    title: 'Staff-friendly ticket actions',
-    copy: 'Support teams can handle tickets faster with built-in actions for claiming, transferring, and keeping conversations moving.'
+    badge: 'Productivity',
+    tag: 'staff',
+    title: 'Staff-Friendly Ticket Actions',
+    copy: 'Empower support agents with instant ticket claiming, seamless category transfers, user addition/removal, and one-click closure with inactivity alerts.'
   },
   {
     icon: FileText,
-    title: 'Saved transcripts',
-    copy: 'Keep a reliable record of closed tickets so important conversations are easy to revisit whenever your team needs them.'
+    badge: 'Archival',
+    tag: 'security',
+    title: 'Saved HTML & Cloud Transcripts',
+    copy: 'Automatically generate and archive complete, verifiable transcripts with images and timestamps. View transcripts directly inside the secure web dashboard.'
   },
   {
     icon: Activity,
-    title: 'Live activity visibility',
-    copy: 'Stay on top of what is happening with recent ticket movement, response trends, and team activity at a glance.'
+    badge: 'Live Sync',
+    tag: 'analytics',
+    title: 'Live Activity & Analytics',
+    copy: 'Stay informed with real-time response time metrics, ticket creation volume trends, staff action leaderboards, and live WebSocket dashboard updates.'
   },
   {
     icon: ScrollText,
-    title: 'Clear history and logs',
-    copy: 'Track setup changes and ticket events in one place so your team always has context for what changed and when.'
+    badge: 'Audit & Safety',
+    tag: 'security',
+    title: 'Comprehensive Audit Logs',
+    copy: 'Track every configuration change, role assignment update, and moderation action in one tamper-evident log stream with full actor attribution.'
+  },
+  {
+    icon: Zap,
+    badge: 'Automation',
+    tag: 'routing',
+    title: 'Inactivity Reminders & Auto-Close',
+    copy: 'Keep ticket channels clean with configurable inactivity warning pings and automatic archival when members stop responding.'
+  },
+  {
+    icon: Lock,
+    badge: 'Security',
+    tag: 'security',
+    title: 'Tier-Based Dashboard Access',
+    copy: 'Granular permissions ensure server owners, developers, administrators, and staff only see the controls and ticket data matching their responsibilities.'
+  },
+  {
+    icon: Sliders,
+    badge: 'Personalized',
+    tag: 'panels',
+    title: 'Modern Pure-Black Interface',
+    copy: 'A high-performance responsive web dashboard featuring pure-black glass aesthetics, responsive mobile layout, custom theme accents, and zero lag.'
   }
 ];
 
+const highlights = [
+  { label: 'Platform Uptime', value: '99.9%' },
+  { label: 'Dispatch Speed', value: '< 250ms' },
+  { label: 'Transcripts Saved', value: 'Unlimited' },
+  { label: 'Setup Time', value: 'Under 2 Min' }
+];
+
 export default function Features({ user }) {
+  const [selectedTag, setSelectedTag] = useState('all');
   const dashboardPath = user ? '/' : '/login';
+
+  const filteredFeatures = selectedTag === 'all'
+    ? featureCards
+    : featureCards.filter((card) => card.tag === selectedTag);
 
   return (
     <>
@@ -53,61 +98,123 @@ export default function Features({ user }) {
       <MarketingFrame
         active="features"
         user={user}
-        eyebrow="Product Overview"
-        title="Powerful features for clean, fast Discord support"
-        description="SyncInk Ticket combines clean design with practical support tools so your community can manage tickets smoothly from the first click to the final transcript."
+        eyebrow="Product Features"
+        title="Engineered for high-volume Discord support"
+        description="SyncInk Ticket combines sleek design with practical support architecture so your server community can handle tickets smoothly from first click to final transcript."
         actions={[
           { label: 'Invite Bot', href: INVITE_URL, external: true, tone: 'primary' },
           { label: 'Open Dashboard', to: dashboardPath, tone: 'secondary' },
           { label: 'Support Server', href: SUPPORT_URL, external: true, tone: 'secondary' }
         ]}
       >
+        {/* Performance Highlights Bar */}
+        <div className="mk-highlights-bar">
+          {highlights.map((item) => (
+            <div key={item.label} className="mk-highlight-item">
+              <strong>{item.value}</strong>
+              <span>{item.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="mk-filter-pills">
+          <button
+            type="button"
+            className={`mk-filter-pill ${selectedTag === 'all' ? 'active' : ''}`}
+            onClick={() => setSelectedTag('all')}
+          >
+            All Features ({featureCards.length})
+          </button>
+          <button
+            type="button"
+            className={`mk-filter-pill ${selectedTag === 'panels' ? 'active' : ''}`}
+            onClick={() => setSelectedTag('panels')}
+          >
+            Panels & Appearance
+          </button>
+          <button
+            type="button"
+            className={`mk-filter-pill ${selectedTag === 'routing' ? 'active' : ''}`}
+            onClick={() => setSelectedTag('routing')}
+          >
+            Routing & Automation
+          </button>
+          <button
+            type="button"
+            className={`mk-filter-pill ${selectedTag === 'staff' ? 'active' : ''}`}
+            onClick={() => setSelectedTag('staff')}
+          >
+            Staff Workflows
+          </button>
+          <button
+            type="button"
+            className={`mk-filter-pill ${selectedTag === 'security' ? 'active' : ''}`}
+            onClick={() => setSelectedTag('security')}
+          >
+            Security & Logs
+          </button>
+          <button
+            type="button"
+            className={`mk-filter-pill ${selectedTag === 'analytics' ? 'active' : ''}`}
+            onClick={() => setSelectedTag('analytics')}
+          >
+            Analytics & Reports
+          </button>
+        </div>
+
+        {/* Feature Cards Grid */}
         <section className="mk-grid mk-grid-3">
-          {featureCards.map((card) => {
+          {filteredFeatures.map((card) => {
             const Icon = card.icon;
             return (
-              <article key={card.title} className="mk-card">
-                <div className="mk-card-icon"><Icon size={22} /></div>
-                <h3>{card.title}</h3>
-                <p>{card.copy}</p>
+              <article key={card.title} className="mk-card" style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                  <div className="mk-card-icon" style={{ marginBottom: 0 }}><Icon size={22} /></div>
+                  <span className="mk-command-badge">{card.badge}</span>
+                </div>
+                <h3 style={{ fontSize: 17, marginBottom: 8, color: '#fff' }}>{card.title}</h3>
+                <p style={{ fontSize: 13, color: 'var(--text-soft)', flexGrow: 1, lineHeight: 1.65 }}>{card.copy}</p>
               </article>
             );
           })}
         </section>
 
-        <section className="mk-panel">
+        {/* Interactive Customization Overview */}
+        <section className="mk-panel" style={{ marginTop: 24 }}>
           <div className="mk-panel-header">
             <div>
-              <span className="mk-panel-label">What you can customize</span>
-              <h2>Control the look, flow, and staff experience</h2>
-              <p>Everything important is easy to manage from the dashboard without changing the bot&apos;s core workflow.</p>
+              <span className="mk-panel-label">Everything Configurable</span>
+              <h2>Complete Control Over Your Ticket System</h2>
+              <p>Everything important is easy to manage from the dashboard without touching code or running complex bot commands.</p>
             </div>
             <div className="mk-card-icon"><ShieldCheck size={22} /></div>
           </div>
           <div className="mk-pill-grid">
-            <span className="mk-pill">Panel text and colors</span>
-            <span className="mk-pill">Ticket category labels</span>
-            <span className="mk-pill">Staff role assignment</span>
-            <span className="mk-pill">Ticket log channels</span>
-            <span className="mk-pill">Transcript channels</span>
-            <span className="mk-pill">Inactivity reminders</span>
-            <span className="mk-pill">Interface preferences</span>
-            <span className="mk-pill">Bot profile details</span>
+            <span className="mk-pill"><CheckCircle2 size={14} style={{ marginRight: 6, color: '#10b981' }} /> Embed Title, Description & Color</span>
+            <span className="mk-pill"><CheckCircle2 size={14} style={{ marginRight: 6, color: '#10b981' }} /> Dynamic Category Emojis</span>
+            <span className="mk-pill"><CheckCircle2 size={14} style={{ marginRight: 6, color: '#10b981' }} /> Target Category Channels</span>
+            <span className="mk-pill"><CheckCircle2 size={14} style={{ marginRight: 6, color: '#10b981' }} /> Role-Based Staff Assignees</span>
+            <span className="mk-pill"><CheckCircle2 size={14} style={{ marginRight: 6, color: '#10b981' }} /> Transcript Destination Channel</span>
+            <span className="mk-pill"><CheckCircle2 size={14} style={{ marginRight: 6, color: '#10b981' }} /> Ticket Event Log Stream</span>
+            <span className="mk-pill"><CheckCircle2 size={14} style={{ marginRight: 6, color: '#10b981' }} /> Inactivity Timer Warnings</span>
+            <span className="mk-pill"><CheckCircle2 size={14} style={{ marginRight: 6, color: '#10b981' }} /> Bot Display Nickname</span>
           </div>
         </section>
 
-        <section className="mk-meta-grid">
+        {/* Stakeholder Value Grid */}
+        <section className="mk-meta-grid" style={{ marginTop: 24 }}>
           <div className="mk-meta-item">
-            <strong>For communities</strong>
-            <span>Give members a clean ticket experience that feels easy, professional, and organized from the start.</span>
+            <strong style={{ fontSize: 15 }}>For Community Members</strong>
+            <span style={{ fontSize: 13 }}>An intuitive, friction-free ticket opening flow with clear category selection and instant Discord staff notifications.</span>
           </div>
           <div className="mk-meta-item">
-            <strong>For staff teams</strong>
-            <span>Keep support moving with better visibility, faster actions, and clear ownership across active tickets.</span>
+            <strong style={{ fontSize: 15 }}>For Support Staff</strong>
+            <span style={{ fontSize: 13 }}>Claim, transfer, rename, add members, and generate transcripts right from Discord buttons or the web interface.</span>
           </div>
           <div className="mk-meta-item">
-            <strong>For server leaders</strong>
-            <span>See how your support flow is performing and keep important settings tidy in one powerful dashboard.</span>
+            <strong style={{ fontSize: 15 }}>For Server Admins</strong>
+            <span style={{ fontSize: 13 }}>Full oversight over ticket volume, agent response speeds, permission governance, and comprehensive audit history.</span>
           </div>
         </section>
       </MarketingFrame>

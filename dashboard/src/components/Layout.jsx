@@ -29,6 +29,8 @@ import {
   Shield,
   ShieldCheck,
   SlidersHorizontal,
+  Sparkles,
+  Terminal,
   User,
   X,
   AlertTriangle,
@@ -432,12 +434,32 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
       )}
 
       <aside className="sidebar">
-        <div className="brand-row">
-          <img src="/ticket-logo.png" alt="SyncInk Ticket" style={{ width: 32, height: 32, borderRadius: 8 }} />
-          <div>
-            <strong>SyncInk Ticket</strong>
-            <span>Ticket System</span>
+        <div className="brand-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img src="/ticket-logo.png" alt="SyncInk Ticket" style={{ width: 32, height: 32, borderRadius: 8 }} />
+            <div>
+              <strong>SyncInk Ticket</strong>
+              <span>Ticket System</span>
+            </div>
           </div>
+          <button
+            type="button"
+            className="mobile-close-sidebar-btn"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close sidebar"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              padding: 6,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <X size={20} />
+          </button>
         </div>
 
         {/* Server Selector with Dropdown */}
@@ -567,6 +589,38 @@ export default function Layout({ user, guilds, selectedGuild, onSelectGuild }) {
               <RefreshCw size={18} />
               <span>Refresh Data</span>
             </button>
+          </div>
+
+          <div className="sidebar-group mobile-only-sidebar-links">
+            <div className="sidebar-label">Platform &amp; Docs</div>
+            <button type="button" className="nav-item" onClick={() => handleNavigate('/features')}>
+              <Sparkles size={18} />
+              <span>Features</span>
+            </button>
+            <button type="button" className="nav-item" onClick={() => handleNavigate('/commands')}>
+              <Terminal size={18} />
+              <span>Commands</span>
+            </button>
+            <button type="button" className="nav-item" onClick={() => handleNavigate('/guide')}>
+              <BookOpen size={18} />
+              <span>Setup Guide</span>
+            </button>
+            <button type="button" className="nav-item" onClick={() => handleNavigate('/faq')}>
+              <HelpCircle size={18} />
+              <span>FAQ</span>
+            </button>
+            <button type="button" className="nav-item" onClick={() => handleNavigate('/privacy')}>
+              <Shield size={18} />
+              <span>Privacy Policy</span>
+            </button>
+            <button type="button" className="nav-item" onClick={() => handleNavigate('/terms')}>
+              <FileText size={18} />
+              <span>Terms of Service</span>
+            </button>
+            <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="nav-item" style={{ textDecoration: 'none' }}>
+              <LifeBuoy size={18} />
+              <span>Discord Support</span>
+            </a>
           </div>
         </div>
       </aside>

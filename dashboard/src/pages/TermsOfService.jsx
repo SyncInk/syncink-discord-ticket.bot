@@ -1,4 +1,5 @@
 import React from 'react';
+import { FileText, CheckCircle2, ShieldAlert, Scale, RefreshCw, MessageSquare, ExternalLink } from 'lucide-react';
 import Seo from '../components/Seo';
 import MarketingFrame from '../components/MarketingFrame';
 
@@ -6,28 +7,52 @@ const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
 
 const termsSections = [
   {
+    id: 'acceptance',
+    icon: Scale,
     title: 'Acceptance of Terms',
-    body: 'By inviting SyncInk Ticket to your server or using the dashboard, you agree to follow these terms while using the service.'
+    badge: 'Agreement',
+    takeaway: 'Using SyncInk Ticket or accessing the dashboard implies full agreement with these terms.',
+    body: 'By inviting SyncInk Ticket to your Discord server or using the web dashboard, you enter into a binding agreement to adhere to these Terms of Service, all applicable laws, and the official Discord Developer Terms of Service and Community Guidelines.'
   },
   {
-    title: 'Using the Service',
-    body: 'You agree to use the bot and dashboard responsibly, avoid misuse, and respect Discord rules as well as the people using your server.'
+    id: 'conduct',
+    icon: ShieldAlert,
+    title: 'Responsible Use & Conduct Rules',
+    badge: 'Fair Use',
+    takeaway: 'Zero tolerance for automated spamming, harassment, or infrastructure abuse.',
+    body: 'You agree to use SyncInk Ticket exclusively for legitimate customer service, community moderation, and support operations. You must not attempt to reverse engineer backend APIs, flood tickets through unauthorized automation, bypass rate limits, or use the service to facilitate illegal activities.'
   },
   {
-    title: 'Availability',
-    body: 'We aim to keep the service available and dependable, but uptime cannot be guaranteed at every moment.'
+    id: 'availability',
+    icon: RefreshCw,
+    title: 'Service Availability & SLA',
+    badge: '99.9% Target',
+    takeaway: 'We maintain high availability but scheduled maintenance may occasionally occur.',
+    body: 'We strive to provide continuous 24/7 reliability across all bot clusters and web dashboard endpoints. However, temporary interruptions may occur due to scheduled infrastructure upgrades, Discord Gateway API outages, or cloud provider maintenance events.'
   },
   {
-    title: 'Termination',
-    body: 'Access may be limited or removed if the service is abused, used to harm others, or used in a way that breaks these terms.'
+    id: 'termination',
+    icon: ShieldAlert,
+    title: 'Suspension & Termination of Access',
+    badge: 'Policy Enforcement',
+    takeaway: 'Abusive servers or malicious actors will be blocked from dashboard and bot services.',
+    body: 'SyncInk reserves the right to suspend or terminate bot operation and dashboard access for any server or user found violating Discord Community Guidelines, engaging in API exploitation, or utilizing the bot to harass community members.'
   },
   {
-    title: 'Changes to These Terms',
-    body: 'We may update these terms over time. Important changes can be shared through the dashboard, support server, or other official notices.'
+    id: 'modifications',
+    icon: FileText,
+    title: 'Modifications to Terms',
+    badge: 'Updated Periodically',
+    takeaway: 'Notice of material updates is communicated through official channels.',
+    body: 'We may periodically update these Terms to reflect technical improvements or legal requirements. Continued use of the bot or dashboard following any revisions constitutes full acceptance of the updated terms.'
   },
   {
-    title: 'Support and Contact',
-    body: 'If you have questions about these terms or need clarification, the support server is the best place to reach us.'
+    id: 'contact',
+    icon: MessageSquare,
+    title: 'Support & Inquiries',
+    badge: 'Direct Assistance',
+    takeaway: 'Our community support team is always available in the official Discord server.',
+    body: 'If you have any questions regarding these Terms or need clarification regarding commercial use in large enterprise Discord communities, please reach out to us via our official Discord Support Server.'
   }
 ];
 
@@ -37,37 +62,92 @@ export default function TermsOfService({ user }) {
   return (
     <>
       <Seo
-        title="Terms of Service | SyncInk Ticket"
+        title="Terms of Service | SyncInk Ticket Bot"
         description="Review the SyncInk Ticket terms of service for using the Discord ticket bot and dashboard."
         path="/terms"
+        keywords="SyncInk Ticket terms of service, Discord ticket bot rules, user agreement, SLA"
       />
 
       <MarketingFrame
         active="terms"
         user={user}
-        eyebrow="Terms"
-        title="Terms for using SyncInk Ticket"
-        description="These terms explain the basic expectations for using the ticket bot, the dashboard, and the public website responsibly."
+        eyebrow="Legal & Terms"
+        title="Terms of Service"
+        description="Clear, sensible guidelines governing the responsible use of the SyncInk Ticket bot, backend APIs, and web management dashboard."
         actions={[
           { label: 'Open Dashboard', to: dashboardPath, tone: 'primary' },
           { label: 'Support Server', href: SUPPORT_URL, external: true, tone: 'secondary' }
         ]}
       >
+        {/* Quick Jump Pills */}
+        <div className="mk-filter-pills" style={{ justifyContent: 'center', marginBottom: 24 }}>
+          {termsSections.map((sec) => (
+            <a
+              key={sec.id}
+              href={`#${sec.id}`}
+              className="mk-filter-pill"
+              style={{ textDecoration: 'none' }}
+            >
+              {sec.title}
+            </a>
+          ))}
+        </div>
+
         <section className="mk-panel">
           <div className="mk-legal-copy">
-            <p className="mk-legal-updated">Last updated: July 25, 2026</p>
-            {termsSections.map((section, index) => (
-              <div key={section.title} className="mk-legal-section">
-                <h2>{index + 1}. {section.title}</h2>
-                <p>{section.body}</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <FileText size={20} style={{ color: 'var(--accent)' }} />
+                <span style={{ fontSize: 14, color: '#fff', fontWeight: 600 }}>SyncInk Service Agreement</span>
               </div>
-            ))}
+              <span className="mk-legal-updated" style={{ margin: 0 }}>Effective Date: October 2026</span>
+            </div>
 
-            <div className="mk-support-cta">
-              <h3>Questions about these terms?</h3>
-              <p>Reach out through the support server if you want help understanding how these terms apply to your server.</p>
-              <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="mk-action mk-action-primary">
-                Join Support Server
+            {termsSections.map((section, index) => {
+              const Icon = section.icon;
+              return (
+                <div key={section.id} id={section.id} className="mk-legal-section" style={{ scrollMarginTop: 100 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div className="mk-card-icon" style={{ width: 34, height: 34, marginBottom: 0, borderRadius: 10 }}>
+                        <Icon size={16} />
+                      </div>
+                      <h2 style={{ fontSize: 17, color: '#fff', margin: 0 }}>
+                        {index + 1}. {section.title}
+                      </h2>
+                    </div>
+                    <span className="mk-command-badge">{section.badge}</span>
+                  </div>
+
+                  {/* Summary Takeaway Callout */}
+                  <div style={{
+                    padding: '10px 14px',
+                    borderRadius: 12,
+                    background: 'rgba(139, 76, 255, 0.08)',
+                    border: '1px solid rgba(139, 76, 255, 0.2)',
+                    fontSize: 12.5,
+                    color: '#e2d9f3',
+                    marginBottom: 14
+                  }}>
+                    <strong style={{ color: 'var(--accent)' }}>Key Takeaway: </strong>
+                    {section.takeaway}
+                  </div>
+
+                  <p style={{ fontSize: 13, color: 'var(--text-soft)', lineHeight: 1.7, margin: 0 }}>
+                    {section.body}
+                  </p>
+                </div>
+              );
+            })}
+
+            {/* Questions Card */}
+            <div className="mk-support-cta" style={{ borderRadius: 18, marginTop: 14 }}>
+              <h3 style={{ margin: '0 0 8px', fontSize: 16, color: '#fff' }}>Have questions regarding these terms?</h3>
+              <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 16 }}>
+                Our team is available on Discord to address any policy or licensing inquiries for your server.
+              </p>
+              <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="mk-action mk-action-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <MessageSquare size={16} /> Contact Legal Support on Discord
               </a>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Shield, Lock, Eye, Database, Trash2, CheckCircle2, MessageSquare, ExternalLink } from 'lucide-react';
 import Seo from '../components/Seo';
 import MarketingFrame from '../components/MarketingFrame';
 
@@ -6,31 +7,50 @@ const SUPPORT_URL = 'https://discord.gg/rB6gNZaK9u';
 
 const privacySections = [
   {
+    id: 'collect',
+    icon: Database,
     title: 'Information We Collect',
+    badge: 'Limited Scope',
+    takeaway: 'We only store data strictly necessary for ticket workflows and user authentication.',
     body: [
-      'We collect the details needed to sign you in, recognize your servers, and help your team manage tickets smoothly.',
-      'This can include Discord profile details, server information, ticket content, and saved conversation records when tickets are closed.'
+      'Account Identification: When authenticating via Discord OAuth2, we receive your Discord User ID, username, global display name, and avatar hash to verify your identity and server permissions.',
+      'Server & Role Configurations: We store Guild IDs, channel destination mappings, category names, hex embed preferences, and staff role IDs configured by administrators.',
+      'Ticket Records & Transcripts: Upon ticket creation, we log the ticket ID, creator ID, channel ID, and timestamps. When closed, full HTML transcripts of messages, attachments, and staff interactions are encrypted and archived for server audit purposes.'
     ]
   },
   {
+    id: 'usage',
+    icon: Eye,
     title: 'How Your Information Is Used',
+    badge: 'Zero Ad Selling',
+    takeaway: 'Your data is never sold, monetized, or shared with third-party advertisers.',
     body: [
-      'Your information is used to run the support experience, keep dashboard access secure, and deliver the records your team expects.',
-      'This includes ticket creation, staff actions, saved transcripts, dashboard sign-in, and support-related improvements.'
+      'To provide core automated ticket management, category routing, and staff notification pings.',
+      'To render live transcripts and historical statistics inside the private authorized server web dashboard.',
+      'To enforce role-based access tiers so only designated administrators and support agents can view confidential support tickets.'
     ]
   },
   {
-    title: 'Storage and Security',
+    id: 'security',
+    icon: Lock,
+    title: 'Data Storage & Security Standards',
+    badge: 'Encrypted & Restricted',
+    takeaway: 'Enterprise-grade MongoDB clusters with restricted VPC access.',
     body: [
-      'We take reasonable steps to keep your information secure and available only to the people who should have access to it.',
-      'Saved transcripts and ticket records are intended for authorized staff and approved dashboard users only.'
+      'Database Security: All records are maintained in isolated database clusters protected with multi-layered authentication, IP whitelisting, and encryption at rest.',
+      'Access Control: Web dashboard sessions are secured with signed HTTP-only cookies and cryptographic Discord OAuth2 verification.',
+      'Transcript Confidentiality: Transcripts are accessible only by authorized staff members of the originating Discord server.'
     ]
   },
   {
-    title: 'Data Removal',
+    id: 'removal',
+    icon: Trash2,
+    title: 'Data Retention & Deletion Rights',
+    badge: 'User Controlled',
+    takeaway: 'Complete deletion of all server tickets and configs upon request.',
     body: [
-      'If you remove the bot from your server or contact support, your server data can be scheduled for removal.',
-      'Depending on the request, ticket records and saved settings may no longer be available after deletion is completed.'
+      'Bot Removal: If SyncInk Ticket is removed or kicked from your Discord server, your ticket data can be automatically queued for deletion.',
+      'Manual Purge Requests: Server owners can request immediate, permanent deletion of all stored transcripts, activity logs, and configurations by opening a support ticket in our official Discord server.'
     ]
   }
 ];
@@ -41,39 +61,97 @@ export default function PrivacyPolicy({ user }) {
   return (
     <>
       <Seo
-        title="Privacy Policy | SyncInk Ticket"
-        description="Read the SyncInk Ticket privacy policy covering account details, transcripts, ticket logs, and dashboard sign-in."
+        title="Privacy Policy | SyncInk Ticket Bot"
+        description="Official SyncInk Ticket privacy policy detailing data collection, storage, security, and deletion practices."
         path="/privacy"
+        keywords="SyncInk Ticket privacy policy, Discord bot data privacy, transcript storage, GDPR"
       />
 
       <MarketingFrame
         active="privacy"
         user={user}
-        eyebrow="Privacy"
-        title="Privacy information for SyncInk Ticket"
-        description="This page explains what information is used to provide the ticket experience, how it supports your server, and how to reach us if you need help."
+        eyebrow="Legal & Privacy"
+        title="Privacy Policy"
+        description="We believe in total transparency. Here is a clear breakdown of the exact data we collect, how it is safeguarded, and how you retain complete control over your server records."
         actions={[
           { label: 'Open Dashboard', to: dashboardPath, tone: 'primary' },
           { label: 'Support Server', href: SUPPORT_URL, external: true, tone: 'secondary' }
         ]}
       >
+        {/* Quick Navigation Anchor Pills */}
+        <div className="mk-filter-pills" style={{ justifyContent: 'center', marginBottom: 24 }}>
+          {privacySections.map((sec) => (
+            <a
+              key={sec.id}
+              href={`#${sec.id}`}
+              className="mk-filter-pill"
+              style={{ textDecoration: 'none' }}
+            >
+              {sec.title}
+            </a>
+          ))}
+        </div>
+
         <section className="mk-panel">
           <div className="mk-legal-copy">
-            <p className="mk-legal-updated">Last updated: July 25, 2026</p>
-            {privacySections.map((section, index) => (
-              <div key={section.title} className="mk-legal-section">
-                <h2>{index + 1}. {section.title}</h2>
-                {section.body.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Shield size={20} style={{ color: 'var(--accent)' }} />
+                <span style={{ fontSize: 14, color: '#fff', fontWeight: 600 }}>SyncInk Privacy Commitment</span>
               </div>
-            ))}
+              <span className="mk-legal-updated" style={{ margin: 0 }}>Effective Date: October 2026</span>
+            </div>
 
-            <div className="mk-support-cta">
-              <h3>Need help with a privacy question?</h3>
-              <p>Join the support server if you want clarification about your account, records, or your server setup.</p>
-              <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="mk-action mk-action-primary">
-                Join Support Server
+            {privacySections.map((section, index) => {
+              const Icon = section.icon;
+              return (
+                <div key={section.id} id={section.id} className="mk-legal-section" style={{ scrollMarginTop: 100 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div className="mk-card-icon" style={{ width: 34, height: 34, marginBottom: 0, borderRadius: 10 }}>
+                        <Icon size={16} />
+                      </div>
+                      <h2 style={{ fontSize: 17, color: '#fff', margin: 0 }}>
+                        {index + 1}. {section.title}
+                      </h2>
+                    </div>
+                    <span className="mk-command-badge">{section.badge}</span>
+                  </div>
+
+                  {/* Summary Takeaway Callout */}
+                  <div style={{
+                    padding: '10px 14px',
+                    borderRadius: 12,
+                    background: 'rgba(139, 76, 255, 0.08)',
+                    border: '1px solid rgba(139, 76, 255, 0.2)',
+                    fontSize: 12.5,
+                    color: '#e2d9f3',
+                    marginBottom: 14
+                  }}>
+                    <strong style={{ color: 'var(--accent)' }}>Key Takeaway: </strong>
+                    {section.takeaway}
+                  </div>
+
+                  {section.body.map((paragraph, pIdx) => (
+                    <p key={pIdx} style={{ fontSize: 13, color: 'var(--text-soft)', lineHeight: 1.7, marginBottom: 10 }}>
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              );
+            })}
+
+            {/* Direct Data Removal Request Box */}
+            <div className="mk-support-cta" style={{ borderRadius: 18, marginTop: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                <Trash2 size={20} style={{ color: '#ef4444' }} />
+                <h3 style={{ margin: 0, fontSize: 16, color: '#fff' }}>Request Server Data Purge</h3>
+              </div>
+              <p style={{ fontSize: 13, color: 'var(--text-soft)', marginBottom: 16 }}>
+                Under GDPR and CCPA guidelines, server owners can submit a total data deletion request at any time. All stored configurations, transcripts, and cached records will be permanently expunged.
+              </p>
+              <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" className="mk-action mk-action-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <MessageSquare size={16} /> Submit Data Deletion Request via Discord
               </a>
             </div>
           </div>

@@ -3,10 +3,10 @@
   min-height: 100vh;
   overflow: hidden;
   background:
-    radial-gradient(circle at top, rgba(126, 34, 206, 0.24), transparent 26%),
-    radial-gradient(circle at 18% 20%, rgba(99, 102, 241, 0.16), transparent 24%),
-    radial-gradient(circle at 84% 18%, rgba(168, 85, 247, 0.12), transparent 22%),
-    linear-gradient(180deg, #11091e 0%, #0a0913 32%, #06070d 100%);
+    radial-gradient(circle at top, rgba(139, 76, 255, 0.16), transparent 26%),
+    radial-gradient(circle at 18% 20%, rgba(91, 33, 182, 0.14), transparent 24%),
+    radial-gradient(circle at 84% 18%, rgba(139, 76, 255, 0.1), transparent 22%),
+    linear-gradient(180deg, #000000 0%, #030305 40%, #000000 100%);
   color: #f8f7ff;
 }
 
@@ -54,7 +54,7 @@
   height: 320px;
   left: -80px;
   bottom: 8%;
-  background: rgba(168, 85, 247, 0.12);
+  background: rgba(139, 76, 255, 0.1);
 }
 
 .mk-content {
@@ -205,7 +205,7 @@
   border-radius: 18px;
   color: #fff;
   font-weight: 700;
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 60%, #6d28d9 100%);
+  background: linear-gradient(135deg, #a855f7 0%, #8b4cff 50%, #5b21b6 100%);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
     0 14px 34px rgba(124, 58, 237, 0.32);
@@ -376,7 +376,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
-    rgba(12, 11, 21, 0.8);
+    rgba(8, 8, 12, 0.78);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
   box-shadow:
@@ -841,5 +841,159 @@
   .mk-brand {
     justify-content: flex-start !important;
     width: 100% !important;
+  }
+}
+
+
+/* Modern Marketing & Documentation Additions */
+.mk-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(14, 14, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 12px 18px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mk-search-bar:focus-within {
+  border-color: rgba(139, 76, 255, 0.5);
+  box-shadow: 0 0 25px rgba(139, 76, 255, 0.2);
+}
+
+.mk-search-bar input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  width: 100%;
+}
+
+.mk-search-bar input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.mk-filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.mk-filter-pill {
+  padding: 8px 18px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s ease;
+}
+
+.mk-filter-pill:hover,
+.mk-filter-pill.active {
+  background: linear-gradient(135deg, rgba(139, 76, 255, 0.25), rgba(91, 33, 182, 0.25));
+  border-color: rgba(139, 76, 255, 0.45);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(139, 76, 255, 0.15);
+}
+
+.mk-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mk-copy-btn:hover {
+  background: rgba(139, 76, 255, 0.25);
+  border-color: rgba(139, 76, 255, 0.4);
+  color: #fff;
+}
+
+.mk-copy-btn.copied {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #10b981;
+}
+
+/* Feature Highlights Strip */
+.mk-highlights-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 34px;
+}
+
+.mk-highlight-item {
+  background: rgba(10, 10, 14, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.mk-highlight-item:hover {
+  border-color: rgba(139, 76, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.mk-highlight-item strong {
+  display: block;
+  font-size: 22px;
+  font-family: 'Outfit', sans-serif;
+  color: #fff;
+  background: linear-gradient(135deg, #fff, #c493ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.mk-highlight-item span {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Roadmap step counters */
+.mk-step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #8b4cff, #5b21b6);
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  margin-right: 12px;
+}
+
+@media (max-width: 840px) {
+  .mk-highlights-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .mk-highlights-bar {
+    grid-template-columns: 1fr;
   }
 }

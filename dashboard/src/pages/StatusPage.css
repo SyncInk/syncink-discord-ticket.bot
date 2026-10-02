@@ -24,7 +24,7 @@
 }
 
 .status-card {
-  background: var(--bg-panel);
+  background: rgba(8, 8, 12, 0.78);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -33,7 +33,7 @@
 /* Incident Card */
 .status-incident-card {
   margin-bottom: 32px;
-  background: var(--bg-panel);
+  background: rgba(8, 8, 12, 0.78);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -196,6 +196,9 @@
   gap: 2px;
   height: 36px;
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
 }
 
 .status-bar-wrapper {
@@ -222,7 +225,7 @@
   bottom: calc(100% + 12px);
   left: 50%;
   transform: translateX(-50%) translateY(5px);
-  background: var(--bg-panel-strong);
+  background: #0c0c10;
   border: 1px solid var(--border-strong);
   border-radius: 8px;
   padding: 12px 16px;
@@ -440,4 +443,40 @@
 .status-date-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+}
+
+
+@media (max-width: 768px) {
+  .status-bars-container {
+    gap: 1.5px !important;
+    height: 30px !important;
+    min-width: 100% !important;
+  }
+
+  .status-bar-wrapper {
+    min-width: 2.5px !important;
+  }
+
+  .status-component-name-wrap strong {
+    font-size: 13.5px !important;
+  }
+
+  .status-page-wrapper {
+    padding: 14px 10px !important;
+  }
+
+  .status-card-header {
+    padding: 16px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  .status-card-date-range {
+    font-size: 12px !important;
+  }
+
+  .status-component-row {
+    padding: 14px 16px !important;
+  }
 }

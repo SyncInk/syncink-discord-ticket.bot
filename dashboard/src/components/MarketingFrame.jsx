@@ -107,7 +107,12 @@ export default function MarketingFrame({
 
           <nav className="mk-nav">
             {NAV_ITEMS.map((item) => (
-              <Link key={item.key} to={item.to} className={`mk-nav-link ${active === item.key ? 'active' : ''}`}>
+              <Link
+                key={item.key}
+                to={item.to}
+                className={`mk-nav-link ${active === item.key ? 'active' : ''}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
                 {item.label}
               </Link>
             ))}
@@ -116,8 +121,8 @@ export default function MarketingFrame({
                 Legal <ChevronDown size={14} style={{marginLeft: 4}} />
               </button>
               <div className="topbar-dropdown-menu">
-                <Link to="/privacy" className="topbar-dropdown-item"><Shield size={16} /> Privacy Policy</Link>
-                <Link to="/terms" className="topbar-dropdown-item"><FileText size={16} /> Terms of Service</Link>
+                <Link to="/privacy" className="topbar-dropdown-item" onClick={() => setMobileMenuOpen(false)}><Shield size={16} /> Privacy Policy</Link>
+                <Link to="/terms" className="topbar-dropdown-item" onClick={() => setMobileMenuOpen(false)}><FileText size={16} /> Terms of Service</Link>
               </div>
             </div>
             <a
@@ -125,6 +130,7 @@ export default function MarketingFrame({
               target="_blank"
               rel="noopener noreferrer"
               className={`mk-nav-link ${active === 'support' ? 'active' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
             >
               Support
               <ExternalLink size={14} />
@@ -145,11 +151,37 @@ export default function MarketingFrame({
           )}
         </section>
 
-          <div className="mk-body">
-            <div key={location.pathname} className="page-transition">
-              {children}
-            </div>
+        <div className="mk-body">
+          <div key={location.pathname} className="page-transition">
+            {children}
           </div>
+        </div>
+
+        {/* Global Footer */}
+        <footer style={{
+          marginTop: 60,
+          paddingTop: 30,
+          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 16,
+          color: 'var(--text-muted)',
+          fontSize: 12
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img src="/ticket-logo.png" alt="SyncInk" style={{ width: 22, height: 22, borderRadius: 6 }} />
+            <span>&copy; {new Date().getFullYear()} SyncInk Ticket. All rights reserved.</span>
+          </div>
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+            <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</Link>
+            <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms of Service</Link>
+            <Link to="/status" style={{ color: 'inherit', textDecoration: 'none' }}>System Status</Link>
+            <Link to="/faq" style={{ color: 'inherit', textDecoration: 'none' }}>FAQ</Link>
+            <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>Discord Support</a>
+          </div>
+        </footer>
       </div>
     </div>
   );

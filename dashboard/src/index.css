@@ -1,34 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
   color-scheme: dark;
-  --bg: #070912;
-  --bg-elevated: #0d1120;
-  --bg-panel: rgba(14, 18, 34, 0.84);
-  --bg-panel-strong: #12182b;
-  --bg-soft: #161d34;
-  --bg-hover: rgba(165, 136, 255, 0.12);
-  --text: #f7f9ff;
-  --text-soft: #bac3df;
-  --text-muted: #7f89aa;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(165, 136, 255, 0.24);
-  --accent: #a588ff;
-  --accent-strong: #8e6fff;
-  --accent-2: #69c3ff;
+  --bg: #000000;
+  --bg-elevated: #050507;
+  --bg-panel: rgba(10, 10, 14, 0.78);
+  --bg-panel-strong: #0d0d12;
+  --bg-soft: #121218;
+  --bg-hover: rgba(139, 76, 255, 0.14);
+  --text: #f4f4f8;
+  --text-soft: #a1a1b3;
+  --text-muted: #6e6e82;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(139, 76, 255, 0.28);
+  --accent: #8b4cff;
+  --accent-strong: #6c2bd9;
+  --accent-2: #5b21b6;
   --success: #71f2b0;
   --warning: #ffc271;
   --danger: #ff8da7;
   --shadow-lg: 0 32px 120px rgba(0, 0, 0, 0.42);
   --shadow-md: 0 18px 50px rgba(0, 0, 0, 0.28);
-  --radius-xl: 28px;
-  --radius-lg: 22px;
-  --radius-md: 18px;
-  --radius-sm: 14px;
+  --radius-xl: 22px;
+  --radius-lg: 16px;
+  --radius-md: 13px;
+  --radius-sm: 10px;
   --transition: 180ms ease;
   --surface: rgba(14, 18, 34, 0.88);
-  --accent-rgb: 165 136 255;
-  --accent-ring: rgb(165 136 255 / 0.2);
+  --accent-rgb: 139 76 255;
+  --accent-ring: rgb(139 76 255 / 0.22);
   --liquid-blur: 28px;
   --liquid-panel-blur: 22px;
   --liquid-topbar-opacity: 0.72;
@@ -52,7 +52,7 @@ body,
 
 body {
   margin: 0;
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   color: var(--text);
   background:
     radial-gradient(circle at 10% 10%, rgba(165, 136, 255, 0.18), transparent 28%),
@@ -205,7 +205,7 @@ img {
 .auth-column h2,
 .server-header h1,
 .invite-hero h1 {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Outfit', sans-serif;
 }
 
 .brand-row strong {
@@ -760,7 +760,7 @@ img {
 .page-header h1 {
   margin: 0 0 10px;
   font-size: clamp(2rem, 3vw, 2.8rem);
-  letter-spacing: -0.04em;
+  letter-spacing: -0.025em;
 }
 
 .page-header p {
@@ -2004,7 +2004,7 @@ img {
 .login-header h1 {
   margin: 18px 0 10px;
   font-size: 28px;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.025em;
 }
 
 .login-header p {
@@ -2984,7 +2984,7 @@ canvas {
   margin: 0 0 6px 0;
   font-size: 18px;
   color: var(--text);
-  font-family: 'Sora', sans-serif;
+  font-family: 'Outfit', sans-serif;
 }
 
 .legal-text p {
@@ -3109,7 +3109,7 @@ canvas {
 .legal-document h2 {
   color: #fff;
   margin-top: 24px;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Outfit', sans-serif;
 }
 .legal-document h2:first-child {
   margin-top: 0;
@@ -3145,7 +3145,7 @@ canvas {
   text-align: left;
   font-size: 16px;
   font-weight: 600;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Outfit', sans-serif;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -3171,7 +3171,7 @@ canvas {
 .support-embed h3 {
   margin: 0;
   color: #fff;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Outfit', sans-serif;
   font-size: 18px;
 }
 .support-embed p {
@@ -3562,5 +3562,214 @@ canvas {
   100% {
     transform: translate(-50%, -50%) scale(3.5);
     opacity: 0;
+  }
+}
+
+
+/* ========================================================
+   COMPREHENSIVE MOBILE & RESPONSIVENESS SUITE
+   Ensures 100% compact mobile experience with zero bugs
+   ======================================================== */
+
+@media (max-width: 1040px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  .dashboard-shell {
+    grid-template-columns: 1fr !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .dashboard-shell::before,
+  .dashboard-shell::after {
+    display: none !important;
+  }
+
+  .content-shell {
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    padding: 12px 14px 40px !important;
+    overflow-x: hidden !important;
+  }
+
+  .mobile-header {
+    margin-bottom: 16px !important;
+    padding: 10px 14px !important;
+    border-radius: 20px !important;
+    background: rgba(8, 8, 12, 0.88) !important;
+    border: 1px solid rgba(139, 76, 255, 0.2) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(139, 76, 255, 0.12) !important;
+  }
+
+  .sidebar {
+    width: min(300px, 84vw) !important;
+    box-shadow: 20px 0 60px rgba(0, 0, 0, 0.8) !important;
+    background: #08080c !important;
+  }
+
+  /* Grid adaptations on mobile */
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .split-grid,
+  .mini-grid,
+  .card-grid,
+  .form-grid,
+  .settings-grid,
+  .two-col-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* Ensure cards & panels fit perfectly */
+  .section-card,
+  .metric-card,
+  .panel-card,
+  .preview-card,
+  .table-card {
+    border-radius: 18px !important;
+    padding: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .metric-card {
+    padding: 14px !important;
+  }
+
+  .metric-value {
+    font-size: 24px !important;
+  }
+
+  .metric-label {
+    font-size: 11px !important;
+  }
+
+  /* Forms & inputs touch-friendly */
+  input, select, textarea, button {
+    font-size: 13px !important;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="search"],
+  select,
+  textarea {
+    min-height: 42px !important;
+    border-radius: 12px !important;
+    padding: 8px 12px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  /* Buttons on mobile */
+  .action-button,
+  .btn,
+  button.tone-primary,
+  button.tone-secondary {
+    min-height: 40px !important;
+    padding: 8px 14px !important;
+    font-size: 12.5px !important;
+    border-radius: 12px !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Tables horizontal scroll wrapper */
+  .table-wrap,
+  .table-responsive,
+  .data-table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 14px !important;
+    display: block !important;
+  }
+
+  table {
+    min-width: 540px !important;
+    font-size: 12px !important;
+  }
+
+  /* Headings on mobile */
+  .page-header h1 {
+    font-size: 22px !important;
+    line-height: 1.2 !important;
+  }
+
+  .page-header p {
+    font-size: 12.5px !important;
+  }
+
+  .section-head h2 {
+    font-size: 16px !important;
+  }
+
+  /* Modals on mobile */
+  .dialog-card,
+  .modal-card,
+  .unsaved-modal-content {
+    width: calc(100vw - 28px) !important;
+    max-width: 480px !important;
+    margin: 14px auto !important;
+    border-radius: 20px !important;
+    padding: 18px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Dropdown on mobile */
+  .server-dropdown {
+    width: 100% !important;
+    max-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+
+  /* Announcement bar */
+  .announcement-bar {
+    padding: 10px 14px !important;
+    font-size: 12px !important;
+    border-radius: 14px !important;
+  }
+
+  /* Discord Live preview on mobile */
+  .discord-preview-shell {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .metric-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .page-header-action {
+    width: 100% !important;
+  }
+
+  .page-header-action button,
+  .page-header-action .action-button {
+    width: 100% !important;
+    justify-content: center !important;
   }
 }
