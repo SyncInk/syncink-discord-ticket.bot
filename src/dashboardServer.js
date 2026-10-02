@@ -252,7 +252,7 @@ function computeStats(tickets, activities) {
 }
 
 function ensureAuthenticated(req, res, next) {
-    if (!req.session.user) {
+    if (!req.session || !req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
     return next();
@@ -470,6 +470,35 @@ async function initDashboard(client) {
     app.use(cors(corsOptions));
     app.use(express.json({ limit: '1mb' }));
     app.use(sessionMiddleware);
+    // Token authorization header middleware (for cross-domain / third-party cookie blocked environments)
+    app.use((req, res, next) => {
+        const authHeader = req.headers['authorization'] || req.headers['x-session-id'] || req.headers['x-token'];
+        const bearerToken = authHeader?.startsWith?.('Bearer ') ? authHeader.slice(7).trim() : authHeader;
+        let sessionId = bearerToken || req.query.token || req.query.session_id;
+
+        if (typeof sessionId === 'string') {
+            sessionId = sessionId.trim().replace(/^["']|["']$/g, '');
+            if (sessionId.startsWith('s:')) {
+                sessionId = sessionId.slice(2).split('.')[0];
+            }
+        }
+
+        if ((!req.session || !req.session.user) && sessionId && req.sessionStore) {
+            req.sessionStore.get(sessionId, (err, sess) => {
+                if (sess) {
+                    if (typeof req.sessionStore.createSession === 'function') {
+                        req.sessionStore.createSession(req, sess);
+                    } else {
+                        req.session = Object.assign(req.session || {}, sess);
+                    }
+                    req.sessionID = sessionId;
+                }
+                next();
+            });
+        } else {
+            next();
+        }
+    });
     app.use((req, res, next) => {
         const origin = req.headers.origin || req.headers.referer;
         if (origin) {
@@ -613,6 +642,19 @@ async function initDashboard(client) {
                 if (!target || target.includes('railway.app') || target.endsWith('/login') || target.endsWith('/servers')) {
                     target = frontendBase || 'https://www.syncink.site/dashboard/tickets';
                 }
+
+                // If redirecting to an external frontend (like syncink.site), pass session token so client can store it
+                try {
+                    const parsedUrl = new URL(target, 'https://www.syncink.site');
+                    if (req.sessionID) {
+                        parsedUrl.searchParams.set('token', req.sessionID);
+                    }
+                    target = parsedUrl.toString();
+                } catch (e) {
+                    if (req.sessionID) {
+                        target += (target.includes('?') ? '&' : '?') + 'token=' + req.sessionID;
+                    }
+                }
                 return res.redirect(target);
             });
         } catch (error) {
@@ -651,12 +693,13 @@ async function initDashboard(client) {
     });
 
     app.get('/api/auth/logout', (req, res) => {
-        let frontendBase = (req.query.redirect || req.session?.returnTo || process.env.FRONTEND_URL || global.frontendUrl || 'https://syncink-discord-ticket-bot.vercel.app').replace(/\/+$/, '');
-        if (frontendBase.includes('railway.app')) {
-            frontendBase = 'https://syncink-discord-ticket-bot.vercel.app';
+        let frontendBase = (req.query.redirect || req.session?.returnTo || process.env.FRONTEND_URL || global.frontendUrl || 'https://www.syncink.site/dashboard/tickets').replace(/\/+$/, '');
+        if (frontendBase.includes('railway.app') || frontendBase.includes('syncink-discord-ticket-bot.vercel.app')) {
+            frontendBase = 'https://www.syncink.site/dashboard/tickets';
         }
         req.session.destroy(() => {
-            res.redirect(frontendBase ? `${frontendBase}/login` : '/login');
+            const redirectUrl = frontendBase ? frontendBase : '/dashboard/tickets';
+            res.redirect(redirectUrl);
         });
     });
 
@@ -907,7 +950,7 @@ async function initDashboard(client) {
         return (TIER_LEVELS[userTier] || 0) >= TIER_LEVELS[requiredTier];
     }
 
-    app.patch('/api/guilds/:guildId/settings', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
+    const handleUpdateSettings = async (req, res) => {
         try {
             const userTier = req.allowedGuild.dashboardTier;
             
@@ -970,9 +1013,11 @@ async function initDashboard(client) {
             console.error('[DASHBOARD] Failed to update settings:', error);
             res.status(500).json({ error: 'Failed to save settings.' });
         }
-    });
+    };
+    app.patch('/api/guilds/:guildId/settings', ensureAuthenticated, ensureGuildAccess(client), handleUpdateSettings);
+    app.post('/api/guilds/:guildId/settings', ensureAuthenticated, ensureGuildAccess(client), handleUpdateSettings);
 
-    app.post('/api/guilds/:guildId/panel/deploy', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
+    const handleDeployPanel = async (req, res) => {
         try {
             const userTier = req.allowedGuild.dashboardTier;
             if (!hasPermission(userTier, 'admin')) {
@@ -985,6 +1030,12 @@ async function initDashboard(client) {
 
             if (!targetChannel || targetChannel.type !== ChannelType.GuildText) {
                 return res.status(400).json({ error: 'Choose a standard text channel for the ticket panel.' });
+            }
+
+            if (req.body?.panelConfig) {
+                await db.updateGuildConfig(req.params.guildId, {
+                    panelConfig: req.body.panelConfig
+                });
             }
 
             const previousConfig = await db.getGuildConfig(req.params.guildId);
@@ -1024,7 +1075,9 @@ async function initDashboard(client) {
             console.error('[DASHBOARD] Failed to deploy panel:', error);
             res.status(500).json({ error: 'Failed to deploy the ticket panel.' });
         }
-    });
+    };
+    app.post('/api/guilds/:guildId/panel/deploy', ensureAuthenticated, ensureGuildAccess(client), handleDeployPanel);
+    app.post('/api/guilds/:guildId/deploy-panel', ensureAuthenticated, ensureGuildAccess(client), handleDeployPanel);
 
     app.get('/api/guilds/:guildId/tickets/:ticketId/transcript', async (req, res) => {
         try {
