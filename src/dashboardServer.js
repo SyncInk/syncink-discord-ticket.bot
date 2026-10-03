@@ -1165,13 +1165,9 @@ async function initDashboard(client) {
         }
     });
 
-    app.use(express.static(path.join(__dirname, '../dashboard/dist')));
+    // Redirect all non-API web traffic directly to the main Vercel website
     app.use((req, res) => {
-        try {
-            res.sendFile(path.join(__dirname, '../dashboard/dist/index.html'));
-        } catch (error) {
-            res.status(500).send('Dashboard is still building or failed to compile. Check build logs.');
-        }
+        res.redirect(302, 'https://www.syncink.site/dashboard/tickets');
     });
 
     const PORT = process.env.PORT || 3000;

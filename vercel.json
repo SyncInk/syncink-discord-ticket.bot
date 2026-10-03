@@ -2,14 +2,11 @@
   "buildCommand": "cd dashboard && npm install && npm run build",
   "outputDirectory": "dashboard/dist",
   "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://syncink-ticket.onrender.com/api/$1"
-    },
+  "redirects": [
     {
       "source": "/(.*)",
-      "destination": "/"
+      "destination": "https://www.syncink.site/dashboard/tickets",
+      "permanent": false
     }
   ],
   "headers": [
