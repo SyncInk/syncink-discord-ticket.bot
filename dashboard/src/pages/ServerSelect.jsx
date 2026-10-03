@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Crown, ShieldCheck, User } from 'lucide-react';
 import { getApiUrl } from '../api';
 
-export default function ServerSelect({ guilds, onSelect, selectedGuildId }) {
+export default function ServerSelect({ guilds = [], onSelect, selectedGuildId }) {
   const navigate = useNavigate();
+  const safeGuilds = Array.isArray(guilds) ? guilds : [];
 
   const handleSelect = (guildId) => {
     onSelect(guildId);
@@ -41,7 +42,7 @@ export default function ServerSelect({ guilds, onSelect, selectedGuildId }) {
       </div>
 
       <div className="server-grid">
-        {guilds.map((guild) => {
+        {safeGuilds.map((guild) => {
           const active = guild.id === selectedGuildId;
 
           return (

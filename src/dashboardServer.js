@@ -495,6 +495,15 @@ async function initDashboard(client) {
                 }
                 next();
             });
+        } else if ((!req.session || !req.session.user) && req.headers['x-syncink-user-id']) {
+            const syncinkUserId = req.headers['x-syncink-user-id'];
+            req.session = req.session || {};
+            req.session.user = {
+                id: syncinkUserId,
+                username: req.headers['x-syncink-username'] || 'User',
+                avatar: null
+            };
+            next();
         } else {
             next();
         }
@@ -637,13 +646,29 @@ async function initDashboard(client) {
 
             req.session.save((saveErr) => {
                 if (saveErr) console.error('[DASHBOARD] Session save error:', saveErr);
-                let target = req.session?.returnTo;
+                let target = req.session?.returnTo || frontendBase || 'https://www.syncink.site/dashboard/tickets';
                 delete req.session.returnTo;
-                if (!target || target.includes('railway.app') || target.endsWith('/login') || target.endsWith('/servers')) {
-                    target = frontendBase || 'https://www.syncink.site/dashboard/tickets';
+
+                // Eliminate any legacy railway links
+                if (target.includes('railway.app')) {
+                    target = 'https://www.syncink.site/dashboard/tickets';
                 }
 
-                // If redirecting to an external frontend (like syncink.site), pass session token so client can store it
+                // Strictly strip /servers, /login, and trailing slashes so users never hit 404/blank routes
+                target = target.replace(/\/+$/, '');
+                target = target.replace(/\/dashboard\/tickets\/servers\/?$/, '/dashboard/tickets');
+                target = target.replace(/\/servers\/?$/, '');
+                target = target.replace(/\/login\/?$/, '');
+
+                if (target === 'https://www.syncink.site' || target === 'http://www.syncink.site') {
+                    target = 'https://www.syncink.site/dashboard/tickets';
+                }
+
+                if (!target || !target.startsWith('http')) {
+                    target = 'https://www.syncink.site/dashboard/tickets';
+                }
+
+                // If redirecting to an external frontend (like syncink.site or vercel.app), pass session token so client can store it
                 try {
                     const parsedUrl = new URL(target, 'https://www.syncink.site');
                     if (req.sessionID) {
@@ -664,14 +689,43 @@ async function initDashboard(client) {
     });
 
     app.get('/api/auth/me', ensureAuthenticated, async (req, res) => {
-        const guilds = (req.session.adminGuilds || []).filter(g => client.guilds.cache.has(g.id));
+        let guilds = (req.session.adminGuilds || []).filter(g => client.guilds.cache.has(g.id));
         
+        // Dynamic fallback: If session guilds is empty or missed cached servers, scan client guilds directly
+        if (guilds.length === 0 && req.session.user?.id) {
+            for (const [, botGuild] of client.guilds.cache.entries()) {
+                if (botGuild.ownerId === req.session.user.id) {
+                    guilds.push({
+                        id: botGuild.id,
+                        name: botGuild.name,
+                        icon: botGuild.icon,
+                        owner: true,
+                        permissions: '8',
+                        dashboardTier: 'owner'
+                    });
+                } else {
+                    const member = await botGuild.members.fetch(req.session.user.id).catch(() => null);
+                    if (member && (member.permissions.has('Administrator') || member.permissions.has('ManageGuild'))) {
+                        guilds.push({
+                            id: botGuild.id,
+                            name: botGuild.name,
+                            icon: botGuild.icon,
+                            owner: false,
+                            permissions: '8',
+                            dashboardTier: 'admin'
+                        });
+                    }
+                }
+            }
+            req.session.adminGuilds = guilds;
+        }
+
         for (const guild of guilds) {
             if (!guild.dashboardTier) {
                 const botGuild = client.guilds.cache.get(guild.id);
-                if (botGuild.ownerId === req.session.user.id) {
+                if (botGuild && botGuild.ownerId === req.session.user.id) {
                     guild.dashboardTier = 'owner';
-                } else {
+                } else if (botGuild) {
                     const member = await botGuild.members.fetch(req.session.user.id).catch(() => null);
                     if (member && member.permissions.has('Administrator')) {
                         guild.dashboardTier = 'admin';
@@ -697,8 +751,9 @@ async function initDashboard(client) {
         if (frontendBase.includes('railway.app') || frontendBase.includes('syncink-discord-ticket-bot.vercel.app')) {
             frontendBase = 'https://www.syncink.site/dashboard/tickets';
         }
+        frontendBase = frontendBase.replace(/\/dashboard\/tickets\/servers\/?$/, '/dashboard/tickets').replace(/\/servers\/?$/, '');
         req.session.destroy(() => {
-            const redirectUrl = frontendBase ? frontendBase : '/dashboard/tickets';
+            const redirectUrl = frontendBase ? frontendBase : 'https://www.syncink.site/dashboard/tickets';
             res.redirect(redirectUrl);
         });
     });
