@@ -1134,10 +1134,14 @@ async function initDashboard(client) {
     app.post('/api/guilds/:guildId/panel/deploy', ensureAuthenticated, ensureGuildAccess(client), handleDeployPanel);
     app.post('/api/guilds/:guildId/deploy-panel', ensureAuthenticated, ensureGuildAccess(client), handleDeployPanel);
 
-    app.get('/api/guilds/:guildId/tickets/:ticketId/transcript', async (req, res) => {
+    const fetchTranscriptHandler = async (req, res) => {
         try {
             const Ticket = db.getMongoModel();
-            const ticket = await Ticket.findOne({ ticketId: req.params.ticketId, guildId: req.params.guildId });
+            const query = { ticketId: req.params.ticketId };
+            if (req.params.guildId) {
+                query.guildId = req.params.guildId;
+            }
+            const ticket = await Ticket.findOne(query);
             if (!ticket) {
                 return res.status(404).json({ error: 'Ticket not found' });
             }
@@ -1187,7 +1191,11 @@ async function initDashboard(client) {
             console.error('[DASHBOARD] Failed to fetch transcript:', error);
             res.status(500).json({ error: 'Failed to fetch transcript.' });
         }
-    });
+    };
+
+    app.get('/api/guilds/:guildId/tickets/:ticketId/transcript', fetchTranscriptHandler);
+    app.get('/api/tickets/:ticketId/transcript', fetchTranscriptHandler);
+    app.get('/api/transcripts/:ticketId', fetchTranscriptHandler);
 
     app.post('/api/guilds/:guildId/nickname', ensureAuthenticated, ensureGuildAccess(client), async (req, res) => {
         try {
