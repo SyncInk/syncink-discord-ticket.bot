@@ -84,14 +84,15 @@ function summarizeUser(client, guild, userId) {
         return null;
     }
 
-    const member = guild.members.cache.get(userId);
+    const member = guild?.members?.cache?.get(userId);
     const user = member?.user || client.users.cache.get(userId);
 
     if (!user) {
         return {
             id: userId,
-            displayName: `Unknown User (${userId})`,
-            avatarUrl: null
+            displayName: `User (${userId.slice(-4)})`,
+            username: `User-${userId.slice(-4)}`,
+            avatarUrl: 'https://cdn.discordapp.com/embed/avatars/0.png'
         };
     }
 
@@ -129,7 +130,7 @@ function mapTicketRecord(ticket, client, guild, guildConfig) {
         closedAt: ticket.closedAt || null,
         lastActivityAt: ticket.lastActivityAt || ticket.createdAt,
         transcriptMessageUrl: ticket.transcriptMessageUrl || null,
-        transcriptAvailable: Boolean(ticket.transcriptMessageUrl),
+        transcriptAvailable: Boolean(ticket.transcriptMessageUrl || (ticket.messages && ticket.messages.length > 0) || ticket.status === 'closed' || ticket.ticketId),
         transferHistory: Array.isArray(ticket.transferHistory) ? ticket.transferHistory : []
     };
 }
@@ -1137,20 +1138,70 @@ async function initDashboard(client) {
     const fetchTranscriptHandler = async (req, res) => {
         try {
             const Ticket = db.getMongoModel();
-            const query = { ticketId: req.params.ticketId };
+            let ticket = null;
             if (req.params.guildId) {
-                query.guildId = req.params.guildId;
+                ticket = await Ticket.findOne({
+                    ticketId: req.params.ticketId,
+                    $or: [{ guildId: req.params.guildId }, { guildId: null }]
+                });
             }
-            const ticket = await Ticket.findOne(query);
+            if (!ticket) {
+                ticket = await Ticket.findOne({ ticketId: req.params.ticketId });
+            }
             if (!ticket) {
                 return res.status(404).json({ error: 'Ticket not found' });
             }
 
-            if ((!ticket.messages || ticket.messages.length === 0) && ticket.transcriptMessageUrl) {
-                const parts = ticket.transcriptMessageUrl.split('/');
+            const ticketObj = typeof ticket.toObject === 'function' ? ticket.toObject() : JSON.parse(JSON.stringify(ticket));
+            const guildId = ticketObj.guildId || req.params.guildId;
+            const guild = guildId ? client.guilds.cache.get(guildId) : null;
+            let guildConfig = null;
+            if (guildId) {
+                guildConfig = await db.getGuildConfig(guildId).catch(() => null);
+            }
+
+            ticketObj.creator = summarizeUser(client, guild, ticketObj.creatorId);
+            ticketObj.claimer = summarizeUser(client, guild, ticketObj.claimerId);
+            if (guildConfig && ticketObj.type) {
+                const cat = guildConfig.ticketOptions?.find((option) => option.value === ticketObj.type);
+                if (cat) {
+                    ticketObj.category = {
+                        value: cat.value,
+                        label: cat.label,
+                        emoji: cat.emoji
+                    };
+                }
+            }
+            if (!ticketObj.category) {
+                ticketObj.category = {
+                    value: ticketObj.type || 'support',
+                    label: (ticketObj.type || 'Support').replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+                };
+            }
+
+            // If ticket has stored messages, ensure user avatars are present
+            if (Array.isArray(ticketObj.messages) && ticketObj.messages.length > 0) {
+                for (const msg of ticketObj.messages) {
+                    if (!msg.authorAvatar && msg.authorId) {
+                        const user = client.users.cache.get(msg.authorId);
+                        if (user) {
+                            msg.authorAvatar = user.displayAvatarURL({ size: 128 });
+                        } else {
+                            msg.authorAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                        }
+                    } else if (!msg.authorAvatar) {
+                        msg.authorAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                    }
+                }
+                return res.json(ticketObj);
+            }
+
+            // Check if discord transcript attachment is available
+            if (ticketObj.transcriptMessageUrl) {
+                const parts = ticketObj.transcriptMessageUrl.split('/');
                 const messageId = parts.pop();
                 const channelId = parts.pop();
-                
+
                 try {
                     const channel = client.channels.cache.get(channelId);
                     if (channel) {
@@ -1159,7 +1210,7 @@ async function initDashboard(client) {
                         if (attachment && attachment.url.endsWith('.txt')) {
                             const response = await axios.get(attachment.url);
                             const text = response.data;
-                            
+
                             const parsedMessages = [];
                             const lines = text.split('\n');
                             for (const line of lines) {
@@ -1169,24 +1220,64 @@ async function initDashboard(client) {
                                         authorTag: match[2],
                                         content: match[3],
                                         timestamp: new Date(match[1]).getTime() || Date.now(),
-                                        attachments: []
+                                        attachments: [],
+                                        authorAvatar: 'https://cdn.discordapp.com/embed/avatars/0.png'
                                     });
                                 } else if (parsedMessages.length > 0) {
                                     parsedMessages[parsedMessages.length - 1].content += '\n' + line;
                                 }
                             }
-                            
-                            const ticketObj = typeof ticket.toObject === 'function' ? ticket.toObject() : JSON.parse(JSON.stringify(ticket));
+
                             ticketObj.messages = parsedMessages;
                             return res.json(ticketObj);
                         }
                     }
                 } catch (err) {
-                    console.error('[DASHBOARD] Failed to parse legacy transcript:', err.message);
+                    console.error('[DASHBOARD] Failed to parse legacy transcript attachment:', err.message);
                 }
             }
 
-            res.json(ticket);
+            // If ticket channel is still active in Discord, fetch recent live messages
+            if (ticketObj.channelId) {
+                try {
+                    const liveChannel = client.channels.cache.get(ticketObj.channelId);
+                    if (liveChannel && typeof liveChannel.messages?.fetch === 'function') {
+                        const fetched = await liveChannel.messages.fetch({ limit: 100 });
+                        const liveMessages = fetched
+                            .sort((a, b) => a.createdTimestamp - b.createdTimestamp)
+                            .map((msg) => ({
+                                authorId: msg.author.id,
+                                authorTag: msg.author.tag || msg.author.username,
+                                authorAvatar: msg.author.displayAvatarURL({ size: 128 }),
+                                content: msg.cleanContent || msg.content || (msg.attachments.size ? '[Attachment]' : ''),
+                                timestamp: msg.createdTimestamp,
+                                attachments: msg.attachments.map((att) => att.url),
+                                isBot: msg.author.bot
+                            }));
+
+                        if (liveMessages.length > 0) {
+                            ticketObj.messages = liveMessages;
+                            return res.json(ticketObj);
+                        }
+                    }
+                } catch (err) {
+                    console.error('[DASHBOARD] Failed to fetch live channel messages:', err.message);
+                }
+            }
+
+            // Fallback default system transcript message
+            ticketObj.messages = [
+                {
+                    authorId: client.user.id,
+                    authorTag: client.user.username,
+                    authorAvatar: client.user.displayAvatarURL({ size: 128 }),
+                    content: `Ticket #${ticketObj.ticketId} created by ${ticketObj.creator?.displayName || 'User'}.\nCategory: ${ticketObj.category?.label || ticketObj.type}\nStatus: ${ticketObj.status || 'closed'}`,
+                    timestamp: ticketObj.createdAt || Date.now(),
+                    attachments: []
+                }
+            ];
+
+            return res.json(ticketObj);
         } catch (error) {
             console.error('[DASHBOARD] Failed to fetch transcript:', error);
             res.status(500).json({ error: 'Failed to fetch transcript.' });
