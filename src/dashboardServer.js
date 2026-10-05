@@ -1179,7 +1179,40 @@ async function initDashboard(client) {
                 };
             }
 
-            // If ticket has stored messages, ensure user avatars are present
+            // 1. If ticket channel is still active in Discord, fetch recent live messages directly
+            if (ticketObj.channelId) {
+                try {
+                    let liveChannel = client.channels.cache.get(ticketObj.channelId);
+                    if (!liveChannel && client.channels.fetch) {
+                        liveChannel = await client.channels.fetch(ticketObj.channelId).catch(() => null);
+                    }
+                    if (liveChannel && typeof liveChannel.messages?.fetch === 'function') {
+                        const fetched = await liveChannel.messages.fetch({ limit: 100 });
+                        const liveMessages = fetched
+                            .sort((a, b) => a.createdTimestamp - b.createdTimestamp)
+                            .map((msg) => ({
+                                authorId: msg.author.id,
+                                authorTag: msg.author.tag || msg.author.username,
+                                authorAvatar: msg.author.displayAvatarURL ? msg.author.displayAvatarURL({ size: 128 }) : 'https://cdn.discordapp.com/embed/avatars/0.png',
+                                content: msg.cleanContent || msg.content || (msg.attachments.size ? '[Attachment]' : ''),
+                                timestamp: msg.createdTimestamp,
+                                attachments: msg.attachments.map((att) => att.url),
+                                isBot: msg.author.bot
+                            }));
+
+                        if (liveMessages.length > 0) {
+                            ticketObj.messages = liveMessages;
+                            // Persist latest live messages to MongoDB asynchronously
+                            Ticket.updateOne({ ticketId: ticketObj.ticketId }, { $set: { messages: liveMessages } }).catch(() => {});
+                            return res.json(ticketObj);
+                        }
+                    }
+                } catch (err) {
+                    console.error('[DASHBOARD] Failed to fetch live channel messages:', err.message);
+                }
+            }
+
+            // 2. If ticket has stored messages, ensure user avatars are present
             if (Array.isArray(ticketObj.messages) && ticketObj.messages.length > 0) {
                 for (const msg of ticketObj.messages) {
                     if (!msg.authorAvatar && msg.authorId) {
@@ -1196,14 +1229,17 @@ async function initDashboard(client) {
                 return res.json(ticketObj);
             }
 
-            // Check if discord transcript attachment is available
+            // 3. Check if discord transcript attachment is available
             if (ticketObj.transcriptMessageUrl) {
                 const parts = ticketObj.transcriptMessageUrl.split('/');
                 const messageId = parts.pop();
                 const channelId = parts.pop();
 
                 try {
-                    const channel = client.channels.cache.get(channelId);
+                    let channel = client.channels.cache.get(channelId);
+                    if (!channel && client.channels.fetch) {
+                        channel = await client.channels.fetch(channelId).catch(() => null);
+                    }
                     if (channel) {
                         const msg = await channel.messages.fetch(messageId);
                         const attachment = msg.attachments.first();
@@ -1234,34 +1270,6 @@ async function initDashboard(client) {
                     }
                 } catch (err) {
                     console.error('[DASHBOARD] Failed to parse legacy transcript attachment:', err.message);
-                }
-            }
-
-            // If ticket channel is still active in Discord, fetch recent live messages
-            if (ticketObj.channelId) {
-                try {
-                    const liveChannel = client.channels.cache.get(ticketObj.channelId);
-                    if (liveChannel && typeof liveChannel.messages?.fetch === 'function') {
-                        const fetched = await liveChannel.messages.fetch({ limit: 100 });
-                        const liveMessages = fetched
-                            .sort((a, b) => a.createdTimestamp - b.createdTimestamp)
-                            .map((msg) => ({
-                                authorId: msg.author.id,
-                                authorTag: msg.author.tag || msg.author.username,
-                                authorAvatar: msg.author.displayAvatarURL({ size: 128 }),
-                                content: msg.cleanContent || msg.content || (msg.attachments.size ? '[Attachment]' : ''),
-                                timestamp: msg.createdTimestamp,
-                                attachments: msg.attachments.map((att) => att.url),
-                                isBot: msg.author.bot
-                            }));
-
-                        if (liveMessages.length > 0) {
-                            ticketObj.messages = liveMessages;
-                            return res.json(ticketObj);
-                        }
-                    }
-                } catch (err) {
-                    console.error('[DASHBOARD] Failed to fetch live channel messages:', err.message);
                 }
             }
 

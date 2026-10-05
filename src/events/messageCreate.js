@@ -23,10 +23,25 @@ module.exports = {
         const isStaff = staffRoles.some((roleId) => message.member.roles.cache.has(roleId)) ||
             message.member.permissions.has(PermissionFlagsBits.Administrator);
 
-        await db.updateTicket(message.channel.id, {
-            lastActivityAt: Date.now(),
-            activityCount: (ticket.activityCount || 0) + 1
-        });
+        const msgItem = {
+            authorId: message.author.id,
+            authorTag: message.author.tag || message.author.username,
+            authorAvatar: message.author.displayAvatarURL ? message.author.displayAvatarURL({ size: 128 }) : 'https://cdn.discordapp.com/embed/avatars/0.png',
+            content: message.cleanContent || message.content || (message.attachments.size ? '[Attachment]' : ''),
+            timestamp: message.createdTimestamp,
+            attachments: message.attachments.map((att) => att.url),
+            isBot: Boolean(message.author.bot)
+        };
+
+        const Ticket = db.getMongoModel();
+        await Ticket.updateOne(
+            { channelId: message.channel.id },
+            {
+                $push: { messages: msgItem },
+                $set: { lastActivityAt: Date.now() },
+                $inc: { activityCount: 1 }
+            }
+        ).catch(() => {});
 
         if (!isStaff) {
             return;
