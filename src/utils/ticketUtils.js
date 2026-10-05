@@ -42,10 +42,11 @@ function getFrontendUrl() {
 function buildTranscriptUrl(guildId, ticketId) {
     let base = getFrontendUrl();
     base = base.replace(/\/+$/, '');
+    const gParam = guildId ? `&guildId=${guildId}` : '';
     if (base.includes('/dashboard/tickets')) {
-        return `${base}?tab=transcripts&ticketId=${ticketId}`;
+        return `${base}?tab=transcripts&ticketId=${ticketId}${gParam}`;
     }
-    return `${base}/dashboard/tickets?tab=transcripts&ticketId=${ticketId}`;
+    return `${base}/dashboard/tickets?tab=transcripts&ticketId=${ticketId}${gParam}`;
 }
 
 async function handleSelectMenu(interaction, client) {

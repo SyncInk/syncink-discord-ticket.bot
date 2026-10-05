@@ -1319,6 +1319,11 @@ async function initDashboard(client) {
         }
     });
 
+    // For unmatched API routes, return 404 JSON, NEVER redirect to HTML website!
+    app.all('/api/*', (req, res) => {
+        res.status(404).json({ error: 'API endpoint not found' });
+    });
+
     // Redirect all non-API web traffic directly to the main Vercel website
     app.use((req, res) => {
         res.redirect(302, 'https://www.syncink.site/dashboard/tickets');
